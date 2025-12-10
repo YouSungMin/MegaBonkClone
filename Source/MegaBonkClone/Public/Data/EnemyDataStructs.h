@@ -58,14 +58,14 @@ public:
 	// -- 리소스 --
 
 	// Mesh
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Visual")
-	int32 DropExp;
-	
-	// 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Visual")
-	int32 DropExp;
-
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Visual")
+	//int32 DropExp;
 	//
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Visual")
-	int32 DropExp;
+	//// 
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Visual")
+	//int32 DropExp;
+
+	////
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Visual")
+	//int32 DropExp;
 };
