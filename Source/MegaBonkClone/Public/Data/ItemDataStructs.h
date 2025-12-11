@@ -33,11 +33,9 @@ UENUM(BlueprintType)
 enum class EItemStatType : uint8
 {
 	None			UMETA(DisplayName = "없음"),
-	AttackPower		UMETA(DisplayName = "공격력"),
-	AttackSpeed		UMETA(DisplayName = "공격속도"),
 	Damage			UMETA(DisplayName = "데미지"),
+	AttackSpeed		UMETA(DisplayName = "공격속도"),
 	Luck			UMETA(DisplayName = "행운"),
-	CriticalChance	UMETA(DisplayName = "크리티컬 확률"),
 	GoldGain		UMETA(DisplayName = "골드 획득량"),
 	HPRegen			UMETA(DisplayName = "체력 재생"),
 	MaxHP			UMETA(DisplayName = "최대 체력"),
@@ -65,10 +63,10 @@ enum class EProcEffectType : uint8
 	CampFire		UMETA(DisplayName = "캠프 파이어(소환,HP 회복)"),
 	Kebin			UMETA(DisplayName = "케빈(피해 무효)"),
 	MoldyGloves		UMETA(DisplayName = "곰팡이 장갑(독구름 생성)"),
-	ThunderGloves	UMETA(DisplayName = "천둥 장갑(번개 생성)"),
+	ThunderMitts	UMETA(DisplayName = "천둥 장갑(번개 생성)"),
 	Bob				UMETA(DisplayName = "밥 소환(소환)"),
-	LooseCannon		UMETA(DisplayName = "루즈 캐논(미사일 발사)"),
-	PoisonBarrel	UMETA(DisplayName = "독 배럴(피격시 독구름 생성)"),
+	SlutyCannon		UMETA(DisplayName = "루즈 캐논(미사일 발사)"),
+	ToxicBarrel		UMETA(DisplayName = "독 배럴(피격시 독구름 생성)"),
 };
 // 스탯 변경 정보 하나를 담는 구조체
 USTRUCT(BlueprintType)
@@ -133,7 +131,7 @@ public:
 	EProcEffectType ProcType = EProcEffectType::None;
 
 	// 발동 확률 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Proc", meta = (DisplayName = "특수 효과 발동 확률"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Proc", meta = (DisplayName = "특수 효과 발동 확률", ClampMin = 0, ClampMax = 1))
 	float ProcChance = 0.0f;
 
 	// 발동 시 위력
