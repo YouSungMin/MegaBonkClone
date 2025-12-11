@@ -108,7 +108,7 @@ void UStatusComponent::UpdateCharacterStatus()
 
         // [점프력]
         // n: 캐릭터 기본 점프력 (예: 420)
-        float BaseJumpZ = 420.0f;
+        float BaseJumpZ = 350.0f;
 
         // JumpPower가 % 증가량이라고 가정
         float FinalJumpPower = BaseJumpZ * (1.0f + (0.01f * JumpPower));

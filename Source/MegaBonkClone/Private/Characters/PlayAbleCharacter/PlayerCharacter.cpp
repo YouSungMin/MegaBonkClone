@@ -6,6 +6,7 @@
 #include "EnhancedInputComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Characters/Components/StatusComponent.h"
+#include "Characters/Components/WeaponSystemComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "InputActionValue.h"
@@ -31,6 +32,7 @@ void APlayerCharacter::InitializeCharacterComponents()
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SpringArm);
 	StatusComponent = CreateDefaultSubobject<UStatusComponent>(TEXT("Status"));
+	WeaponComponent = CreateDefaultSubobject<UWeaponSystemComponent>(TEXT("WeaponSystem"));
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -70.0f), FRotator(0.0f, -90.0f, 0.0f));
 
 	//컴포넌트 세부 수치 설정
@@ -87,7 +89,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	if (enhanced) {
 		enhanced->BindAction(IA_Move, ETriggerEvent::Triggered, this, &APlayerCharacter::OnMoveInput);
 
-		enhanced->BindAction(IA_Jump, ETriggerEvent::Triggered, this, &APlayerCharacter::OnJumpInput);
+		enhanced->BindAction(IA_Jump, ETriggerEvent::Started, this, &APlayerCharacter::OnJumpInput);
 
 	}
 

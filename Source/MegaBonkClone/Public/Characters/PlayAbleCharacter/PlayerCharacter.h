@@ -73,8 +73,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player|Input")
 	TObjectPtr<class UInputAction> IA_Jump = nullptr;
 
-	
-
 
 	//컴포넌트들 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player|Components")
@@ -85,6 +83,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player|Components")
 	TObjectPtr<class UStatusComponent> StatusComponent = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player|Components")
+	TObjectPtr<class UWeaponSystemComponent> WeaponComponent = nullptr;
 
 
 private:
