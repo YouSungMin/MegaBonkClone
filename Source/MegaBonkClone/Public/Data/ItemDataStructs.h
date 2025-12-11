@@ -63,10 +63,10 @@ enum class EProcEffectType : uint8
 	CampFire		UMETA(DisplayName = "캠프 파이어(소환,HP 회복)"),
 	Kebin			UMETA(DisplayName = "케빈(피해 무효)"),
 	MoldyGloves		UMETA(DisplayName = "곰팡이 장갑(독구름 생성)"),
-	ThunderGloves	UMETA(DisplayName = "천둥 장갑(번개 생성)"),
+	ThunderMitts	UMETA(DisplayName = "천둥 장갑(번개 생성)"),
 	Bob				UMETA(DisplayName = "밥 소환(소환)"),
-	LooseCannon		UMETA(DisplayName = "루즈 캐논(미사일 발사)"),
-	PoisonBarrel	UMETA(DisplayName = "독 배럴(피격시 독구름 생성)"),
+	SlutyCannon		UMETA(DisplayName = "루즈 캐논(미사일 발사)"),
+	ToxicBarrel		UMETA(DisplayName = "독 배럴(피격시 독구름 생성)"),
 };
 // 스탯 변경 정보 하나를 담는 구조체
 USTRUCT(BlueprintType)
