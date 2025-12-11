@@ -33,15 +33,15 @@ public:
 	// ============================================================
 
 	// 아이템 이름
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Info", meta = (DisplayName = "아이템 이름"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Info", meta = (DisplayName = "아이템 이름"))
 	FText Name;
 
 	// 아이템 설명
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Info", meta = (DisplayName = "아이템 설명", MultiLine = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Info", meta = (DisplayName = "아이템 설명", MultiLine = "true"))
 	FText Description;
 
 	// 아이템 등급
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Info", meta = (DisplayName = "등급"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Info", meta = (DisplayName = "등급"))
 	EItemGrade Grade = EItemGrade::Common;
 
 	// =========================================================
