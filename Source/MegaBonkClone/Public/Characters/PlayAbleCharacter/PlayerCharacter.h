@@ -15,15 +15,26 @@ public:
 	// Sets default values for this character's properties
 	APlayerCharacter();
 
+	// Called to bind functionality to input
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+private:
 
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+public:
+
+protected:
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player|Components")
+	TObjectPtr<class USpringArmComponent> SpringArm = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player|Components")
+	TObjectPtr<class UCameraComponent> Camera = nullptr;
+
+
+private:
+
 
 };
