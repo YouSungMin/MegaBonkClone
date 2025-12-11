@@ -32,13 +32,38 @@ public:
 	// [전투 스탯]
 	// =========================================================
 
-	// 기본 공격력
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (DisplayName = "공격력", ClampMin = "0"))
-	float AttackPower = 10.0f;
+	// 기본 데미지
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (DisplayName = "데미지", ClampMin = "0"))
+	float Damage = 10.0f;
 
-	// 기본 공격 속도
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (DisplayName = "공격 속도", ClampMin = "0"))
-	float AttackSpeed = 1.0f;
+	// 기본 발사체 수
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (DisplayName = "발사체 수", ClampMin = "0"))
+	int32 ProjectileCount = 1;
+
+	// 기본 발사체 속도
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (DisplayName = "발사체 속도", ClampMin = "0"))
+	float ProjectileSpeed = 1.0f;
+
+	// 기본 발사체 크기
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (DisplayName = "발사체 크기", ClampMin = "0"))
+	float ProjectileScale = 0.0f;
+
+	// 기본 발사체 반사
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (DisplayName = "발사체 반사", ClampMin = "0"))
+	float ChainCount = 0.0f;
+
+	// 치명타 확률
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (DisplayName = "치명타 확률", ClampMin = "0"))
+	int32 CriticalChance = 0;
+
+	// 치명타 데미지
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (DisplayName = "치명타 데미지", ClampMin = "0"))
+	float CriticalDamage = 0.0f;
+
+	// 기본 넉백
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (DisplayName = "넉백", ClampMin = "0"))
+	float KnockBack = 0.0f;
+
 
 	// =========================================================
 	// [리소스]

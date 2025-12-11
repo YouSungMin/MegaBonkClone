@@ -70,7 +70,7 @@ public:
 
 	// AnimInstancee 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Visual", meta = (DisplayName = "몬스터 AnimClass"))
-	TSoftObjectPtr<USkeletalMesh> AnimClass;
+	TSoftObjectPtr<UAnimInstance> AnimClass;
 
 	// AI Controller
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Visual", meta = (DisplayName = "몬스터 ControllerClass"))
