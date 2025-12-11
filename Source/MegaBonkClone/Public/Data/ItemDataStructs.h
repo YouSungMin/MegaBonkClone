@@ -33,11 +33,9 @@ UENUM(BlueprintType)
 enum class EItemStatType : uint8
 {
 	None			UMETA(DisplayName = "없음"),
-	AttackPower		UMETA(DisplayName = "공격력"),
-	AttackSpeed		UMETA(DisplayName = "공격속도"),
 	Damage			UMETA(DisplayName = "데미지"),
+	AttackSpeed		UMETA(DisplayName = "공격속도"),
 	Luck			UMETA(DisplayName = "행운"),
-	CriticalChance	UMETA(DisplayName = "크리티컬 확률"),
 	GoldGain		UMETA(DisplayName = "골드 획득량"),
 	HPRegen			UMETA(DisplayName = "체력 재생"),
 	MaxHP			UMETA(DisplayName = "최대 체력"),
@@ -133,7 +131,7 @@ public:
 	EProcEffectType ProcType = EProcEffectType::None;
 
 	// 발동 확률 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Proc", meta = (DisplayName = "특수 효과 발동 확률"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Proc", meta = (DisplayName = "특수 효과 발동 확률", ClampMin = 0, ClampMax = 1))
 	float ProcChance = 0.0f;
 
 	// 발동 시 위력
