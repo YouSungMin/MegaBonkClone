@@ -14,4 +14,10 @@ class MEGABONKCLONE_API AMainHUD : public AHUD
 {
 	GENERATED_BODY()
 	
+protected:
+	virtual void BeginPlay() override;
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TSubclassOf<UUserWidget> MainWidgetClass = nullptr;
 };
