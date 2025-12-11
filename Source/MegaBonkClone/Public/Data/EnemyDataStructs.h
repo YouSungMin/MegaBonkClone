@@ -13,6 +13,7 @@
 UENUM(BlueprintType)
 enum class EEnemyRank : uint8
 {
+	None		,
 	Normal		UMETA(DisplayName = "일반"),
 	Elite		UMETA(DisplayName = "엘리트"),
 	Boss		UMETA(DisplayName = "보스")
@@ -25,47 +26,53 @@ struct FEnemyData : public FTableRowBase
 	GENERATED_BODY()
 
 public:
-	// -- 기본 정보 --
-
-	// 적 이름 
+	// ============================================================
+	// [기본 정보]
+	// ============================================================
+	
+	// 몬스터 이름 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Info")
 	FText Name;
 
-	// 적 타입 ( 일반, 엘리트, 보스 ) 
+	// 몬스터 등급 ( 일반, 엘리트, 보스 ) 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Info")
-	EEnemyRank Rank;
+	EEnemyRank Rank = EEnemyRank::None;
 
-	// -- 전투 스텟 --
+	// ============================================================
+	// [전투 스탯]
+	// ============================================================
 	
 	// 최대 체력
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
-	EEnemyRank MaxHP;
+	float MaxHP = 100.0f;
 
 	// 공격력
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
-	EEnemyRank AttackPower;
+	float AttackPower = 10.0f;
 
 	// 이동 속도
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
-	EEnemyRank MoveSpeed;
+	float MoveSpeed = 10.0f;
 
 	// -- 보상 --
 
 	// 경험치
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Reward")
-	int32 DropExp;
+	int32 DropExp = 10;
 
-	// -- 리소스 --
+	// ============================================================
+	// [리소스]
+	// ============================================================
 
 	// Mesh
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Visual")
-	//int32 DropExp;
-	//
-	//// 
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Visual")
-	//int32 DropExp;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Visual")
+	TSoftObjectPtr<USkeletalMesh> Mesh;
 
-	////
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Visual")
-	//int32 DropExp;
+	// AnimInstancee 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Visual")
+	TSoftObjectPtr<USkeletalMesh> AnimClass;
+
+	// AI Controller
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Visual")
+	TSoftObjectPtr<AController> AIControllerClass;
 };
