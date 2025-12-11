@@ -19,11 +19,15 @@ protected:
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
 public:
+	//전체이동속도
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "AnimInstance|Speed")
 	float Speed=0.0f;
 
+	//수직속도
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "AnimInstance|Speed")
-	bool IsJumping = false;
+	float ZSpeed = 0.0f; 
+
+
 
 protected:
 

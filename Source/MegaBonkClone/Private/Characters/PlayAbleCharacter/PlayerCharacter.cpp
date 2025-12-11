@@ -76,10 +76,11 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 	UEnhancedInputComponent* enhanced = Cast<UEnhancedInputComponent>(PlayerInputComponent);
 
+	//입력 액션 바인드 함수
 	if (enhanced) {
-		enhanced->BindAction(IA_Move, ETriggerEvent::Triggered, this, "OnMoveInput");
+		enhanced->BindAction(IA_Move, ETriggerEvent::Triggered, this, &APlayerCharacter::OnMoveInput);
 
-		enhanced->BindAction(IA_Jump, ETriggerEvent::Triggered, this, "OnJumpInput");
+		enhanced->BindAction(IA_Jump, ETriggerEvent::Triggered, this, &APlayerCharacter::OnJumpInput);
 
 	}
 
