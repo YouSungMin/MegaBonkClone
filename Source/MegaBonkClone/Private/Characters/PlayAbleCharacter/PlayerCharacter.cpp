@@ -5,6 +5,7 @@
 #include "Camera/CameraComponent.h"
 #include "EnhancedInputComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Characters/Components/StatusComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "InputActionValue.h"
@@ -16,26 +17,31 @@ APlayerCharacter::APlayerCharacter()
 	PrimaryActorTick.bCanEverTick = false;
 
 	InitializeCharacterComponents();
-
+	
 }
 
 void APlayerCharacter::InitializeCharacterComponents()
 {
+	//컴포넌트 생성 Attach 및 위치 , 회전 조정
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	SpringArm->SetupAttachment(RootComponent);
 	SpringArm->TargetArmLength = 500.0f;
 	SpringArm->SocketOffset = FVector(0.0f, 0.0f, 100.0f);
 	SpringArm->AddRelativeRotation(FRotator(0.0f, 0.0f, 0.0f));
-	SpringArm->bUsePawnControlRotation = true;
-
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SpringArm);
-
+	StatusComponent = CreateDefaultSubobject<UStatusComponent>(TEXT("Status"));
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -70.0f), FRotator(0.0f, -90.0f, 0.0f));
-	GetCapsuleComponent()->SetCapsuleSize(30.0f, 70.0f);
 
-	GetCharacterMovement()->bOrientRotationToMovement = true;
+	//컴포넌트 세부 수치 설정
+	GetCapsuleComponent()->SetCapsuleSize(30.0f, 70.0f);
+	SpringArm->bUsePawnControlRotation = true;
 	bUseControllerRotationYaw = false;
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	GetCharacterMovement()->MaxWalkSpeed = 400.0f;
+	GetCharacterMovement()->SetWalkableFloorAngle(46.0f);
+	//점프횟수 조절가능
+	JumpMaxCount = 2;
 }
 
 
@@ -44,7 +50,8 @@ void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	
+	OnActorBeginOverlap.AddDynamic(this, &APlayerCharacter::OnBeginOverlap);
+
 }
 
 void APlayerCharacter::OnMoveInput(const FInputActionValue& InValue)
@@ -84,5 +91,21 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 	}
 
+}
+
+void APlayerCharacter::OnBeginOverlap(AActor* OverlappedActor, AActor* OtherActor)
+{
+	UE_LOG(LogTemp, Warning, TEXT("오버랩 성공 : %s"), *OtherActor->GetName());
+}
+
+void APlayerCharacter::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit)
+{
+	UE_LOG(LogTemp, Warning, TEXT("히트 성공 : %s"), *Other->GetName());
+}
+
+float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	return 0.0f;
 }
 

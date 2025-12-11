@@ -22,7 +22,7 @@ void APlayAbleCharacterController::OnCameraLookInput(const FInputActionValue& In
 {
 	FVector2D input = InValue.Get<FVector2D>();
 
-	UE_LOG(LogTemp, Warning, TEXT("%s"),*input.ToString());
+	//UE_LOG(LogTemp, Warning, TEXT("%s"),*input.ToString());
 	//마우스 축에 따라 카메라 이동을 위한 코드
 	AddPitchInput(-input.Y);
 	AddYawInput(input.X);
