@@ -45,6 +45,7 @@ enum class EItemStatType : uint8
 	Difficulty		UMETA(DisplayName = "난이도"),
 	Damage			UMETA(DisplayName = "데미지"),
 	CritChance		UMETA(DisplayName = "치명타 확률"),
+	MegaCritChance	UMETA(DisplayName = "메가 치명타 확률"),
 	AttackSpeed		UMETA(DisplayName = "공격속도"),
 	ProjectileCount	UMETA(DisplayName = "발사체 수"),
 	KnockBack		UMETA(DisplayName = "넉백"),
@@ -57,14 +58,17 @@ enum class EItemStatType : uint8
 UENUM(BlueprintType)
 enum class EProcEffectType : uint8
 {
-	None			UMETA(DisplayName = "없음"),
-	SpawnActor		UMETA(DisplayName = "액터 소환"),
-	FireProjectile	UMETA(DisplayName = "투사체 발사"),
-	ApplyStatus		UMETA(DisplayName = "상태 이상 부여"),
-	AreaExplosion	UMETA(DisplayName = "범위 공격"),
-	ReflectDamage	UMETA(DisplayName = "반사"),
-	TimeStop		UMETA(DisplayName = "시간 정지"),
-	Execute			UMETA(DisplayName = "처형")
+	None					UMETA(DisplayName = "없음"),
+	SpawnActor				UMETA(DisplayName = "액터 소환"),
+	FireProjectile			UMETA(DisplayName = "투사체 발사"),
+	ApplyStatus				UMETA(DisplayName = "상태 이상 부여"),
+	AreaExplosion			UMETA(DisplayName = "범위 공격"),
+	ReflectDamage			UMETA(DisplayName = "반사"),
+	TimeStop				UMETA(DisplayName = "시간 정지"),
+	Execute					UMETA(DisplayName = "처형"),
+	FreeInteract			UMETA(DisplayName = "상자 무료"),
+	TemporaryBuffStat		UMETA(DisplayName = "일시적 스탯 버프"),
+	PermanentBuffStat		UMETA(DisplayName = "영구적 스탯 버프")
 };
 
 UENUM(BlueprintType)
@@ -75,7 +79,26 @@ enum class EStatusEffectType : uint8
 	Poison		UMETA(DisplayName = "독/중독"),
 	Burn		UMETA(DisplayName = "화상"),
 	Shock		UMETA(DisplayName = "감전"),
-	Bleed		UMETA(DisplayName = "출혈")
+	Bleed		UMETA(DisplayName = "출혈"),
+	Curse		UMETA(DisplayName = "저주")
+};
+
+UENUM(BlueprintType)
+enum class EProcTriggerType : uint8
+{
+	OnHit			UMETA(DisplayName = "공격 시"),
+	OnKill			UMETA(DisplayName = "처치 시"),
+	OnCritical		UMETA(DisplayName = "치명타 피해 시"),
+	OnInteract		UMETA(DisplayName = "상호작용 시"),
+	OnTakeDamage	UMETA(DisplayName = "피격 시"),
+	OnTick			UMETA(DisplayName = "매 프레임"),
+	OnEvade         UMETA(DisplayName = "회피 성공 시"),
+	OnOpenChest		UMETA(DisplayName = "상자를 열때"),
+	OnJump			UMETA(DisplayName = "점프 시"),
+	OnMove			UMETA(DisplayName = "이동 시"),
+	OnLifeDrain		UMETA(DisplayName = "생명 흡수 시"),
+	OnHeal			UMETA(DisplayName = "체력 회복 시"),
+	OnLowHP			UMETA(DisplayName = "체력이 50% 이하일때")
 };
 
 USTRUCT(BlueprintType)
@@ -84,32 +107,48 @@ struct FItemProcData
 	GENERATED_BODY()
 
 public:
+	// 발동 조건
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (DisplayName = "발동 조건 (Trigger)"))
+	EProcTriggerType TriggerType = EProcTriggerType::OnHit;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (DisplayName = "행동 타입"))
 	EProcEffectType ProcType = EProcEffectType::None;
 
-	// [추가] 상태 이상 타입 (ProcType이 ApplyStatus일 때만 사용)
+	// 변경할 스탯
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (DisplayName = "대상 스탯 (Buff용)"))
+	EItemStatType StatType = EItemStatType::None;
+
+	// 퍼센트 여부
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (DisplayName = "퍼센트(%) 적용"))
+	bool bIsPercentage = false;
+
+	// 상태 이상 타입
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (DisplayName = "상태 이상 종류 (옵션)"))
 	EStatusEffectType StatusType = EStatusEffectType::None;
 
-	// 확률
+	// 발동 확률
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (DisplayName = "발동 확률 (%)"))
 	float BaseChance = 0.0f;
 
-	// 중첩당 확률
+	// 중첩당 발동 확률 증가율
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (DisplayName = "중첩당 확률 증가 (%)"))
 	float StackChance = 0.0f;
 
 	// 위력 (Value)
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (DisplayName = "기본 위력 (Value)"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (DisplayName = "기본 위력 (BaseValue)"))
 	float BaseValue = 0.0f;
 
 	// 중첩 당 위력
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (DisplayName = "중첩당 위력 증가"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (DisplayName = "중첩당 증가값"))
 	float StackValue = 0.0f;
 
 	// 기타 옵션
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (DisplayName = "쿨타임 (Cooldown)"))
 	float Cooldown = 0.0f;
+
+	// 지속 시간
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (DisplayName = "지속 시간 (Duration)"))
+	float Duration = 0.0f;
 
 	// 범위
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (DisplayName = "범위 (Radius)"))
@@ -132,7 +171,7 @@ public:
 	EItemStatType StatType = EItemStatType::None;
 
 	// 변경 수치
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (DisplayName = "수치"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (DisplayName = "기본 위력 (BaseValue)"))
 	float BaseValue = 0.0f;
 
 	// 중첩당 수치

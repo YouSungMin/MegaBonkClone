@@ -34,7 +34,7 @@ public:
 
 	// 기본 데미지
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (DisplayName = "데미지", ClampMin = "0"))
-	float Damage = 10.0f;
+	float WeaponDamage = 10.0f;
 
 	// 기본 발사체 수
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (DisplayName = "발사체 수", ClampMin = "0"))
