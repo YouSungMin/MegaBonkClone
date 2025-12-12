@@ -19,14 +19,18 @@ void AProjectileWeaponBaseActor::LaunchProjectile()
 
 		AActor* owner = this->GetOwner();
 
-		FActorSpawnParameters SpawnParams;
-		SpawnParams.Owner = owner;     
-		SpawnParams.Instigator = Cast<APawn>(owner);
+		// TrailClass가 할당되었는지 체크 (안전장치)
+		if (ProjectileClass)
+		{
+			// 충돌 때문에 스폰 실패하는 것을 방지 (선택 사항)
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.Owner = owner;
+			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-		if (ProjectileClass) {
-			AProjectileBase* projectile = world->SpawnActor<AProjectileBase>(
+			GetWorld()->SpawnActor<AProjectileBase>(
 				ProjectileClass,
-				owner->GetActorTransform(),
+				GetActorLocation(),
+				GetActorRotation(),
 				SpawnParams
 			);
 		}
@@ -39,12 +43,11 @@ void AProjectileWeaponBaseActor::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	//GetWorldTimerManager().SetTimer(
-	//	ProjectileTimerHandle,         // 사용할 핸들
-	//	this,                      // 함수가 있는 객체 (나 자신)
-	//	&AProjectileWeaponBaseActor::LaunchProjectile, // 호출할 함수 주소
-	//	ProjectileTimerTime,                      // 시간 간격 (1.0초)
-	//	true                       // 반복 여부 (true: 계속 반복, false: 1번만 실행)
-	//);
-
+	GetWorldTimerManager().SetTimer(
+		ProjectileTimerHandle,
+		this,
+		&AProjectileWeaponBaseActor::LaunchProjectile,
+		1.0f,
+		true
+	);
 }

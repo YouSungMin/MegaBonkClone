@@ -44,7 +44,7 @@ void AProjectileBase::BeginPlay()
 void AProjectileBase::StartReturn()
 {
 	// 타이머가 발동되면 "유도탄(Homing)" 모드로 전환
-	if (APawn* OwnerPawn = GetInstigator())
+	if (APawn* OwnerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(),0))
 	{
 		// 1. 유도탄 타겟 설정 (플레이어의 RootComponent)
 		ProjectileComponent->HomingTargetComponent = OwnerPawn->GetRootComponent();
@@ -61,6 +61,7 @@ void AProjectileBase::StartReturn()
 	else
 	{
 		// 주인이 없으면 그냥 자폭
+		UE_LOG(LogTemp, Warning, TEXT("삭제"));
 		Destroy();
 	}
 }
