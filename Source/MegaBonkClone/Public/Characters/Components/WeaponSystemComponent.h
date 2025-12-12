@@ -16,13 +16,16 @@ public:
 	// Sets default values for this component's properties
 	UWeaponSystemComponent();
 
+
+	//배열에 있는 무기 액터에 스폰후 어태치
+	UFUNCTION(BlueprintCallable)
+	void EquipWeapon();
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "WeaponComponent|Weapons")
+	TArray<TSubclassOf<AActor>> PlayerWeapons;
 
-		
 };
