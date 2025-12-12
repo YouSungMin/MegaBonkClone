@@ -8,6 +8,35 @@
 /**
  *
  */
+UENUM(BlueprintType)
+enum class EWeaponStatType : uint8
+{
+	None,
+	Damage			UMETA(DisplayName = "데미지"),
+	ProjectileCount UMETA(DisplayName = "발사체 수"),
+	ProjectileSpeed UMETA(DisplayName = "발사체 속도"),
+	ProjectileScale UMETA(DisplayName = "발사체 크기(범위)"),
+	ChainCount		UMETA(DisplayName = "반사 횟수"),
+	CritChance		UMETA(DisplayName = "치명타 확률"),
+	CritDamage		UMETA(DisplayName = "치명타 데미지"),
+	KnockBack		UMETA(DisplayName = "넉백"),
+	Cooldown		UMETA(DisplayName = "쿨타임 감소")
+};
+USTRUCT(BlueprintType)
+struct FWeaponUpgradeOption
+{
+	GENERATED_BODY()
+
+public:
+	// 강화할 스탯 종류
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (DisplayName = "강화 대상 스탯"))
+	EWeaponStatType StatType = EWeaponStatType::Damage;
+
+	// 강화 효율
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (DisplayName = "증가량 (Increment Value)"))
+	float Value = 0.0f;
+};
+
 
  // 아이템 데이터 구조체
 USTRUCT(BlueprintType)
@@ -38,7 +67,7 @@ public:
 
 	// 기본 발사체 수
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (DisplayName = "발사체 수", ClampMin = "0"))
-	int32 ProjectileCount = 1;
+	float ProjectileCount = 1;
 
 	// 기본 발사체 속도
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (DisplayName = "발사체 속도", ClampMin = "0"))
@@ -54,7 +83,7 @@ public:
 
 	// 치명타 확률
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (DisplayName = "치명타 확률", ClampMin = "0"))
-	int32 CriticalChance = 0;
+	float CriticalChance = 0;
 
 	// 치명타 데미지
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (DisplayName = "치명타 데미지", ClampMin = "0"))
@@ -64,6 +93,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (DisplayName = "넉백", ClampMin = "0"))
 	float KnockBack = 0.0f;
 
+	// 강화 효율 배열
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Upgrades", meta = (DisplayName = "강화 선택지 목록 (Pool)", TitleProperty = "StatType"))
+	TArray<FWeaponUpgradeOption> UpgradeOptions;
 
 	// =========================================================
 	// [리소스]
