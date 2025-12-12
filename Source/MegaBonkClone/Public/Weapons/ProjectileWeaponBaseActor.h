@@ -15,29 +15,18 @@ class MEGABONKCLONE_API AProjectileWeaponBaseActor : public AWeaponBase
 public:	
 	// Sets default values for this actor's properties
 	AProjectileWeaponBaseActor();
+	
+	void LaunchProjectile();
 
-	void SetHomingTarget(AActor* Target);
-	//오브젝트에 오버랩 되었을때 실행할 함수
-	virtual void OnBeginWeaponOverlap(AActor* OverlappedActor, AActor* OtherActor) override;
-	//오브젝트에 오버랩 끝났을때 실행할 함수
-	virtual void OnEndWeaponOverlap(AActor* OverlappedActor, AActor* OtherActor) override;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ProjectileWeapon")
+	TSubclassOf<class AProjectileBase> ProjectileClass = nullptr;
 
-protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "WeaponBase|Mesh")
-	TObjectPtr<UStaticMeshComponent> BaseMesh = nullptr;
+private:
+	FTimerHandle ProjectileTimerHandle;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "WeaponBase|Collision")
-	TObjectPtr<class UCapsuleComponent> Collision = nullptr;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "WeaponBase|Projectile")
-	TObjectPtr<class UProjectileMovementComponent> ProjectileComponent = nullptr;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "WeaponBase|Rotator")
-	TObjectPtr<class URotatingMovementComponent> RotatingComponent = nullptr;
-	
-	
+	float ProjectileTimerTime = 1.0f;
 };

@@ -53,11 +53,6 @@ void AAuraWeaponBase::StartAttackTimer()
 void AAuraWeaponBase::OnBeginWeaponOverlap(AActor* OverlappedActor, AActor* OtherActor)
 {
 	Super::OnBeginWeaponOverlap(OverlappedActor, OtherActor);
-
-	if (OtherActor) {
-		UE_LOG(LogTemp, Warning, TEXT("AAuraWeaponBase : %s 에 데미지"), *OtherActor->GetName());
-		StartAttackTimer();
-	}
 	
 }
 

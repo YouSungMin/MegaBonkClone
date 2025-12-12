@@ -32,7 +32,7 @@ void APlayerCharacter::InitializeCharacterComponents()
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SpringArm);
 	StatusComponent = CreateDefaultSubobject<UStatusComponent>(TEXT("Status"));
-	WeaponComponent = CreateDefaultSubobject<UWeaponSystemComponent>(TEXT("WeaponSystem"));
+	WeaponComponent2 = CreateDefaultSubobject<UWeaponSystemComponent>(TEXT("WeaponSystem"));
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -70.0f), FRotator(0.0f, -90.0f, 0.0f));
 
 	//컴포넌트 세부 수치 설정
@@ -97,12 +97,12 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 void APlayerCharacter::OnBeginOverlap(AActor* OverlappedActor, AActor* OtherActor)
 {
-	UE_LOG(LogTemp, Warning, TEXT("오버랩 성공 : %s"), *OtherActor->GetName());
+	//UE_LOG(LogTemp, Warning, TEXT("오버랩 성공 : %s"), *OtherActor->GetName());
 }
 
 void APlayerCharacter::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit)
 {
-	UE_LOG(LogTemp, Warning, TEXT("히트 성공 : %s"), *Other->GetName());
+	//UE_LOG(LogTemp, Warning, TEXT("히트 성공 : %s"), *Other->GetName());
 }
 
 float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)

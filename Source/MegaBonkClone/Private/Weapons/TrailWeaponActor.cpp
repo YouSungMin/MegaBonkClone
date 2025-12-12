@@ -37,12 +37,7 @@ void ATrailWeaponActor::BeginPlay()
 {
 	Super::BeginPlay();
 	
-}
-
-// Called every frame
-void ATrailWeaponActor::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
+	SetLifeSpan(1.0f);
 
 }
 

@@ -3,6 +3,7 @@
 
 #include "Characters/Components/WeaponSystemComponent.h"
 #include "Weapons/WeaponBase.h"
+#include "GameFramework/Character.h"
 // Sets default values for this component's properties
 UWeaponSystemComponent::UWeaponSystemComponent()
 {
@@ -12,18 +13,19 @@ UWeaponSystemComponent::UWeaponSystemComponent()
 
 	// ...
 	//고정 무기 슬롯
-	int MaxWeaponNum = 3;
-	PlayerWeapons.Empty(MaxWeaponNum);
+	int32 MaxWeaponNum = 3;
+	PlayerWeapons.Empty();
+	PlayerWeapons.SetNum(MaxWeaponNum);
 
 }
 
 void UWeaponSystemComponent::EquipWeapon()
 {
-	
-	for (const TSubclassOf<class AWeaponBase> elements : PlayerWeapons) {
+	ACharacter* character = Cast<ACharacter>(GetOwner());
+	for (const TSubclassOf<AActor> elements : PlayerWeapons) {
 		if (elements) {
-			AWeaponBase* spawnWeapon = GetWorld()->SpawnActor<AWeaponBase>(elements, FVector::ZeroVector, FRotator::ZeroRotator);
-			spawnWeapon->AttachToActor(GetOwner(), FAttachmentTransformRules::SnapToTargetIncludingScale, NAME_None);
+			AActor* spawnWeapon = GetWorld()->SpawnActor<AActor>(elements, FVector::ZeroVector, FRotator::ZeroRotator);
+			spawnWeapon->AttachToComponent(character->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, NAME_None);
 		}
 	}
 }

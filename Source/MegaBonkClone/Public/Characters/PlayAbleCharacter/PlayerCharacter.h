@@ -81,11 +81,11 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player|Components")
 	TObjectPtr<class UCameraComponent> Camera = nullptr;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player|Components")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Player|Components")
 	TObjectPtr<class UStatusComponent> StatusComponent = nullptr;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player|Components")
-	TObjectPtr<class UWeaponSystemComponent> WeaponComponent = nullptr;
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite, Category = "Player|Components")
+	TObjectPtr<class UWeaponSystemComponent> WeaponComponent2 = nullptr;
 
 
 private:
