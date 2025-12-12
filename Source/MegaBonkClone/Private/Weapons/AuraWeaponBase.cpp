@@ -23,7 +23,7 @@ AAuraWeaponBase::AAuraWeaponBase()
 
 void AAuraWeaponBase::AttackWeapon_Implementation()
 {
-	UE_LOG(LogTemp, Warning, TEXT("데미지 처리"));
+	
 }
 
 void AAuraWeaponBase::GetDamageWeapon_Implementation()

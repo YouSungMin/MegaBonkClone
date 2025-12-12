@@ -27,7 +27,7 @@ void ATrailWeaponActor::OnBeginWeaponOverlap(AActor* OverlappedActor, AActor* Ot
 	Super::OnBeginWeaponOverlap(OverlappedActor, OtherActor);
 
 	if (IsValidTarget(OtherActor)) {
-		UE_LOG(LogTemp, Warning, TEXT("%s"),*OtherActor->GetName());
+		
 	}
 }
 
