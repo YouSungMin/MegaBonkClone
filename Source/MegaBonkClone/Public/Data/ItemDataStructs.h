@@ -32,42 +32,140 @@ enum class EItemGrade : uint8
 UENUM(BlueprintType)
 enum class EItemStatType : uint8
 {
-	None			UMETA(DisplayName = "없음"),
-	Damage			UMETA(DisplayName = "데미지"),
-	AttackSpeed		UMETA(DisplayName = "공격속도"),
-	Luck			UMETA(DisplayName = "행운"),
-	GoldGain		UMETA(DisplayName = "골드 획득량"),
-	HPRegen			UMETA(DisplayName = "체력 재생"),
-	MaxHP			UMETA(DisplayName = "최대 체력"),
-	EvasionChance	UMETA(DisplayName = "회피율"),
-	Difficulty		UMETA(DisplayName = "난이도"),
-	MoveSpeed		UMETA(DisplayName = "이동 속도"),
-	ExpGain			UMETA(DisplayName = "경험치 획득량"),
-	CritChance		UMETA(DisplayName = "치명타 확률"),
-	ProjectileCount	UMETA(DisplayName = "발사체 수"),
-	JumpPower		UMETA(DisplayName = "점프 높이")
+	None					UMETA(DisplayName = "없음"),
+	MaxHP					UMETA(DisplayName = "최대 체력"),
+	HPRegen					UMETA(DisplayName = "체력 재생"),
+	OverHeal				UMETA(DisplayName = "오버 힐"),
+	Shield					UMETA(DisplayName = "실드"),
+	Armor					UMETA(DisplayName = "방어력"),
+	EvasionChance			UMETA(DisplayName = "회피율"),
+	LifeDrain				UMETA(DisplayName = "생명 흡수"),
+	Thorn					UMETA(DisplayName = "가시"),
+	ExpGain					UMETA(DisplayName = "경험치 획득량"),
+	SilverGain				UMETA(DisplayName = "실버 획득량"),
+	GoldGain				UMETA(DisplayName = "골드 획득량"),
+	PickUpRange				UMETA(DisplayName = "픽업 범위"),
+	Difficulty				UMETA(DisplayName = "난이도"),
+	Damage					UMETA(DisplayName = "데미지"),
+	CritChance				UMETA(DisplayName = "치명타 확률"),
+	MegaCritChance			UMETA(DisplayName = "메가 치명타 확률"),
+	AttackSpeed				UMETA(DisplayName = "공격속도"),
+	ProjectileCount			UMETA(DisplayName = "발사체 수"),
+	ProjectileReflectCount	UMETA(DisplayName = "발사체 반사 수"),
+	AttackSize				UMETA(DisplayName = "발사체 크기"),
+	ProjectileSpeed			UMETA(DisplayName = "발사체 속도"),
+	AttackDuration			UMETA(DisplayName = "지속 시간"),
+	KnockBack				UMETA(DisplayName = "넉백"),
+	MoveSpeed				UMETA(DisplayName = "이동 속도"),
+	JumpPower				UMETA(DisplayName = "점프 높이"),
+	Luck					UMETA(DisplayName = "행운")
 };
 
-// 특수 아이템 효과
+// 특수 효과 유형
 UENUM(BlueprintType)
 enum class EProcEffectType : uint8
 {
-	None			UMETA(DisplayName = "없음"),
-	Burger			UMETA(DisplayName = "버거(햄버거 생성, HP회복)"),
-	Cactus			UMETA(DisplayName = "선인장(피격 시 반사)"),
-	CurseDoll		UMETA(DisplayName = "저주 인형(디버프)"),
-	Ghost			UMETA(DisplayName = "유령(소환)"),
-	IceCrystal		UMETA(DisplayName = "얼음 결정(빙결)"),
-	Key				UMETA(DisplayName = "열쇠(상자 무료) "),
-	MoldyCheese		UMETA(DisplayName = "곰팡이 치즈(중독)"),
-	CampFire		UMETA(DisplayName = "캠프 파이어(소환,HP 회복)"),
-	Kebin			UMETA(DisplayName = "케빈(피해 무효)"),
-	MoldyGloves		UMETA(DisplayName = "곰팡이 장갑(독구름 생성)"),
-	ThunderMitts	UMETA(DisplayName = "천둥 장갑(번개 생성)"),
-	Bob				UMETA(DisplayName = "밥 소환(소환)"),
-	SlutyCannon		UMETA(DisplayName = "루즈 캐논(미사일 발사)"),
-	ToxicBarrel		UMETA(DisplayName = "독 배럴(피격시 독구름 생성)"),
+	None					UMETA(DisplayName = "없음"),
+	SpawnActor				UMETA(DisplayName = "액터 소환"),
+	FireProjectile			UMETA(DisplayName = "투사체 발사"),
+	ApplyStatus				UMETA(DisplayName = "상태 이상 부여"),
+	AreaExplosion			UMETA(DisplayName = "범위 공격"),
+	ReflectDamage			UMETA(DisplayName = "반사"),
+	TimeStop				UMETA(DisplayName = "시간 정지"),
+	Execute					UMETA(DisplayName = "처형"),
+	FreeInteract			UMETA(DisplayName = "상자 무료"),
+	TemporaryBuffStat		UMETA(DisplayName = "일시적 스탯 버프"),
+	PermanentBuffStat		UMETA(DisplayName = "영구적 스탯 버프")
 };
+
+UENUM(BlueprintType)
+enum class EStatusEffectType : uint8
+{
+	None,
+	Freeze		UMETA(DisplayName = "빙결"),
+	Poison		UMETA(DisplayName = "독/중독"),
+	Burn		UMETA(DisplayName = "화상"),
+	Shock		UMETA(DisplayName = "감전"),
+	Bleed		UMETA(DisplayName = "출혈"),
+	Curse		UMETA(DisplayName = "저주")
+};
+
+UENUM(BlueprintType)
+enum class EProcTriggerType : uint8
+{
+	OnHit			UMETA(DisplayName = "공격 시"),
+	OnKill			UMETA(DisplayName = "처치 시"),
+	OnCritical		UMETA(DisplayName = "치명타 피해 시"),
+	OnInteract		UMETA(DisplayName = "상호작용 시"),
+	OnTakeDamage	UMETA(DisplayName = "피격 시"),
+	OnTick			UMETA(DisplayName = "매 프레임"),
+	OnEvade         UMETA(DisplayName = "회피 성공 시"),
+	OnOpenChest		UMETA(DisplayName = "상자를 열때"),
+	OnJump			UMETA(DisplayName = "점프 시"),
+	OnMove			UMETA(DisplayName = "이동 시"),
+	OnLifeDrain		UMETA(DisplayName = "생명 흡수 시"),
+	OnHeal			UMETA(DisplayName = "체력 회복 시"),
+	OnLowHP			UMETA(DisplayName = "체력이 50% 이하일때")
+};
+
+USTRUCT(BlueprintType)
+struct FItemProcData
+{
+	GENERATED_BODY()
+
+public:
+	// 발동 조건
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (DisplayName = "발동 조건 (Trigger)"))
+	EProcTriggerType TriggerType = EProcTriggerType::OnHit;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (DisplayName = "행동 타입"))
+	EProcEffectType ProcType = EProcEffectType::None;
+
+	// 변경할 스탯
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (DisplayName = "대상 스탯 (Buff용)"))
+	EItemStatType StatType = EItemStatType::None;
+
+	// 퍼센트 여부
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (DisplayName = "퍼센트(%) 적용"))
+	bool bIsPercentage = false;
+
+	// 상태 이상 타입
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (DisplayName = "상태 이상 종류 (옵션)"))
+	EStatusEffectType StatusType = EStatusEffectType::None;
+
+	// 발동 확률
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (DisplayName = "발동 확률 (%)"))
+	float BaseChance = 0.0f;
+
+	// 중첩당 발동 확률 증가율
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (DisplayName = "중첩당 확률 증가 (%)"))
+	float StackChance = 0.0f;
+
+	// 위력 (Value)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (DisplayName = "기본 위력 (BaseValue)"))
+	float BaseValue = 0.0f;
+
+	// 중첩 당 위력
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (DisplayName = "중첩당 증가값"))
+	float StackValue = 0.0f;
+
+	// 기타 옵션
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (DisplayName = "쿨타임 (Cooldown)"))
+	float Cooldown = 0.0f;
+
+	// 지속 시간
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (DisplayName = "지속 시간 (Duration)"))
+	float Duration = 0.0f;
+
+	// 범위
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (DisplayName = "범위 (Radius)"))
+	float Radius = 0.0f;
+
+	// 소환할 액터
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (DisplayName = "스폰할 액터 클래스"))
+	TSoftClassPtr<AActor> SpawnActorClass;
+};
+
 // 스탯 변경 정보 하나를 담는 구조체
 USTRUCT(BlueprintType)
 struct FItemStatModifier
@@ -80,8 +178,12 @@ public:
 	EItemStatType StatType = EItemStatType::None;
 
 	// 변경 수치
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (DisplayName = "수치"))
-	float Value = 0.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (DisplayName = "기본 위력 (BaseValue)"))
+	float BaseValue = 0.0f;
+
+	// 중첩당 수치
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (DisplayName = "중첩당 증가값"))
+	float StackValue = 0.0f;
 
 	// 퍼센트 여부
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (DisplayName = "퍼센트(%) 적용"))
@@ -127,20 +229,8 @@ public:
 	// =========================================================
 	
 	// 아이템 발동할 특수 효과
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Proc", meta = (DisplayName = "아이템 발동 특수 효과"))
-	EProcEffectType ProcType = EProcEffectType::None;
-
-	// 발동 확률 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Proc", meta = (DisplayName = "특수 효과 발동 확률", ClampMin = 0, ClampMax = 1))
-	float ProcChance = 0.0f;
-
-	// 발동 시 위력
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Proc", meta = (DisplayName = "특수 효과 적용 값"))
-	float ProcValue = 0.0f;
-
-	// 발동 시 스폰할 BP클래스
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Proc", meta = (DisplayName = "스폰할 액터 클래스 (옵션)"))
-	TSoftClassPtr<AActor> SpawnActorClass;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Proc", meta = (DisplayName = "특수 효과 목록", TitleProperty = "ProcType"))
+	TArray<FItemProcData> ProcModifiers;
 
 	// =========================================================
 	// [상인 거래 정보]
