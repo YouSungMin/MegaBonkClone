@@ -1,14 +1,14 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Weapons/ProjectileBase.h"
+#include "Weapons/ProjectileWeaponBase.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "GameFramework/RotatingMovementComponent.h"
 #include "Kismet/GameplayStatics.h"//임시
 
 // Sets default values
-AProjectileBase::AProjectileBase()
+AProjectileWeaponBase::AProjectileWeaponBase()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
@@ -33,15 +33,29 @@ AProjectileBase::AProjectileBase()
 }
 
 // Called when the game starts or when spawned
-void AProjectileBase::BeginPlay()
+void AProjectileWeaponBase::BeginPlay()
 {
 	Super::BeginPlay();
 	// 지정된 시간(ReturnDelay) 후에 StartReturn 함수 실행
-	GetWorldTimerManager().SetTimer(ReturnTimerHandle, this, &AProjectileBase::StartReturn, ReturnDelay, false);
+	GetWorldTimerManager().SetTimer(ReturnTimerHandle, this, &AProjectileWeaponBase::StartReturn, ReturnDelay, false);
 	SetHomingTarget(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
 }
 
-void AProjectileBase::StartReturn()
+void AProjectileWeaponBase::OnBeginWeaponOverlap(AActor* OverlappedActor, AActor* OtherActor)
+{
+	if (IsValidTarget(OtherActor)) {
+
+	}
+}
+
+void AProjectileWeaponBase::OnEndWeaponOverlap(AActor* OverlappedActor, AActor* OtherActor)
+{
+	if (IsValidTarget(OtherActor)) {
+
+	}
+}
+
+void AProjectileWeaponBase::StartReturn()
 {
 	// 타이머가 발동되면 "유도탄(Homing)" 모드로 전환
 	if (APawn* OwnerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(),0))
@@ -66,7 +80,7 @@ void AProjectileBase::StartReturn()
 	}
 }
 
-void AProjectileBase::SetHomingTarget(AActor* Target)
+void AProjectileWeaponBase::SetHomingTarget(AActor* Target)
 {
 	UE_LOG(LogTemp, Warning, TEXT("SetHomingTarget"));
 	ProjectileComponent->HomingTargetComponent = Target->GetRootComponent();

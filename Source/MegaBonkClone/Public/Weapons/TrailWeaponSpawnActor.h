@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "WeaponBase.h"
 #include "TrailWeaponSpawnActor.generated.h"
 
 UCLASS()
-class MEGABONKCLONE_API ATrailWeaponSpawnActor : public AActor
+class MEGABONKCLONE_API ATrailWeaponSpawnActor : public AWeaponBase
 {
 	GENERATED_BODY()
 	

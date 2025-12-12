@@ -39,7 +39,7 @@ void ATrailWeaponSpawnActor::SpawnTrailWeapon()
 
 		GetWorld()->SpawnActor<ATrailWeaponActor>(
 			TrailClass,
-			GetActorLocation(),
+			FVector(GetActorLocation().X, GetActorLocation().Y,0.0f),
 			GetActorRotation(),
 			SpawnParams
 		);

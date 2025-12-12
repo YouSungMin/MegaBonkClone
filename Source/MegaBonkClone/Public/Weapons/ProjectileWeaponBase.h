@@ -4,16 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "ProjectileBase.generated.h"
+#include "Weapons/WeaponBase.h"
+#include "ProjectileWeaponBase.generated.h"
 
 UCLASS()
-class MEGABONKCLONE_API AProjectileBase : public AActor
+class MEGABONKCLONE_API AProjectileWeaponBase : public AWeaponBase
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	AProjectileBase();
+	AProjectileWeaponBase();
 
 	//유도될 대상 세팅
 	UFUNCTION(BlueprintCallable)
@@ -24,9 +25,9 @@ protected:
 
 
 	//오브젝트에 오버랩 되었을때 실행할 함수
-	void OnBeginProjectileOverlap(AActor* OverlappedActor, AActor* OtherActor);
+	virtual void OnBeginWeaponOverlap(AActor* OverlappedActor, AActor* OtherActor) override;
 	//오브젝트에 오버랩 끝났을때 실행할 함수
-	void OnEndProjectileOverlap(AActor* OverlappedActor, AActor* OtherActor);
+	virtual void OnEndWeaponOverlap(AActor* OverlappedActor, AActor* OtherActor) override;
 
 
 protected:
@@ -49,6 +50,9 @@ protected:
 	float HomingAccel = 3000.0f; // 돌아올 때의 가속도 (유도 성능)
 
 private:
+
+	float LifeSpan = 0.0f;
+
 	FTimerHandle ReturnTimerHandle; // 타이머 핸들
 
 	// 타이머가 끝나면 호출될 함수
