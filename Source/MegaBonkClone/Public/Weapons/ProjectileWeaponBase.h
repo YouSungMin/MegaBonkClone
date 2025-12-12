@@ -50,10 +50,13 @@ protected:
 	float HomingAccel = 3000.0f; // 돌아올 때의 가속도 (유도 성능)
 
 private:
-
 	float LifeSpan = 0.0f;
 
 	FTimerHandle ReturnTimerHandle; // 타이머 핸들
+
+	bool bIsReturning = false;
+
+	TObjectPtr<APawn> OwnerPawn = nullptr;
 
 	// 타이머가 끝나면 호출될 함수
 	void StartReturn();

@@ -37,6 +37,7 @@ void AProjectileWeaponBase::BeginPlay()
 {
 	Super::BeginPlay();
 	// 지정된 시간(ReturnDelay) 후에 StartReturn 함수 실행
+	OwnerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(),0);
 	GetWorldTimerManager().SetTimer(ReturnTimerHandle, this, &AProjectileWeaponBase::StartReturn, ReturnDelay, false);
 	SetHomingTarget(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
 }
@@ -44,7 +45,14 @@ void AProjectileWeaponBase::BeginPlay()
 void AProjectileWeaponBase::OnBeginWeaponOverlap(AActor* OverlappedActor, AActor* OtherActor)
 {
 	if (IsValidTarget(OtherActor)) {
+		if (bIsReturning && OtherActor == OwnerPawn)
+		{
+			// 여기서 무기를 제거하거나, 쿨타임 초기화 등의 로직 수행
+			//무기제거 나중에 오브젝트풀 사용예정
 
+			Destroy();
+			return;
+		}
 	}
 }
 
@@ -58,8 +66,11 @@ void AProjectileWeaponBase::OnEndWeaponOverlap(AActor* OverlappedActor, AActor* 
 void AProjectileWeaponBase::StartReturn()
 {
 	// 타이머가 발동되면 "유도탄(Homing)" 모드로 전환
-	if (APawn* OwnerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(),0))
+	if (OwnerPawn)
 	{
+		//이제부터는 돌아오는 상태임을 명시
+		bIsReturning = true;
+
 		// 1. 유도탄 타겟 설정 (플레이어의 RootComponent)
 		ProjectileComponent->HomingTargetComponent = OwnerPawn->GetRootComponent();
 
@@ -74,8 +85,8 @@ void AProjectileWeaponBase::StartReturn()
 	}
 	else
 	{
-		// 주인이 없으면 그냥 자폭
-		UE_LOG(LogTemp, Warning, TEXT("삭제"));
+		//예외처리
+		UE_LOG(LogTemp, Warning, TEXT("OwnerPawn없음"));
 		Destroy();
 	}
 }
