@@ -17,9 +17,22 @@ void AWeaponBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-   
 	OnActorBeginOverlap.AddDynamic(this, &AWeaponBase::OnBeginWeaponOverlap);
 	OnActorEndOverlap.AddDynamic(this, &AWeaponBase::OnEndWeaponOverlap);
 	
 }
 
+void AWeaponBase::OnBeginWeaponOverlap(AActor* OverlappedActor, AActor* OtherActor)
+{
+	if (OtherActor) {
+		UE_LOG(LogTemp, Warning, TEXT("AWeaponBase : %s 에 데미지"), *OtherActor->GetName());
+	}
+
+}
+
+void AWeaponBase::OnEndWeaponOverlap(AActor* OverlappedActor, AActor* OtherActor)
+{
+	if (OtherActor) {
+		UE_LOG(LogTemp, Warning, TEXT("AWeaponBase : 오버랩 끝"), *OtherActor->GetName());
+	}
+}

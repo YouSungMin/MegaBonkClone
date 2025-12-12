@@ -22,10 +22,10 @@ public:
     virtual void GetDamageWeapon_Implementation() override {}
     //오브젝트에 오버랩 되었을때 실행할 함수
     UFUNCTION()
-    virtual void OnBeginWeaponOverlap(AActor* OverlappedActor, AActor* OtherActor) {}
+    virtual void OnBeginWeaponOverlap(AActor* OverlappedActor, AActor* OtherActor);
     //오브젝트에 오버랩 끝났을때 실행할 함수
     UFUNCTION()
-    virtual void OnEndWeaponOverlap(AActor* OverlappedActor, AActor* OtherActor) {}
+    virtual void OnEndWeaponOverlap(AActor* OverlappedActor, AActor* OtherActor);
 
 
 public:
