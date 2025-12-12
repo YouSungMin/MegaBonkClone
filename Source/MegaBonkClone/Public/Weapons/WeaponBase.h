@@ -8,33 +8,45 @@
 #include "WeaponBase.generated.h"
 
 UCLASS()
-class MEGABONKCLONE_API AWeaponBase : public AActor , public IWeapon
+class MEGABONKCLONE_API AWeaponBase : public AActor, public IWeapon
 {
-	GENERATED_BODY()
-	
-public:	
-	// Sets default values for this actor's properties
-	AWeaponBase();
+    GENERATED_BODY()
 
-	//IWeapon 인터페이스 구현부
-	virtual void AttackWeapon_Implementation() override;
-	virtual void GetDamageWeapon_Implementation() override;
+public:
+    AWeaponBase();
+
+    //꼭 구현해야하는 함수들
+
+    //IWeapon 인터페이스 구현부
+    virtual void AttackWeapon_Implementation() override {}
+    virtual void GetDamageWeapon_Implementation() override {}
+    //오브젝트에 오버랩 되었을때 실행할 함수
+    UFUNCTION()
+    virtual void OnBeginWeaponOverlap(AActor* OverlappedActor, AActor* OtherActor) {}
+    //오브젝트에 오버랩 끝났을때 실행할 함수
+    UFUNCTION()
+    virtual void OnEndWeaponOverlap(AActor* OverlappedActor, AActor* OtherActor) {}
+
+
+public:
+
+    //무기의 종류별로 구현 안해도되는 함수들
 
     // 공격 타이머 시작/재시작 (쿨타임 변경 시 재호출 가능)
     UFUNCTION(BlueprintCallable, Category = "Weapon")
-    void StartAttackTimer();
+    virtual void StartAttackTimer() {}
 
     // 최종 데미지 계산 (무기 깡뎀 * 플레이어 데미지 배율)
     UFUNCTION(BlueprintPure, Category = "Weapon")
-    float GetFinalDamage() const;
+    virtual float GetFinalDamage() const { return 0.0f; }
 
     // 최종 쿨타임 계산 (무기 쿨타임 * 플레이어 쿨감 배율)
     UFUNCTION(BlueprintPure, Category = "Weapon")
-    float GetFinalCooldown() const;
+    virtual float GetFinalCooldown() const { return 1.0f; }//임시
 
     // 최종 범위 계산
     UFUNCTION(BlueprintPure, Category = "Weapon")
-    float GetFinalArea() const;
+    virtual float GetFinalArea() const { return 0.0f; }
 
 protected:
 	// Called when the game starts or when spawned
@@ -42,7 +54,7 @@ protected:
 
 public:
     // ==========================================
-    // 무기 기본 스탯
+    // 무기 기본 스탯 (테이블에서 가져올예정)
     // ==========================================
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Stats")
     float BaseDamage = 10.0f;
@@ -56,10 +68,14 @@ public:
     // ==========================================
     // 내부 변수
     // ==========================================
-    //UPROPERTY()
-    //FTimerHandle AttackTimerHandle;
+    UPROPERTY()
+    FTimerHandle AttackTimerHandle;
 
-    //UPROPERTY()
-   // class UStatusComponent* OwnerStatusComp; // 주인님의 스탯 컴포넌트 캐싱
+    UPROPERTY()
+    TWeakObjectPtr<class UStatusComponent> OwnerStatusComp; // 주인님의 스탯 컴포넌트 캐싱
+
+    UPROPERTY()
+    TObjectPtr<UDataAsset> WeaponDataAsset;
+
 
 };

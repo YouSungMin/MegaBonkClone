@@ -88,6 +88,12 @@ public:
     UFUNCTION(BlueprintCallable)
     inline void SetSilverGain(float NewSilverGain) { SilverGain = NewSilverGain; }
 
+    // GoldGain
+    UFUNCTION(BlueprintCallable)
+    inline float GetGoldGain() const { return GoldGain; }
+    UFUNCTION(BlueprintCallable)
+    inline void SetGoldGain(float NewGoldGain) { GoldGain = NewGoldGain; }
+
     // PowerUPRate
     UFUNCTION(BlueprintCallable)
     inline float GetPowerUPRate() const { return PowerUPRate; }
@@ -361,9 +367,12 @@ protected:
 	//행운 (합연산)
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character|Status")
 	float Luck = 0.0f;
+    //골드 획득량
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character|Status")
+    float GoldGain = 0.0f;
 
 
-
+    
 private:
 
 	

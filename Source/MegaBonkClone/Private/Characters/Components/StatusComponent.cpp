@@ -46,6 +46,7 @@ void UStatusComponent::UpdateCharacterStatus()
 
     // [기타 배율들]
     float ExpMultiplier = (1.0f + (0.01f * ExpGain));
+    float GoldMultiplier = (1.0f + (0.01f * GoldGain));
     float SilverMultiplier = (1.0f + (0.01f * SilverGain));
     float PickupRangeMultiplier = (1.0f + (0.01f * PickUpRange));
 

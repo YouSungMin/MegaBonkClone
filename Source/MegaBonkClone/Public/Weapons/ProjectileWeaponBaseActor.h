@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Weapons/WeaponBase.h"
 #include "ProjectileWeaponBaseActor.generated.h"
 
 UCLASS()
-class MEGABONKCLONE_API AProjectileWeaponBaseActor : public AActor
+class MEGABONKCLONE_API AProjectileWeaponBaseActor : public AWeaponBase
 {
 	GENERATED_BODY()
 	
