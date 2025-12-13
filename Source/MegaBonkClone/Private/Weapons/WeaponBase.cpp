@@ -3,6 +3,7 @@
 
 #include "Weapons/WeaponBase.h"
 #include "Characters/Components/StatusComponent.h"
+#include "Characters/PlayAbleCharacter/PlayerCharacter.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -20,6 +21,8 @@ void AWeaponBase::BeginPlay()
 
 	OnActorBeginOverlap.AddDynamic(this, &AWeaponBase::OnBeginWeaponOverlap);
 	OnActorEndOverlap.AddDynamic(this, &AWeaponBase::OnEndWeaponOverlap);
+
+	OwnerStatusComp = Cast<APlayerCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0))->GetStatusComponent();
 	
 }
 

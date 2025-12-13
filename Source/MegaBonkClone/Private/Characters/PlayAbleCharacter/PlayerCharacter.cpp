@@ -32,7 +32,7 @@ void APlayerCharacter::InitializeCharacterComponents()
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SpringArm);
 	StatusComponent = CreateDefaultSubobject<UStatusComponent>(TEXT("Status"));
-	WeaponComponent2 = CreateDefaultSubobject<UWeaponSystemComponent>(TEXT("WeaponSystem"));
+	WeaponComponent = CreateDefaultSubobject<UWeaponSystemComponent>(TEXT("WeaponSystem"));
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -70.0f), FRotator(0.0f, -90.0f, 0.0f));
 
 	//컴포넌트 세부 수치 설정

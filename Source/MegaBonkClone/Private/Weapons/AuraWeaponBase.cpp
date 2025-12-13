@@ -23,11 +23,15 @@ AAuraWeaponBase::AAuraWeaponBase()
 
 void AAuraWeaponBase::AttackWeapon_Implementation()
 {
-	
+	UE_LOG(LogTemp, Warning, TEXT("AAuraWeaponBase :도트 데미지 처리"));
 }
 
 void AAuraWeaponBase::GetDamageWeapon_Implementation()
 {
+	if (OwnerStatusComp.IsValid()) {
+		UE_LOG(LogTemp, Warning, TEXT("AAuraWeaponBase :스테이터스 존재"));
+	}
+
 }
 
 void AAuraWeaponBase::StartAttackTimer()

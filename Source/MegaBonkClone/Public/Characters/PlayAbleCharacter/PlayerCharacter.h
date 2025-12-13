@@ -7,7 +7,7 @@
 #include "PlayerCharacter.generated.h"
 
 struct FInputActionValue;
-
+class UStatusComponent;
 UCLASS()
 class MEGABONKCLONE_API APlayerCharacter : public ACharacter
 {
@@ -23,6 +23,9 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+
+	//스테이터스 GETTER 함수
+	inline UStatusComponent* GetStatusComponent() { return StatusComponent; }
 
 	//오브젝트에 오버랩 되었을때 실행할 함수
 	UFUNCTION()
@@ -82,10 +85,10 @@ protected:
 	TObjectPtr<class UCameraComponent> Camera = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Player|Components")
-	TObjectPtr<class UStatusComponent> StatusComponent = nullptr;
+	TObjectPtr<UStatusComponent> StatusComponent = nullptr;
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadWrite, Category = "Player|Components")
-	TObjectPtr<class UWeaponSystemComponent> WeaponComponent2 = nullptr;
+	TObjectPtr<class UWeaponSystemComponent> WeaponComponent = nullptr;
 
 
 private:

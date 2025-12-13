@@ -7,6 +7,8 @@
 #include "WeaponSystemComponent.generated.h"
 
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnWeaponChanged);
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class MEGABONKCLONE_API UWeaponSystemComponent : public UActorComponent
 {
@@ -20,6 +22,8 @@ public:
 	//배열에 있는 무기 액터에 스폰후 어태치
 	UFUNCTION(BlueprintCallable)
 	void EquipWeapon();
+
+	FOnWeaponChanged OnWeaponChanged;
 
 protected:
 	// Called when the game starts
