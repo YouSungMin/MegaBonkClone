@@ -22,19 +22,7 @@ ATrailWeaponActor::ATrailWeaponActor()
 
 }
 
-void ATrailWeaponActor::OnBeginWeaponOverlap(AActor* OverlappedActor, AActor* OtherActor)
-{
-	Super::OnBeginWeaponOverlap(OverlappedActor, OtherActor);
 
-	if (IsValidTarget(OtherActor)) {
-		
-	}
-}
-
-void ATrailWeaponActor::OnEndWeaponOverlap(AActor* OverlappedActor, AActor* OtherActor)
-{
-	Super::OnEndWeaponOverlap(OverlappedActor, OtherActor);
-}
 
 // Called when the game starts or when spawned
 void ATrailWeaponActor::BeginPlay()

@@ -23,6 +23,9 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	UFUNCTION(BlueprintCallable)
+	void TryInteract();
+
 
 	//스테이터스 GETTER 함수
 	inline UStatusComponent* GetStatusComponent() { return StatusComponent; }

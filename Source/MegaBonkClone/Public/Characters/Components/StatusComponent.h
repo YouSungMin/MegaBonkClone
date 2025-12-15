@@ -260,7 +260,7 @@ public:
     void UpdateCharacterStatus();
 
     UFUNCTION(BlueprintCallable)
-    float GetFinalDamage();
+    float GetStatusDamage();
 
 protected:
 	// Called when the game starts

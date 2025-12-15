@@ -54,23 +54,7 @@ void AAuraWeaponBase::StartAttackTimer()
 	}
 }
 
-void AAuraWeaponBase::OnBeginWeaponOverlap(AActor* OverlappedActor, AActor* OtherActor)
-{
-	Super::OnBeginWeaponOverlap(OverlappedActor, OtherActor);
 
-	if (IsValidTarget(OtherActor)) {
-		StartAttackTimer();
-		UE_LOG(LogTemp, Warning, TEXT("%s"), *OtherActor->GetName());
-	}
-	
-}
-
-void AAuraWeaponBase::OnEndWeaponOverlap(AActor* OverlappedActor, AActor* OtherActor)
-{
-	Super::OnEndWeaponOverlap(OverlappedActor, OtherActor);
-
-	GetWorld()->GetTimerManager().ClearTimer(AttackTimerHandle);
-}
 
 // Called when the game starts or when spawned
 void AAuraWeaponBase::BeginPlay()

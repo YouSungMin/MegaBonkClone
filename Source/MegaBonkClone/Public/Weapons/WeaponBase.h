@@ -20,15 +20,10 @@ public:
     //IWeapon 인터페이스 구현부
     virtual void AttackWeapon_Implementation() override {}  //무기마다 다르게 재정의 해야함
     virtual void GetDamageWeapon_Implementation() override;//무기마다 데미지 공식은 똑같을듯
-    //오브젝트에 오버랩 되었을때 실행할 함수
-    UFUNCTION()
-    virtual void OnBeginWeaponOverlap(AActor* OverlappedActor, AActor* OtherActor);
 
+    //액터 유효성 검사 //플레이어인지 아닌지  , 유효한지 아닌지
     bool IsValidTarget(AActor* OtherActor);
-    //오브젝트에 오버랩 끝났을때 실행할 함수
-    UFUNCTION()
-    virtual void OnEndWeaponOverlap(AActor* OverlappedActor, AActor* OtherActor);
-
+   
 
 public:
 
@@ -38,9 +33,11 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Weapon")
     virtual void StartAttackTimer() {}
 
+
+    //몬스터에 적용할 최종 데미지 함수
     // 최종 데미지 계산 (무기 깡뎀 * 플레이어 데미지 배율)
     UFUNCTION(BlueprintPure, Category = "Weapon")
-    virtual float GetFinalDamage() const { return 0.0f; }
+    virtual float GetFinalDamage() const;
 
     // 최종 쿨타임 계산 (무기 쿨타임 * 플레이어 쿨감 배율)
     UFUNCTION(BlueprintPure, Category = "Weapon")

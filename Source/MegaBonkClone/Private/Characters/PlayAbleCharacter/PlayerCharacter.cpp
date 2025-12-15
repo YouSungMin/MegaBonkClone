@@ -5,6 +5,7 @@
 #include "Camera/CameraComponent.h"
 #include "EnhancedInputComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "Characters/Components/StatusComponent.h"
 #include "Characters/Components/WeaponSystemComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -93,6 +94,43 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 	}
 
+}
+
+void APlayerCharacter::TryInteract()
+{
+	//검사할 오브젝트 타입류
+	TArray<TEnumAsByte<EObjectTypeQuery>> objectTypes;
+	objectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
+	objectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_WorldDynamic));
+
+	//무시할 액터종류
+	TArray<AActor*> ignoreActors;
+	ignoreActors.Add(this);
+
+	TArray<FHitResult> outResults;
+
+	UKismetSystemLibrary::SphereTraceMultiForObjects(
+		GetWorld(),
+		GetActorLocation(), 
+		GetActorLocation(),
+		100.0f, 
+		objectTypes, 
+		false, 
+		ignoreActors, 
+		EDrawDebugTrace::Persistent, 
+		outResults, 
+		true, 
+		FLinearColor::Red,
+		FLinearColor::Green, 
+		5.0f);
+
+	
+	for (const auto elements : outResults) {
+		UE_LOG(LogTemp, Warning, TEXT("상호작용 : %s"),*elements.GetActor()->GetName());
+		/*if (elements.GetActor()->Implements<UInteratable>()) {
+			
+		}*/
+	}
 }
 
 void APlayerCharacter::OnBeginOverlap(AActor* OverlappedActor, AActor* OtherActor)
