@@ -26,6 +26,38 @@ void AWeaponBase::BeginPlay()
 	
 }
 
+void AWeaponBase::InvokeAttack()
+{
+	if (Implements<UWeapon>()) {
+		IWeapon::Execute_AttackWeapon(this);
+	}
+}
+
+void AWeaponBase::StartAttackTimer()
+{
+	if (!OwnerStatusComp.IsValid()) return;
+
+	float attackSpeed = OwnerStatusComp->GetAttackSpeed();
+
+	//기존 타이머가 돌고 있다면 초기화 (스탯 변경 시 재설정 위함)
+	GetWorldTimerManager().ClearTimer(AttackTimerHandle);
+
+	//타이머 설정
+	//InvokeAttack 함수를 attackSpeed마다 반복(loop) 실행
+	GetWorldTimerManager().SetTimer(
+		AttackTimerHandle,
+		this,
+		&AWeaponBase::InvokeAttack,
+		attackSpeed,
+		true
+	);
+
+}
+
+void AWeaponBase::InitializeWeaponStatus()
+{
+}
+
 void AWeaponBase::GetDamageWeapon_Implementation()
 {
 	if (OwnerStatusComp.IsValid()) {

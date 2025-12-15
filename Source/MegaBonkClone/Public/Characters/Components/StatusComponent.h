@@ -332,7 +332,7 @@ protected:
 	float ResultCritDmgRate = 0.0f;
 	//공격속도 (합연산)
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character|Status")
-	float AttackSpeed = 0.0f;
+	float AttackSpeed = 1.0f;
 	//발사체수 (합연산) 소숫점아래버림
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character|Status")
 	float ProjectileCount = 0.0f;
