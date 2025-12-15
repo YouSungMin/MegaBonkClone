@@ -48,6 +48,11 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+    // 오버랩을 사용하여 범위 내 가장 가까운 적 찾기
+    UFUNCTION(BlueprintCallable, Category = "Weapon|Helper")
+    AActor* FindNearestEnemy(float SearchRadius = 1500.0f); // 기본 반경 1500
+
+    //데이터 테이블에서 해당하는 row 읽어서 데이터 로드
     void LoadWeaponData();
 
     //타이머에서 AttackWeapon함수 바로 호출 불가능해서 만든 인보크 함수

@@ -353,7 +353,7 @@ protected:
 	float PlayerProjectileSpeed = 0.0f;
 	//계산된 발사체 속도
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character|Status")
-	float ResultProjectileSpeed = 0.0f;
+	float ResultProjectileSpeed = 1.0f;
 	//지속시간
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character|Status")
 	float AttackDuration = 1.0f;

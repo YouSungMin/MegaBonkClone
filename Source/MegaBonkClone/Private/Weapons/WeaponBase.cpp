@@ -6,6 +6,7 @@
 #include "Characters/PlayAbleCharacter/PlayerCharacter.h"
 #include "Data/WeaponDataStructs.h"
 #include "Kismet/GameplayStatics.h"
+#include "Engine/OverlapResult.h" 
 
 // Sets default values
 AWeaponBase::AWeaponBase()
@@ -23,6 +24,68 @@ void AWeaponBase::BeginPlay()
 	OwnerCharacter = Cast<APlayerCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
 	OwnerStatusComp = OwnerCharacter->GetStatusComponent();
 	LoadWeaponData();
+}
+
+AActor* AWeaponBase::FindNearestEnemy(float SearchRadius)
+{
+	if (!GetWorld() || !OwnerCharacter.IsValid()) return nullptr;
+
+	FVector MyLoc = OwnerCharacter->GetActorLocation();
+
+	// 1. 탐색할 오브젝트 타입 설정 (Pawn = 캐릭터/몬스터)
+	// 몬스터가 'Pawn' 채널을 쓴다고 가정합니다.
+	FCollisionObjectQueryParams ObjectQueryParams;
+	ObjectQueryParams.AddObjectTypesToQuery(ECC_Pawn);
+	// 만약 몬스터가 WorldDynamic이면 아래 줄 주석 해제
+	ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldDynamic);
+
+	// 2. 탐색 모양 설정 (구체)
+	FCollisionShape CollisionShape;
+	CollisionShape.SetSphere(SearchRadius);
+
+	// 3. 오버랩 검사 실행
+	TArray<FOverlapResult> OverlapResults;
+	bool bHit = GetWorld()->OverlapMultiByObjectType(
+		OverlapResults,
+		MyLoc,
+		FQuat::Identity,
+		ObjectQueryParams,
+		CollisionShape
+	);
+
+	// 4. 결과 중에서 가장 가까운 적 찾기
+	AActor* NearestEnemy = nullptr;
+	float MinDistSq = FLT_MAX; // 최소 거리(제곱)
+
+	if (bHit)
+	{
+		for (const FOverlapResult& Result : OverlapResults)
+		{
+			AActor* Enemy = Result.GetActor();
+
+			// (중요) 유효성 검사 + "Enemy" 태그 확인 + 나 자신 제외
+			if (Enemy && Enemy->ActorHasTag("Enemy") && IsValidTarget(Enemy))
+			{
+				float DistSq = FVector::DistSquared(MyLoc, Enemy->GetActorLocation());
+				if (DistSq < MinDistSq)
+				{
+					MinDistSq = DistSq;
+					NearestEnemy = Enemy;
+				}
+			}
+		}
+	}
+
+	// 디버그용: 범위 눈으로 확인하기 (필요할 때만 주석 해제)
+	
+	DrawDebugSphere(GetWorld(), MyLoc, SearchRadius, 32, FColor::Red, false, 0.1f);
+	if(NearestEnemy)
+	{
+		DrawDebugLine(GetWorld(), MyLoc, NearestEnemy->GetActorLocation(), FColor::Green, false, 0.1f, 0, 2.0f);
+	}
+	
+
+	return NearestEnemy;
 }
 
 void AWeaponBase::LoadWeaponData()

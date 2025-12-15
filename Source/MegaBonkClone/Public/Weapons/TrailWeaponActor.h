@@ -32,10 +32,10 @@ protected:
 
 	// 적이 밟았는지 감지할 영역
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
-	class UCapsuleComponent* OverlapComp;
+	TObjectPtr<class UCapsuleComponent> OverlapComp = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
-	class UNiagaraComponent* EffectComp;
+	TObjectPtr<class UNiagaraComponent> EffectComp = nullptr;
 
 private:
 	float Damage = 0.0f;

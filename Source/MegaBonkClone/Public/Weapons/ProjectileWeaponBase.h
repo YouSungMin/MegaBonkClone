@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Weapons/WeaponBase.h"
 #include "ProjectileWeaponBase.generated.h"
 
 UCLASS()
-class MEGABONKCLONE_API AProjectileWeaponBase : public AActor
+class MEGABONKCLONE_API AProjectileWeaponBase : public AWeaponBase
 {
 	GENERATED_BODY()
 	
@@ -19,8 +20,15 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	virtual void AttackWeapon_Implementation() override;
+
+public:
+
+protected:
+
+	//발사할 발사체
+	UPROPERTY(EditDefaultsOnly, Category = "ProjectileWeaponBase")
+	TSubclassOf<class AProjectileWeaponActor> ProjectileClass;
+
 
 };
