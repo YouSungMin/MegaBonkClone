@@ -10,7 +10,7 @@ public class MegaBonkClone : ModuleRules
 	
 		PublicDependencyModuleNames.AddRange(new string[] { 
 			"Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput",
-            "UMG" /*UI*/ , "Niagara" , "NavigationSystem"
+            "UMG" /*UI*/ , "Niagara" , "NavigationSystem","Paper2D"
         });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });

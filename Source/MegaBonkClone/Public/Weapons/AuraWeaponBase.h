@@ -35,5 +35,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon|Aura|Component")
 	TObjectPtr<class UCapsuleComponent> Collision = nullptr;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon|Aura|Component")
+	TObjectPtr<class UPaperSprite> BaseSprite = nullptr;
+
 
 };

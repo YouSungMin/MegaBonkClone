@@ -3,6 +3,7 @@
 
 #include "Weapons/AuraWeaponBase.h"
 #include "Characters/Components/StatusComponent.h"
+#include "Paper2D/Classes/PaperSprite.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
 
