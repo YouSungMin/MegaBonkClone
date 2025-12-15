@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Weapons/Weapon.h"
 #include "WeaponBase.generated.h"
+struct FWeaponData;
 
 UCLASS()
 class MEGABONKCLONE_API AWeaponBase : public AActor, public IWeapon
@@ -14,14 +15,13 @@ class MEGABONKCLONE_API AWeaponBase : public AActor, public IWeapon
 
 public:
     AWeaponBase();
-
-    //꼭 구현해야하는 함수들
+ 
 
     //IWeapon 인터페이스 구현부
     //무기 공격 함수
-    virtual void AttackWeapon_Implementation() override {}  //무기마다 다르게 재정의 해야함
+    virtual void AttackWeapon_Implementation() override;  //무기마다 다르게 재정의 해야함
 
-    
+    //무기데미지 계산
     virtual void GetDamageWeapon_Implementation() override;//무기마다 데미지 공식은 똑같을듯
 
     //액터 유효성 검사 //플레이어인지 아닌지  , 유효한지 아닌지
@@ -42,7 +42,7 @@ public:
     virtual void StartAttackTimer();
 
     UFUNCTION()
-    void InitializeWeaponStatus();
+    void InitializeWeaponStatus(const FWeaponData& InWeaponData);
 
 protected:
 	// Called when the game starts or when spawned
@@ -80,9 +80,14 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Stats")
     float KnockBack = 1.0f; // 넉백
 
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon Settings", meta = (RowType = "/Script/MegaBonkClone.WeaponData"))
+    FDataTableRowHandle WeaponTableRow;
+
     // ==========================================
     // 내부 변수
     // ==========================================
+public:
+
     UPROPERTY()
     FTimerHandle AttackTimerHandle;
 
@@ -91,9 +96,6 @@ public:
 
     UPROPERTY()
     float WeaponFinalDamage = 0.0f;
-
-    UPROPERTY()
-    TObjectPtr<UDataAsset> WeaponDataAsset;
 
 
 };

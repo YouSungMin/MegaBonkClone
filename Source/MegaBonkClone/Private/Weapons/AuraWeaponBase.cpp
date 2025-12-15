@@ -21,39 +21,22 @@ AAuraWeaponBase::AAuraWeaponBase()
 	
 }
 
+
+
 void AAuraWeaponBase::AttackWeapon_Implementation()
 {
-	UE_LOG(LogTemp, Warning, TEXT("AAuraWeaponBase :도트 데미지 처리"));
+	Super::AttackWeapon_Implementation();
 }
 
 void AAuraWeaponBase::GetDamageWeapon_Implementation()
 {
-	if (OwnerStatusComp.IsValid()) {
-		UE_LOG(LogTemp, Warning, TEXT("AAuraWeaponBase :스테이터스 존재"));
-	}
-
+	Super::GetDamageWeapon_Implementation();
 }
 
 void AAuraWeaponBase::StartAttackTimer()
 {
-	GetWorld()->GetTimerManager().ClearTimer(AttackTimerHandle);
-
-	float FinalCooldown = GetFinalCooldown();
-
-	// 쿨타임마다 Fire 함수 호출 (Loop = true)
-	if (FinalCooldown > 0.0f)
-	{
-		GetWorld()->GetTimerManager().SetTimer(
-			AttackTimerHandle, this,
-			&AWeaponBase::AttackWeapon_Implementation,
-			FinalCooldown,
-			true);
-
-		// 시작하자마자 한 번 쏘기
-		AttackWeapon_Implementation();
-	}
+	Super::StartAttackTimer();
 }
-
 
 
 // Called when the game starts or when spawned

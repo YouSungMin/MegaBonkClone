@@ -317,7 +317,7 @@ protected:
 	float Difficulty = 0.0f;
 	//데미지
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character|Status")
-	float Damage = 0.0f;
+	float Damage = 1.0f;
 	//크리티컬확률(수치그대로)
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character|Status")
 	float CriticalChance = 0.0f;
