@@ -142,7 +142,6 @@ float UStatusComponent::GetStatusDamage()
 {
 
     // [데미지] (기본 데미지 * 배율)
-    // 주의: 무기 데미지를 가져오는 로직이 필요합니다. 여기선 예시로 10.0f라 가정합니다.
     float FinalDamage = (1.0f + (0.01f * Damage));
 
     // [엘리트 데미지]

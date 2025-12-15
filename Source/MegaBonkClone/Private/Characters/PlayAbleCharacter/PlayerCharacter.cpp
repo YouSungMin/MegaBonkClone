@@ -44,7 +44,7 @@ void APlayerCharacter::InitializeCharacterComponents()
 	GetCharacterMovement()->MaxWalkSpeed = 400.0f;
 	GetCharacterMovement()->SetWalkableFloorAngle(46.0f);
 	//점프횟수 조절가능
-	JumpMaxCount = 2;
+	//JumpMaxCount = 2;
 }
 
 
@@ -148,4 +148,5 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	return 0.0f;
 }
+
 

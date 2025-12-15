@@ -317,7 +317,7 @@ protected:
 	float Difficulty = 0.0f;
 	//데미지
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character|Status")
-	float Damage = 0.0f;
+	float Damage = 1.0f;
 	//크리티컬확률(수치그대로)
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character|Status")
 	float CriticalChance = 0.0f;
@@ -332,7 +332,7 @@ protected:
 	float ResultCritDmgRate = 0.0f;
 	//공격속도 (합연산)
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character|Status")
-	float AttackSpeed = 0.0f;
+	float AttackSpeed = 1.0f;
 	//발사체수 (합연산) 소숫점아래버림
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character|Status")
 	float ProjectileCount = 0.0f;
@@ -341,7 +341,7 @@ protected:
 	float ProjectileReflectCount = 0.0f;
 	//크기를지원하는 무기의 크기
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character|Status")
-	float AttackSize = 0.0f;
+	float AttackSize = 1.0f;
 	//발사체 속도 (성소)
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character|Status")
 	float ShrineProjectileSpeed = 0.0f;
@@ -353,10 +353,10 @@ protected:
 	float PlayerProjectileSpeed = 0.0f;
 	//계산된 발사체 속도
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character|Status")
-	float ResultProjectileSpeed = 0.0f;
+	float ResultProjectileSpeed = 1.0f;
 	//지속시간
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character|Status")
-	float AttackDuration = 0.0f;
+	float AttackDuration = 1.0f;
 	//엘리트데미지
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character|Status")
 	float EliteDamage = 0.0f;

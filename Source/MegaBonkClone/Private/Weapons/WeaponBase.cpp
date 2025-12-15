@@ -4,14 +4,16 @@
 #include "Weapons/WeaponBase.h"
 #include "Characters/Components/StatusComponent.h"
 #include "Characters/PlayAbleCharacter/PlayerCharacter.h"
+#include "Data/WeaponDataStructs.h"
 #include "Kismet/GameplayStatics.h"
+#include "Engine/OverlapResult.h" 
 
 // Sets default values
 AWeaponBase::AWeaponBase()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
-
+	
 }
 
 // Called when the game starts or when spawned
@@ -19,19 +21,164 @@ void AWeaponBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//OnActorBeginOverlap.AddDynamic(this, &AWeaponBase::OnBeginWeaponOverlap);
-	//OnActorEndOverlap.AddDynamic(this, &AWeaponBase::OnEndWeaponOverlap);
-
-	OwnerStatusComp = Cast<APlayerCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0))->GetStatusComponent();
-	
+	OwnerCharacter = Cast<APlayerCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+	OwnerStatusComp = OwnerCharacter->GetStatusComponent();
+	LoadWeaponData();
 }
+
+AActor* AWeaponBase::FindNearestEnemy(float SearchRadius)
+{
+	if (!GetWorld() || !OwnerCharacter.IsValid()) return nullptr;
+
+	FVector MyLoc = OwnerCharacter->GetActorLocation();
+
+	// 1. 탐색할 오브젝트 타입 설정 (Pawn = 캐릭터/몬스터)
+	// 몬스터가 'Pawn' 채널을 쓴다고 가정합니다.
+	FCollisionObjectQueryParams ObjectQueryParams;
+	ObjectQueryParams.AddObjectTypesToQuery(ECC_Pawn);
+	// 만약 몬스터가 WorldDynamic이면 아래 줄 주석 해제
+	ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldDynamic);
+
+	// 2. 탐색 모양 설정 (구체)
+	FCollisionShape CollisionShape;
+	CollisionShape.SetSphere(SearchRadius);
+
+	// 3. 오버랩 검사 실행
+	TArray<FOverlapResult> OverlapResults;
+	bool bHit = GetWorld()->OverlapMultiByObjectType(
+		OverlapResults,
+		MyLoc,
+		FQuat::Identity,
+		ObjectQueryParams,
+		CollisionShape
+	);
+
+	// 4. 결과 중에서 가장 가까운 적 찾기
+	AActor* NearestEnemy = nullptr;
+	float MinDistSq = FLT_MAX; // 최소 거리(제곱)
+
+	if (bHit)
+	{
+		for (const FOverlapResult& Result : OverlapResults)
+		{
+			AActor* Enemy = Result.GetActor();
+
+			// (중요) 유효성 검사 + "Enemy" 태그 확인 + 나 자신 제외
+			if (Enemy && Enemy->ActorHasTag("Enemy") && IsValidTarget(Enemy))
+			{
+				float DistSq = FVector::DistSquared(MyLoc, Enemy->GetActorLocation());
+				if (DistSq < MinDistSq)
+				{
+					MinDistSq = DistSq;
+					NearestEnemy = Enemy;
+				}
+			}
+		}
+	}
+
+	// 디버그용: 범위 눈으로 확인하기 (필요할 때만 주석 해제)
+	
+	DrawDebugSphere(GetWorld(), MyLoc, SearchRadius, 32, FColor::Red, false, 0.1f);
+	if(NearestEnemy)
+	{
+		DrawDebugLine(GetWorld(), MyLoc, NearestEnemy->GetActorLocation(), FColor::Green, false, 0.1f, 0, 2.0f);
+	}
+	
+
+	return NearestEnemy;
+}
+
+void AWeaponBase::LoadWeaponData()
+{
+	// 1. 데이터 테이블 핸들이 유효한지 확인
+	if (!WeaponTableRow.IsNull())
+	{
+		// 2. 핸들을 통해 실제 데이터(Row) 가져오기
+		// GetRow<구조체타입>(ContextString)
+		FWeaponData* RowData = WeaponTableRow.GetRow<FWeaponData>(TEXT("Weapon Data Context"));
+
+		// 3. 데이터가 잘 가져와졌다면 초기화 함수 실행
+		if (RowData)
+		{
+			// 기존에 만들어두신 InitializeWeapon 함수 재활용
+			// 포인터(*RowData)를 참조(&)로 넘김
+			InitializeWeaponStatus(*RowData);
+
+			// 로그로 확인 (선택 사항)
+			UE_LOG(LogTemp, Log, TEXT("Weapon Loaded: %s, Damage: %f"), *RowData->Name.ToString(), RowData->WeaponDamage);
+		}
+	}
+}
+
+void AWeaponBase::InvokeAttack()
+{
+	//UE_LOG(LogTemp, Warning, TEXT("InvokeAttack"));
+	if (Implements<UWeapon>()) {
+		IWeapon::Execute_AttackWeapon(this);
+	}
+}
+
+void AWeaponBase::StartAttackTimer()
+{
+	
+
+	if (!OwnerStatusComp.IsValid())return;
+	UE_LOG(LogTemp, Warning, TEXT("StartAttackTimer"));
+	if (OwnerStatusComp.IsValid()) {
+		float attackSpeed = OwnerStatusComp.Get()->GetAttackSpeed();
+		UE_LOG(LogTemp, Log, TEXT("attackSpeed: %f"), attackSpeed);
+		//기존 타이머가 돌고 있다면 초기화 (스탯 변경 시 재설정 위함)
+		GetWorldTimerManager().ClearTimer(AttackTimerHandle);
+
+		//타이머 설정
+		//InvokeAttack 함수를 attackSpeed마다 반복(loop) 실행
+		GetWorldTimerManager().SetTimer(
+			AttackTimerHandle,
+			this,
+			&AWeaponBase::InvokeAttack,
+			attackSpeed,
+			true
+		);
+	}
+	
+	
+
+}
+
+void AWeaponBase::InitializeWeaponStatus(const FWeaponData& InWeaponData)
+{
+	//UE_LOG(LogTemp, Warning, TEXT("InitializeWeaponStatus"));
+	WeaponDamage = InWeaponData.WeaponDamage;
+	ProjectileCount = InWeaponData.ProjectileCount;
+	ProjectileSpeed = InWeaponData.ProjectileSpeed;
+	ProjectileAttackSize = InWeaponData.ProjectileScale; 
+	ProjectileReflectCount = InWeaponData.ChainCount;     
+	CriticalChance = InWeaponData.CriticalChance;
+	CritDmgRate = InWeaponData.CriticalDamage; 
+	KnockBack = InWeaponData.KnockBack;
+
+	if (Implements<UWeapon>()) {
+		IWeapon::Execute_GetDamageWeapon(this);
+	}
+
+	StartAttackTimer();
+
+}
+
 
 void AWeaponBase::GetDamageWeapon_Implementation()
 {
 	if (OwnerStatusComp.IsValid()) {
 		WeaponFinalDamage = OwnerStatusComp->GetStatusDamage();
-		UE_LOG(LogTemp, Warning, TEXT("데미지 : %.1f"),WeaponFinalDamage);
+		//UE_LOG(LogTemp, Warning, TEXT("데미지 : %.1f"),GetFinalDamage());
 	}
+}
+
+void AWeaponBase::AttackWeapon_Implementation()
+{
+	
+	//UE_LOG(LogTemp, Warning, TEXT("%s : AttackWeapon_Implementation : %.1f"),*this->GetName(), WeaponFinalDamage);
+	
 }
 
 
@@ -46,7 +193,7 @@ bool AWeaponBase::IsValidTarget(AActor* OtherActor)
 	{
 		return false;
 	}
-	//같은 클래스 종류(ATrailWeaponActor 및 이를 상속받은 모든 자식)인지 확인
+	//같은 클래스 종류인지 확인
 	if (OtherActor->IsA(AWeaponBase::StaticClass()))
 	{
 		return false;

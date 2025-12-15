@@ -2,79 +2,82 @@
 
 
 #include "Weapons/ProjectileWeaponBase.h"
-#include "Components/CapsuleComponent.h"
-#include "GameFramework/ProjectileMovementComponent.h"
-#include "GameFramework/RotatingMovementComponent.h"
-#include "Kismet/GameplayStatics.h"//임시
+#include "Weapons/ProjectileWeaponActor.h"
+#include "Characters/PlayAbleCharacter/PlayerCharacter.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AProjectileWeaponBase::AProjectileWeaponBase()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
-	BaseMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BaseMesh"));
-	SetRootComponent(BaseMesh);
-	BaseMesh->SetCollisionProfileName("NoCollision");
 
-	Collision = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Collision"));
-	Collision->SetupAttachment(BaseMesh);
-
-	ProjectileComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileComponent"));
-	ProjectileComponent->bIsHomingProjectile = true;
-	ProjectileComponent->InitialSpeed = 1500.0f;
-	ProjectileComponent->MaxSpeed = 1500.0f;
-	ProjectileComponent->bRotationFollowsVelocity = false; // 이동 방향으로 회전하지 않음 (바나나는 따로 돌거니까)
-	ProjectileComponent->bShouldBounce = false; // 튕기기 끔
-	ProjectileComponent->ProjectileGravityScale = 0.0f; // 중력 무시 (직사)
-
-
-	RotatingComponent = CreateDefaultSubobject<URotatingMovementComponent>(TEXT("RotatingComponent"));
-	RotatingComponent->RotationRate = FRotator(0.0f, 720.0f, 0.0f);
 }
 
 // Called when the game starts or when spawned
 void AProjectileWeaponBase::BeginPlay()
 {
 	Super::BeginPlay();
-	// 지정된 시간(ReturnDelay) 후에 StartReturn 함수 실행
-	OwnerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(),0);
-	GetWorldTimerManager().SetTimer(ReturnTimerHandle, this, &AProjectileWeaponBase::StartReturn, ReturnDelay, false);
-	SetHomingTarget(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+	
 }
 
-
-
-void AProjectileWeaponBase::StartReturn()
+void AProjectileWeaponBase::AttackWeapon_Implementation()
 {
-	// 타이머가 발동되면 "유도탄(Homing)" 모드로 전환
-	if (OwnerPawn)
+	if (!ProjectileClass) return;
+
+	// 1. 발사 위치: 플레이어 위치
+	FVector SpawnLoc = OwnerCharacter.Get()->GetActorLocation();
+	FRotator SpawnRot = OwnerCharacter.Get()->GetActorRotation(); // 기본은 플레이어가 보는 방향
+
+	//가장 가까운 적 찾기
+	
+	AActor* NearestEnemy = FindNearestEnemy(); 
+	if (NearestEnemy)
 	{
-		//이제부터는 돌아오는 상태임을 명시
-		bIsReturning = true;
-
-		// 1. 유도탄 타겟 설정 (플레이어의 RootComponent)
-		ProjectileComponent->HomingTargetComponent = OwnerPawn->GetRootComponent();
-
-		// 2. 유도탄 모드 활성화
-		ProjectileComponent->bIsHomingProjectile = true;
-
-		// 3. 유도 가속도 설정 (높을수록 빨리 꺾어서 돌아옴)
-		ProjectileComponent->HomingAccelerationMagnitude = HomingAccel;
-
-		// (선택사항) 돌아올 때 속도를 조금 더 높이고 싶다면
-		ProjectileComponent->MaxSpeed = 2000.0f;
+		FVector Dir = NearestEnemy->GetActorLocation() - SpawnLoc;
+		SpawnRot = Dir.Rotation();
 	}
-	else
+	
+
+	// 2. 투사체 개수만큼 발사 (샷건처럼 여러 발 나가는 경우 처리)
+	int32 NumProjectiles = FMath::Max(1, (int32)ProjectileCount);
+
+	for (int32 i = 0; i < NumProjectiles; ++i)
 	{
-		//예외처리
-		UE_LOG(LogTemp, Warning, TEXT("OwnerPawn없음"));
-		Destroy();
+		// 여러 발이면 각도를 약간씩 틀어줌 (예: -10도, 0도, +10도)
+		FRotator CurrentRot = SpawnRot;
+		if (NumProjectiles > 1)
+		{
+			float SpreadAngle = 15.0f; // 부채꼴 각도
+			float AngleOffset = SpreadAngle * (i - (NumProjectiles - 1) / 2.0f);
+			CurrentRot.Yaw += AngleOffset;
+		}
+
+		FActorSpawnParameters Params;
+		Params.Owner = this;
+		Params.Instigator = Cast<APawn>(OwnerCharacter.Get());
+
+		// 3. 스폰
+		AProjectileWeaponActor* NewProj = GetWorld()->SpawnActor<AProjectileWeaponActor>(ProjectileClass, SpawnLoc, CurrentRot, Params);
+
+		// 4. 데이터 주입
+		if (NewProj)
+		{
+			// WeaponBase가 가지고 있는 계산된 스탯들을 넘겨줌
+			float FinalDmg = GetFinalDamage();
+			// ProjectileAttackSize, ProjectileSpeed 등 WeaponBase 변수 활용
+			float Duration = 3.0f; // 혹은 사거리
+
+			NewProj->InitializeProjectile(FinalDmg, ProjectileSpeed, Duration, KnockBack,false);
+
+			// 크기 조절
+			if (ProjectileAttackSize > 0.0f)
+			{
+				NewProj->SetActorScale3D(FVector(ProjectileAttackSize));
+			}
+		}
 	}
 }
 
-void AProjectileWeaponBase::SetHomingTarget(AActor* Target)
-{
-	//UE_LOG(LogTemp, Warning, TEXT("SetHomingTarget"));
-	ProjectileComponent->HomingTargetComponent = Target->GetRootComponent();
-}
+
 

@@ -2,7 +2,9 @@
 
 
 #include "Weapons/AuraWeaponBase.h"
+#include "Characters/Components/StatusComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AAuraWeaponBase::AAuraWeaponBase()
@@ -23,35 +25,57 @@ AAuraWeaponBase::AAuraWeaponBase()
 
 void AAuraWeaponBase::AttackWeapon_Implementation()
 {
-	UE_LOG(LogTemp, Warning, TEXT("AAuraWeaponBase :도트 데미지 처리"));
-}
+	Super::AttackWeapon_Implementation();
 
-void AAuraWeaponBase::GetDamageWeapon_Implementation()
-{
-	if (OwnerStatusComp.IsValid()) {
-		UE_LOG(LogTemp, Warning, TEXT("AAuraWeaponBase :스테이터스 존재"));
-	}
+	// 이 함수는 타이머에 의해 '공격 속도' 주기로 계속 불립니다.
+	// 즉, 0.5초마다 불리면 0.5초마다 범위 내 적에게 데미지를 줍니다.
 
-}
+	// 1. 범위 내에 겹쳐있는 모든 액터 가져오기
+	TArray<AActor*> OverlappingActors;
+	Collision->GetOverlappingActors(OverlappingActors);
 
-void AAuraWeaponBase::StartAttackTimer()
-{
-	GetWorld()->GetTimerManager().ClearTimer(AttackTimerHandle);
+	// 2. 데미지 계산 (WeaponBase의 GetFinalDamage 활용)
+	float DamageToApply = GetFinalDamage();
 
-	float FinalCooldown = GetFinalCooldown();
-
-	// 쿨타임마다 Fire 함수 호출 (Loop = true)
-	if (FinalCooldown > 0.0f)
+	// 3. 반복문으로 데미지 적용
+	bool bHitAny = false;
+	for (AActor* Actor : OverlappingActors)
 	{
-		GetWorld()->GetTimerManager().SetTimer(
-			AttackTimerHandle, this,
-			&AWeaponBase::AttackWeapon_Implementation,
-			FinalCooldown,
-			true);
-
-		// 시작하자마자 한 번 쏘기
-		AttackWeapon_Implementation();
+		// 유효한 타겟인지 확인 (WeaponBase에 있는 함수 활용)
+		if (IsValidTarget(Actor))
+		{
+			// 데미지 전달
+			UGameplayStatics::ApplyDamage(
+				Actor,
+				DamageToApply,
+				GetInstigatorController(), // 혹은 nullptr
+				this,
+				UDamageType::StaticClass()
+			);
+			bHitAny = true;
+		}
 	}
+
+	if (bHitAny)
+	{
+		// (선택) 타격감이 필요하면 여기서 사운드나 이펙트 재생
+		UE_LOG(LogTemp, Log, TEXT("Aura Hit! Damage: %f"), DamageToApply);
+	}
+}
+
+void AAuraWeaponBase::UpdateAuraScale()
+{
+	// 플레이어의 범위 증가 스탯(AttackSize) 반영
+	float BaseScale = 5.0f;
+	float PlayerBonus = 1.0f;
+	if (OwnerStatusComp.IsValid())
+	{// StatusComponent의 공격 범위 스탯
+		PlayerBonus = OwnerStatusComp->GetAttackSize(); 
+	}
+
+	// 최종 크기 적용
+	float FinalScale = PlayerBonus * BaseScale;
+	SetActorScale3D(FVector(FinalScale));
 }
 
 
@@ -61,6 +85,8 @@ void AAuraWeaponBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	//오라 크기 설정
+	UpdateAuraScale();
 }
 
 
