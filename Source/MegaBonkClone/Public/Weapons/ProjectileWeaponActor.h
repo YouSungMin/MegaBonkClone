@@ -24,7 +24,7 @@ protected:
 
 	// 충돌 감지 함수
 	UFUNCTION()
-	void OnProjectileHit(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	virtual void OnProjectileHit(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 protected:
 	//메쉬
@@ -43,8 +43,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	TObjectPtr<class URotatingMovementComponent> RotatingComp =nullptr;
 
-private:
 	float Damage = 0.0f;
 	float Knockback = 0.0f;
-	bool bPenetrate = false; // 관통 여부
+	bool bPenetrate = true; // 관통 여부
+
+	
 };

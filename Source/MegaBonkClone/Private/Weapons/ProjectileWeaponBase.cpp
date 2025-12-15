@@ -68,7 +68,7 @@ void AProjectileWeaponBase::AttackWeapon_Implementation()
 			// ProjectileAttackSize, ProjectileSpeed 등 WeaponBase 변수 활용
 			float Duration = 3.0f; // 혹은 사거리
 
-			NewProj->InitializeProjectile(FinalDmg, ProjectileSpeed, Duration, KnockBack);
+			NewProj->InitializeProjectile(FinalDmg, ProjectileSpeed, Duration, KnockBack,false);
 
 			// 크기 조절
 			if (ProjectileAttackSize > 0.0f)
