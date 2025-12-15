@@ -16,10 +16,7 @@ public:
 	// Sets default values for this actor's properties
 	ATrailWeaponActor();
 
-	//오브젝트에 오버랩 되었을때 실행할 함수
-	virtual void OnBeginWeaponOverlap(AActor* OverlappedActor, AActor* OtherActor) override;
-	//오브젝트에 오버랩 끝났을때 실행할 함수
-	virtual void OnEndWeaponOverlap(AActor* OverlappedActor, AActor* OtherActor) override;
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

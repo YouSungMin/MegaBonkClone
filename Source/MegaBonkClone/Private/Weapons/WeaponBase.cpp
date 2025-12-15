@@ -19,20 +19,21 @@ void AWeaponBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	OnActorBeginOverlap.AddDynamic(this, &AWeaponBase::OnBeginWeaponOverlap);
-	OnActorEndOverlap.AddDynamic(this, &AWeaponBase::OnEndWeaponOverlap);
+	//OnActorBeginOverlap.AddDynamic(this, &AWeaponBase::OnBeginWeaponOverlap);
+	//OnActorEndOverlap.AddDynamic(this, &AWeaponBase::OnEndWeaponOverlap);
 
 	OwnerStatusComp = Cast<APlayerCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0))->GetStatusComponent();
 	
 }
 
-void AWeaponBase::OnBeginWeaponOverlap(AActor* OverlappedActor, AActor* OtherActor)
+void AWeaponBase::GetDamageWeapon_Implementation()
 {
-	if (IsValidTarget(OtherActor)) {
-		UE_LOG(LogTemp, Warning, TEXT("%s"), *OtherActor->GetName());
-
+	if (OwnerStatusComp.IsValid()) {
+		WeaponFinalDamage = OwnerStatusComp->GetStatusDamage();
+		UE_LOG(LogTemp, Warning, TEXT("데미지 : %.1f"),WeaponFinalDamage);
 	}
 }
+
 
 bool AWeaponBase::IsValidTarget(AActor* OtherActor)
 {
@@ -53,7 +54,9 @@ bool AWeaponBase::IsValidTarget(AActor* OtherActor)
 	return true;
 }
 
-void AWeaponBase::OnEndWeaponOverlap(AActor* OverlappedActor, AActor* OtherActor)
-{
 
+
+float AWeaponBase::GetFinalDamage() const
+{
+	return WeaponDamage* WeaponFinalDamage;
 }

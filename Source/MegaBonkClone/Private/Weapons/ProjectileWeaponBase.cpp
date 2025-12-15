@@ -42,32 +42,7 @@ void AProjectileWeaponBase::BeginPlay()
 	SetHomingTarget(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
 }
 
-void AProjectileWeaponBase::OnBeginWeaponOverlap(AActor* OverlappedActor, AActor* OtherActor)
-{
-	Super::OnBeginWeaponOverlap(OverlappedActor, OtherActor);
-	//캐릭터 일때 처리
-	if (bIsReturning && OtherActor == OwnerPawn)
-	{
-		// 여기서 무기를 제거하거나, 쿨타임 초기화 등의 로직 수행
-		//무기제거 나중에 오브젝트풀 사용예정
 
-		Destroy();
-		return;
-	}
-
-	//적일때 처리
-	if (IsValidTarget(OtherActor)) {
-		
-	}
-}
-
-void AProjectileWeaponBase::OnEndWeaponOverlap(AActor* OverlappedActor, AActor* OtherActor)
-{
-	Super::OnEndWeaponOverlap(OverlappedActor, OtherActor);
-	if (IsValidTarget(OtherActor)) {
-
-	}
-}
 
 void AProjectileWeaponBase::StartReturn()
 {

@@ -18,17 +18,12 @@ public:
     //꼭 구현해야하는 함수들
 
     //IWeapon 인터페이스 구현부
-    virtual void AttackWeapon_Implementation() override {}
-    virtual void GetDamageWeapon_Implementation() override {}
-    //오브젝트에 오버랩 되었을때 실행할 함수
-    UFUNCTION()
-    virtual void OnBeginWeaponOverlap(AActor* OverlappedActor, AActor* OtherActor);
+    virtual void AttackWeapon_Implementation() override {}  //무기마다 다르게 재정의 해야함
+    virtual void GetDamageWeapon_Implementation() override;//무기마다 데미지 공식은 똑같을듯
 
+    //액터 유효성 검사 //플레이어인지 아닌지  , 유효한지 아닌지
     bool IsValidTarget(AActor* OtherActor);
-    //오브젝트에 오버랩 끝났을때 실행할 함수
-    UFUNCTION()
-    virtual void OnEndWeaponOverlap(AActor* OverlappedActor, AActor* OtherActor);
-
+   
 
 public:
 
@@ -38,9 +33,11 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Weapon")
     virtual void StartAttackTimer() {}
 
+
+    //몬스터에 적용할 최종 데미지 함수
     // 최종 데미지 계산 (무기 깡뎀 * 플레이어 데미지 배율)
     UFUNCTION(BlueprintPure, Category = "Weapon")
-    virtual float GetFinalDamage() const { return 0.0f; }
+    virtual float GetFinalDamage() const;
 
     // 최종 쿨타임 계산 (무기 쿨타임 * 플레이어 쿨감 배율)
     UFUNCTION(BlueprintPure, Category = "Weapon")
@@ -59,13 +56,13 @@ public:
     // 무기 기본 스탯 (테이블에서 가져올예정)
     // ==========================================
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Stats")
-    float BaseDamage = 10.0f;
+    float WeaponDamage = 10.0f;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Stats")
-    float BaseCooldown = 1.0f; // 공격 주기
+    float WeaponCooldown = 1.0f; // 공격 주기
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Stats")
-    float BaseArea = 100.0f; // 범위 혹은 크기
+    float WeaponAttackSize = 100.0f; // 범위 혹은 크기
 
     // ==========================================
     // 내부 변수
@@ -75,6 +72,9 @@ public:
 
     UPROPERTY()
     TWeakObjectPtr<class UStatusComponent> OwnerStatusComp; // 주인님의 스탯 컴포넌트 캐싱
+
+    UPROPERTY()
+    float WeaponFinalDamage = 0.0f;
 
     UPROPERTY()
     TObjectPtr<UDataAsset> WeaponDataAsset;

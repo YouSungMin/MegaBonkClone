@@ -11,7 +11,7 @@ UStatusComponent::UStatusComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
-
+    
 	// ...
 }
 
@@ -21,17 +21,21 @@ void UStatusComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
-	
+	OwnerCharacter = Cast<ACharacter>(GetOwner());
+    Movement = OwnerCharacter->GetCharacterMovement();
+
+
+    //캐릭터 존재 확인용 로그
+    /*if (OwnerCharacter && Movement) {
+        UE_LOG(LogTemp, Warning, TEXT("UStatusComponent : 캐릭터 존재"));
+    }*/
 }
 
 void UStatusComponent::UpdateCharacterStatus()
 {
     // 0. 주인 캐릭터와 무브먼트 컴포넌트 가져오기
-    ACharacter* OwnerCharacter = Cast<ACharacter>(GetOwner());
     if (!OwnerCharacter) return;
-
-    UCharacterMovementComponent* Movement = OwnerCharacter->GetCharacterMovement();
+    if (!Movement) return;
 
     // ==========================================================
     // 1. 계산 로직 (수식 적용)
@@ -49,11 +53,6 @@ void UStatusComponent::UpdateCharacterStatus()
     float GoldMultiplier = (1.0f + (0.01f * GoldGain));
     float SilverMultiplier = (1.0f + (0.01f * SilverGain));
     float PickupRangeMultiplier = (1.0f + (0.01f * PickUpRange));
-
-    // [데미지] (기본 데미지 * 배율)
-    // 주의: 무기 데미지를 가져오는 로직이 필요합니다. 여기선 예시로 10.0f라 가정합니다.
-    float WeaponDamage = 10.0f;
-    float FinalDamage = WeaponDamage * (1.0f + (0.01f * Damage));
 
     // [크리티컬 데미지] (Result 변수가 존재함 -> 셋터 사용 가능)
     // X: 무기 치피, Y: 무기 데미지라고 가정
@@ -79,10 +78,6 @@ void UStatusComponent::UpdateCharacterStatus()
     // [공격 지속 시간]
     float WeaponBaseDuration = 5.0f;
     float CalculatedDuration = WeaponBaseDuration * (0.001f * AttackDuration);
-
-
-    // [엘리트 데미지]
-    float CalculatedEliteDamage = FinalDamage * (1.0f + (0.01f * EliteDamage));
 
 
     // [넉백]
@@ -122,6 +117,8 @@ void UStatusComponent::UpdateCharacterStatus()
         int32 FinalExtraJumps = FMath::FloorToInt(ExtraJump);
         OwnerCharacter->JumpMaxCount = 1 + FinalExtraJumps; // 기본 1 + 추가점프
     }
+
+    //디버그용 프린트 
     if (GEngine)
     {
         FString DebugMsg = FString::Printf(TEXT(
@@ -137,9 +134,24 @@ void UStatusComponent::UpdateCharacterStatus()
             ResultProjectileSpeed
         );
 
-        // (Key: -1, Time: 5.0f, Color: Yellow)
         GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, DebugMsg);
     }
+}
+
+float UStatusComponent::GetStatusDamage()
+{
+
+    // [데미지] (기본 데미지 * 배율)
+    // 주의: 무기 데미지를 가져오는 로직이 필요합니다. 여기선 예시로 10.0f라 가정합니다.
+    float FinalDamage = (1.0f + (0.01f * Damage));
+
+    // [엘리트 데미지]
+    float CalculatedEliteDamage = FinalDamage * (1.0f + (0.01f * EliteDamage));
+
+    return FinalDamage;
+
+    //엘리트면
+    //return CalculatedEliteDamage;
 }
 
 
