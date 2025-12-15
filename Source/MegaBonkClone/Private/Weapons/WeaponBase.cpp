@@ -21,6 +21,11 @@ void AWeaponBase::BeginPlay()
 	Super::BeginPlay();
 
 	OwnerStatusComp = Cast<APlayerCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0))->GetStatusComponent();
+	LoadWeaponData();
+}
+
+void AWeaponBase::LoadWeaponData()
+{
 	// 1. 데이터 테이블 핸들이 유효한지 확인
 	if (!WeaponTableRow.IsNull())
 	{
@@ -88,15 +93,12 @@ void AWeaponBase::InitializeWeaponStatus(const FWeaponData& InWeaponData)
 	CritDmgRate = InWeaponData.CriticalDamage; 
 	KnockBack = InWeaponData.KnockBack;
 
+	if (Implements<UWeapon>()) {
+		IWeapon::Execute_GetDamageWeapon(this);
+	}
+
 	StartAttackTimer();
-	//if (!OwnerStatusComp.IsValid())
-	//{
-	//	// GetOwner()로 주인을 가져옵니다. (SpawnParams.Owner 설정 필수)
-	//	if (APlayerCharacter* Player = Cast<APlayerCharacter>(GetOwner()))
-	//	{
-	//		OwnerStatusComp = Player->GetStatusComponent();
-	//	}
-	//}	
+
 }
 
 
@@ -104,16 +106,14 @@ void AWeaponBase::GetDamageWeapon_Implementation()
 {
 	if (OwnerStatusComp.IsValid()) {
 		WeaponFinalDamage = OwnerStatusComp->GetStatusDamage();
-		UE_LOG(LogTemp, Warning, TEXT("데미지 : %.1f"),GetFinalDamage());
+		//UE_LOG(LogTemp, Warning, TEXT("데미지 : %.1f"),GetFinalDamage());
 	}
 }
 
 void AWeaponBase::AttackWeapon_Implementation()
 {
-	if (Implements<UWeapon>()) {
-		IWeapon::Execute_GetDamageWeapon(this);
-		UE_LOG(LogTemp, Warning, TEXT("AttackWeapon_Implementation : %.1f"), WeaponFinalDamage);
-	}
+	
+	//UE_LOG(LogTemp, Warning, TEXT("%s : AttackWeapon_Implementation : %.1f"),*this->GetName(), WeaponFinalDamage);
 	
 }
 

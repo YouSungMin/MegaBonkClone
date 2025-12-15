@@ -341,7 +341,7 @@ protected:
 	float ProjectileReflectCount = 0.0f;
 	//크기를지원하는 무기의 크기
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character|Status")
-	float AttackSize = 0.0f;
+	float AttackSize = 1.0f;
 	//발사체 속도 (성소)
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character|Status")
 	float ShrineProjectileSpeed = 0.0f;

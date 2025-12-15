@@ -18,11 +18,10 @@ public:
 
 	//IWeapon 인터페이스 구현부
 	virtual void AttackWeapon_Implementation() override;
-	virtual void GetDamageWeapon_Implementation() override;
 
-	virtual void StartAttackTimer() override;
-	
-
+	// 오라 크기를 업데이트하는 함수 (스탯 변화 시 호출 가능)
+	UFUNCTION(BlueprintCallable, Category = "Aura")
+	void UpdateAuraScale();
 
 protected:
 	// Called when the game starts or when spawned

@@ -48,6 +48,8 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+    void LoadWeaponData();
+
     //타이머에서 AttackWeapon함수 바로 호출 불가능해서 만든 인보크 함수
     UFUNCTION()
     void InvokeAttack();
