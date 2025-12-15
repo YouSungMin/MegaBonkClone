@@ -4,16 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "ProjectileWeaponBase.generated.h"
+#include "ProjectileWeaponActor.generated.h"
 
 UCLASS()
-class MEGABONKCLONE_API AProjectileWeaponBase : public AActor
+class MEGABONKCLONE_API AProjectileWeaponActor : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	AProjectileWeaponBase();
+	AProjectileWeaponActor();
 
 protected:
 	// Called when the game starts or when spawned

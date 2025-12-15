@@ -88,13 +88,16 @@ public:
     // ==========================================
     // 내부 변수
     // ==========================================
-public:
+ protected:
 
     UPROPERTY()
     FTimerHandle AttackTimerHandle;
 
     UPROPERTY()
-    TWeakObjectPtr<class UStatusComponent> OwnerStatusComp; // 주인님의 스탯 컴포넌트 캐싱
+    TWeakObjectPtr<class APlayerCharacter> OwnerCharacter = nullptr; 
+
+    UPROPERTY()
+    TWeakObjectPtr<class UStatusComponent> OwnerStatusComp = nullptr;
 
     UPROPERTY()
     float WeaponFinalDamage = 0.0f;

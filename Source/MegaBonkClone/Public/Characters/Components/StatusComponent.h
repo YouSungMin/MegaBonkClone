@@ -356,7 +356,7 @@ protected:
 	float ResultProjectileSpeed = 0.0f;
 	//지속시간
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character|Status")
-	float AttackDuration = 0.0f;
+	float AttackDuration = 1.0f;
 	//엘리트데미지
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character|Status")
 	float EliteDamage = 0.0f;

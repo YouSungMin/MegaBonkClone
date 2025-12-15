@@ -12,7 +12,7 @@ AWeaponBase::AWeaponBase()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
-
+	
 }
 
 // Called when the game starts or when spawned
@@ -20,7 +20,8 @@ void AWeaponBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	OwnerStatusComp = Cast<APlayerCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0))->GetStatusComponent();
+	OwnerCharacter = Cast<APlayerCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+	OwnerStatusComp = OwnerCharacter->GetStatusComponent();
 	LoadWeaponData();
 }
 
@@ -129,7 +130,7 @@ bool AWeaponBase::IsValidTarget(AActor* OtherActor)
 	{
 		return false;
 	}
-	//같은 클래스 종류(ATrailWeaponActor 및 이를 상속받은 모든 자식)인지 확인
+	//같은 클래스 종류인지 확인
 	if (OtherActor->IsA(AWeaponBase::StaticClass()))
 	{
 		return false;

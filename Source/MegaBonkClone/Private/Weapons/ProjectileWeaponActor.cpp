@@ -1,10 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Weapons/ProjectileWeaponBase.h"
+#include "Weapons/ProjectileWeaponActor.h"
 
 // Sets default values
-AProjectileWeaponBase::AProjectileWeaponBase()
+AProjectileWeaponActor::AProjectileWeaponActor()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -12,14 +12,14 @@ AProjectileWeaponBase::AProjectileWeaponBase()
 }
 
 // Called when the game starts or when spawned
-void AProjectileWeaponBase::BeginPlay()
+void AProjectileWeaponActor::BeginPlay()
 {
 	Super::BeginPlay();
 	
 }
 
 // Called every frame
-void AProjectileWeaponBase::Tick(float DeltaTime)
+void AProjectileWeaponActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
