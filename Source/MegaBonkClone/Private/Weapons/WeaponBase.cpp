@@ -26,6 +26,14 @@ void AWeaponBase::BeginPlay()
 	
 }
 
+void AWeaponBase::GetDamageWeapon_Implementation()
+{
+	if (OwnerStatusComp.IsValid()) {
+		WeaponFinalDamage = OwnerStatusComp->GetFinalDamage();
+		UE_LOG(LogTemp, Warning, TEXT("데미지 : %.1f"),WeaponFinalDamage);
+	}
+}
+
 void AWeaponBase::OnBeginWeaponOverlap(AActor* OverlappedActor, AActor* OtherActor)
 {
 	if (IsValidTarget(OtherActor)) {

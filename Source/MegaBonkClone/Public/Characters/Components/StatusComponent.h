@@ -253,12 +253,20 @@ public:
     UFUNCTION(BlueprintCallable)
     inline void SetJumpPower(float NewJumpPower) { JumpPower = NewJumpPower; }
 
+
+
+public:
+    UFUNCTION(BlueprintCallable)
+    void UpdateCharacterStatus();
+
+    UFUNCTION(BlueprintCallable)
+    float GetFinalDamage();
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-    UFUNCTION(BlueprintCallable)
-	void UpdateCharacterStatus();
+   
 
 private:
 
@@ -374,6 +382,10 @@ protected:
 
     
 private:
+
+    TObjectPtr<ACharacter> OwnerCharacter = nullptr;
+
+    TObjectPtr<class UCharacterMovementComponent> Movement = nullptr;
 
 	
 };
