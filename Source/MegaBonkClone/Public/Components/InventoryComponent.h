@@ -7,7 +7,7 @@
 #include "Data/WeaponDataStructs.h"
 #include "Data/ItemDataStructs.h"
 #include "InventoryComponent.generated.h"
-
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnItemUpdate, FName, ItemID, const FItemData&, ItemData);
 USTRUCT(BlueprintType)
 struct FInventorySlot
 {
@@ -18,7 +18,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FName ItemID;
 
-	// 현재 레벨 (무기/비전서용)
+	// 현재 레벨 (비전서용)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Level = 1;
 
@@ -41,10 +41,6 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
-	// 무기 획득
-	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	bool AddWeapon(FName WeaponID);
-
 	// 비전서 획득 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	bool AddSecretBook(FName BookID);
@@ -53,16 +49,18 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	void AddItem(FName ItemID, int32 Count = 1);
 
+	UFUNCTION(BlueprintPure, Category = "Inventory")
+	const TArray<FInventorySlot>& GetSecretBookSlots() const { return SecretBookSlots; }
+
+	// ID를 통해 아이템 상세 데이터를 찾아오는 함수 
+	FItemData* GetItemInfo(FName ItemID) const;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnItemUpdate OnItemAdd;
+
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "DataTable")
-	TObjectPtr<UDataTable> WeaponDataTable;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "DataTable")
-	TObjectPtr<UDataTable> ItemDataTable;
-
-	// 1. 무기 슬롯 (최대 3개)
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory|Weapons")
-	TArray<FInventorySlot> WeaponSlots;
+	TObjectPtr<UDataTable> ItemDataTable = nullptr;
 
 	// 2. 비전서 슬롯 (최대 3개)
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory|SecretBooks")
@@ -72,6 +70,5 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory|Items")
 	TArray<FInventorySlot> GeneralItems;
 private:
-	const int32 MaxWeaponCount = 3;
 	const int32 MaxSecretBookCount = 3;
 };
