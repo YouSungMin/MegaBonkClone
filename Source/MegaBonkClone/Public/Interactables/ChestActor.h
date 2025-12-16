@@ -4,10 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Interfaces/InteractionInterface.h"
+#include "Data/ItemDataStructs.h"
 #include "ChestActor.generated.h"
+struct FLootCandidate
+{
+	FName ItemID;
+	float Weight;
+};
 
 UCLASS()
-class MEGABONKCLONE_API AChestActor : public AActor
+class MEGABONKCLONE_API AChestActor : public AActor, public IInteractionInterface
 {
 	GENERATED_BODY()
 	
@@ -19,8 +26,24 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	virtual void Interact_Implementation(AActor* PlayerActor) override;
+private:
+	FName GetRandomItemID();
+protected:
+	// 등급별 등장 가중치 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loot Settings")
+	TMap<EItemGrade, float> TierProbabilities;
+
+	// 전체 아이템 데이터 테이블
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Data")
+	TObjectPtr<UDataTable> ItemDataTable;
+
+	// 상자 외형
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<UStaticMeshComponent> ChestMesh;
+
+	// 상자 여는 비용 (0이면 무료, 100이면 100골드 필요)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loot Settings")
+	int32 OpenCost = 0;
 
 };

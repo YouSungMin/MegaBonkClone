@@ -25,8 +25,6 @@ void APotActor::BeginPlay()
 
 void APotActor::Interact_Implementation(AActor* InstigatorActor)
 {
-	
-
 	// 깨지는 이펙트 (파티클) 재생
 	if (BreakEffect)
 	{
