@@ -133,9 +133,9 @@ void APlayerCharacter::TryInteract()
 		5.0f);
 
 	
-	for (const auto elements : outResults) {
+	for (const auto& elements : outResults) {
 		if (elements.GetActor()->Implements<UInteractionInterface>()) {
-			IInteractionInterface::Execute_Interact(this,this);
+			IInteractionInterface::Execute_Interact(elements.GetActor(),this);
 			UE_LOG(LogTemp, Warning, TEXT("상호작용 : %s"),*elements.GetActor()->GetName());
 		}
 	}
@@ -148,7 +148,7 @@ void APlayerCharacter::OnPickupOverlap(AActor* OverlappedActor, AActor* OtherAct
 	if (true) {
 		UE_LOG(LogTemp, Warning, TEXT("Pickup : %s"), *OtherActor->GetName());
 		if (OtherActor->Implements<UPickupInterface>()) {
-			IPickupInterface::Execute_OnPickup(this,this);
+			IPickupInterface::Execute_OnPickup(OtherActor,this);
 		}
 	}
 	
