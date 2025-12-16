@@ -36,9 +36,9 @@ void AChestActor::Interact_Implementation(AActor* PlayerActor)
 
 	if (PlayerActor->Implements<UInventoryOwner>())
 	{
-		//IInventoryOwner::Execute_ReceiveItem(PlayerActor);
+		IInventoryOwner::Execute_ReceiveItem(PlayerActor, SelectedItemID, 1);
 		UE_LOG(LogTemp, Log,TEXT("아이템 추가 %s"),*SelectedItemID.ToString());
-		Destroy();
+		//Destroy();
 	}
 	
 }
