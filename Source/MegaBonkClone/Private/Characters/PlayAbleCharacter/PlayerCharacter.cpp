@@ -143,8 +143,10 @@ void APlayerCharacter::TryInteract()
 
 void APlayerCharacter::OnPickupOverlap(AActor* OverlappedActor, AActor* OtherActor)
 {
+	
 	//오브젝트 Pickup류인지 체크할 조건 넣어야함
-	if (1) {
+	if (true) {
+		UE_LOG(LogTemp, Warning, TEXT("Pickup : %s"), *OtherActor->GetName());
 		if (OtherActor->Implements<UPickupInterface>()) {
 			IPickupInterface::Execute_OnPickup(this,this);
 		}
