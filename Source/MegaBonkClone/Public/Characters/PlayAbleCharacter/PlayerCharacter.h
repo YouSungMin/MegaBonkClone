@@ -32,7 +32,7 @@ public:
 
 	//오브젝트에 오버랩 되었을때 실행할 함수
 	UFUNCTION()
-	void OnBeginOverlap(AActor* OverlappedActor, AActor* OtherActor);
+	void OnPickupOverlap(AActor* OverlappedActor, AActor* OtherActor);
 
 	UFUNCTION()
 	virtual void NotifyHit(
@@ -65,7 +65,8 @@ protected:
 	UFUNCTION()
 	void OnJumpInput(const FInputActionValue& InValue);
 	
-
+	/*UFUNCTION()
+	void */
 private:
 
 public:
@@ -86,6 +87,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player|Components")
 	TObjectPtr<class UCameraComponent> Camera = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player|Components")
+	TObjectPtr<class UCapsuleComponent> PickupCollision = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Player|Components")
 	TObjectPtr<UStatusComponent> StatusComponent = nullptr;
