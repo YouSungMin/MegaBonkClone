@@ -3,7 +3,7 @@
 
 #include "Weapons/AuraWeaponBase.h"
 #include "Characters/Components/StatusComponent.h"
-#include "Paper2D/Classes/PaperSprite.h"
+#include "Paper2D/Classes/PaperSpriteComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -13,14 +13,19 @@ AAuraWeaponBase::AAuraWeaponBase()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 	
-	BaseMesh = CreateDefaultSubobject<UStaticMeshComponent>("BaseMesh");
-	SetRootComponent(BaseMesh);
-	BaseMesh->SetCollisionProfileName("NoCollision");
-	RingMesh = CreateDefaultSubobject<UStaticMeshComponent>("RingMesh");
-	RingMesh->SetupAttachment(BaseMesh);
-	RingMesh->SetCollisionProfileName("NoCollision");
+
+	BaseRoot = CreateDefaultSubobject<USceneComponent>("BaseRoot");
+	SetRootComponent(BaseRoot);
+
+	BaseSprite = CreateDefaultSubobject<UPaperSpriteComponent>("BaseSprite");
+	BaseSprite->SetupAttachment(BaseRoot);
+	BaseSprite->SetCollisionProfileName("NoCollision");
+	BaseSprite->SetRelativeRotation(FRotator(90.0f, 0.0f, 0.0f));
+	BaseSprite->SetSpriteColor(FColor::FromHex("66CCFF"));
+	
 	Collision = CreateDefaultSubobject<UCapsuleComponent>("Collision");
-	Collision->SetupAttachment(BaseMesh);
+	Collision->SetupAttachment(BaseRoot); 
+	Collision->SetCapsuleSize(35.0f, 35.0f);
 	
 }
 
@@ -54,14 +59,17 @@ void AAuraWeaponBase::AttackWeapon_Implementation()
 				UDamageType::StaticClass()
 			);
 			bHitAny = true;
+
+			if (bHitAny)
+			{
+				// (선택) 타격감이 필요하면 여기서 사운드나 이펙트 재생
+				UE_LOG(LogTemp, Log, TEXT("Aura Hit! %s에 Damage: %f"), *Actor->GetName(), DamageToApply);
+			}
+
 		}
 	}
 
-	if (bHitAny)
-	{
-		// (선택) 타격감이 필요하면 여기서 사운드나 이펙트 재생
-		UE_LOG(LogTemp, Log, TEXT("Aura Hit! Damage: %f"), DamageToApply);
-	}
+	
 }
 
 void AAuraWeaponBase::UpdateAuraScale()

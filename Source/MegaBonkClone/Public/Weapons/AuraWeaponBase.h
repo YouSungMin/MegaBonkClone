@@ -29,14 +29,13 @@ protected:
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon|Aura|Component")
-	TObjectPtr<UStaticMeshComponent> BaseMesh = nullptr;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon|Aura|Component")
-	TObjectPtr<UStaticMeshComponent>  RingMesh = nullptr;
+	TObjectPtr<USceneComponent> BaseRoot = nullptr;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon|Aura|Component")
 	TObjectPtr<class UCapsuleComponent> Collision = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon|Aura|Component")
-	TObjectPtr<class UPaperSprite> BaseSprite = nullptr;
+	TObjectPtr<class UPaperSpriteComponent> BaseSprite = nullptr;
 
 
 };
