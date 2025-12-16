@@ -5,6 +5,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Framework/ObjectPoolSubsystem.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "MegaBonkClone/MegaBonkClone.h"
 #include "GameFramework/RotatingMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -105,6 +106,7 @@ void AProjectileWeaponActor::LifeSpanExpired()
 	}
 	else
 	{
+		UE_LOG(LogWeapon, Warning, TEXT("서브시스템 : Null"));
 		Super::LifeSpanExpired(); // 서브시스템 없으면 그냥 파괴
 	}
 }

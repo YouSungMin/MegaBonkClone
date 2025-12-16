@@ -71,7 +71,7 @@ void AProjectileWeaponBase::AttackWeapon_Implementation()
 			// WeaponBase가 가지고 있는 계산된 스탯들을 넘겨줌
 			float FinalDmg = GetFinalDamage();
 			// ProjectileAttackSize, ProjectileSpeed 등 WeaponBase 변수 활용
-			float Duration = 3.0f; // 혹은 사거리
+			float Duration = 5.0f; // 혹은 사거리
 
 			NewProj->InitializeProjectile(FinalDmg, ProjectileSpeed, Duration, KnockBack,false);
 

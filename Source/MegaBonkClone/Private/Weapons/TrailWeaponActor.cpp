@@ -6,6 +6,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Paper2D/Classes/PaperSpriteComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Framework/ObjectPoolSubsystem.h"
 
 // Sets default values
 ATrailWeaponActor::ATrailWeaponActor()
@@ -88,6 +89,42 @@ void ATrailWeaponActor::OnDamageTick()
 	}
 }
 
+void ATrailWeaponActor::OnPoolActivate_Implementation()
+{
+	SetActorHiddenInGame(false);
+	SetActorEnableCollision(true);
+	SetActorTickEnabled(true);
+}
+
+void ATrailWeaponActor::OnPoolDeactivate_Implementation()
+{
+	SetActorHiddenInGame(true);
+	SetActorEnableCollision(false);
+	SetActorTickEnabled(false);
+
+	// 1. 모든 타이머 정지 (DamageTimer, ShrinkTimer 등)
+	GetWorldTimerManager().ClearAllTimersForObject(this);
+
+	// 2. 타임라인 정지
+	if (ScaleTimeline)
+	{
+		ScaleTimeline->Stop();
+	}
+
+}
+
+void ATrailWeaponActor::LifeSpanExpired()
+{
+	if (UObjectPoolSubsystem* Pool = GetWorld()->GetSubsystem<UObjectPoolSubsystem>())
+	{
+		Pool->ReturnToPool(this);
+	}
+	else
+	{
+		Super::LifeSpanExpired();
+	}
+}
+
 // Called when the game starts or when spawned
 void ATrailWeaponActor::BeginPlay()
 {
@@ -119,7 +156,14 @@ void ATrailWeaponActor::OnShrinkUpdate(float Value)
 
 void ATrailWeaponActor::OnShrinkFinished()
 {
-	Destroy();
+	if (UObjectPoolSubsystem* Pool = GetWorld()->GetSubsystem<UObjectPoolSubsystem>())
+	{
+		Pool->ReturnToPool(this);
+	}
+	else
+	{
+		Destroy();
+	}
 }
 
 void ATrailWeaponActor::StartShrink()
