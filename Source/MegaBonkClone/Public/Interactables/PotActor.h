@@ -25,8 +25,17 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UStaticMeshComponent> PotMesh = nullptr;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pot|Coin")
-	TSubclassOf<AActor> CoinClass;
+	// 깨질 때 나오는 아이템 클래스 목록
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pot|Drops")
+	TArray<TSubclassOf<class AResourcePickup>> DropPickup;
+
+	// 아이템이 나오는 최소 개수
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pot|Drops")
+	int32 MinDropCount = 3;
+
+	// 아이템이 나오는 최대 개수
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pot|Drops")
+	int32 MaxDropCount = 5;
 
 	// 깨질 때 나올 이펙트 (파티클)
 	UPROPERTY(EditAnywhere, Category = "FX")

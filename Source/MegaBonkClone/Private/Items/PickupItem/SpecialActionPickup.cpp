@@ -24,7 +24,9 @@ void ASpecialActionPickup::OnPickupComplete_Implementation()
 
 void ASpecialActionPickup::ExecuteNuke()
 {
-	
+	UE_LOG(LogTemp, Log, TEXT("모든 적 제거 효과"));
+
+
 }
 
 void ASpecialActionPickup::ExecuteMagnet()
