@@ -5,6 +5,8 @@
 #include "Camera/CameraComponent.h"
 #include "EnhancedInputComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Interfaces/PickupInterface.h"
+#include "Interfaces/InteractionInterface.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Characters/Components/StatusComponent.h"
 #include "Characters/Components/WeaponSystemComponent.h"
@@ -32,6 +34,12 @@ void APlayerCharacter::InitializeCharacterComponents()
 	SpringArm->AddRelativeRotation(FRotator(0.0f, 0.0f, 0.0f));
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SpringArm);
+
+	PickupCollision = CreateDefaultSubobject<UCapsuleComponent>(TEXT("PickupCollision"));
+	PickupCollision->SetupAttachment(RootComponent);
+	PickupCollision->SetCapsuleSize(100.0f, 100.0f);
+
+
 	StatusComponent = CreateDefaultSubobject<UStatusComponent>(TEXT("Status"));
 	WeaponComponent = CreateDefaultSubobject<UWeaponSystemComponent>(TEXT("WeaponSystem"));
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -70.0f), FRotator(0.0f, -90.0f, 0.0f));
@@ -53,7 +61,7 @@ void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	OnActorBeginOverlap.AddDynamic(this, &APlayerCharacter::OnBeginOverlap);
+	OnActorBeginOverlap.AddDynamic(this, &APlayerCharacter::OnPickupOverlap);
 
 }
 
@@ -126,16 +134,22 @@ void APlayerCharacter::TryInteract()
 
 	
 	for (const auto elements : outResults) {
-		UE_LOG(LogTemp, Warning, TEXT("상호작용 : %s"),*elements.GetActor()->GetName());
-		/*if (elements.GetActor()->Implements<UInteratable>()) {
-			
-		}*/
+		if (elements.GetActor()->Implements<UInteractionInterface>()) {
+			IInteractionInterface::Execute_Interact(this,this);
+			UE_LOG(LogTemp, Warning, TEXT("상호작용 : %s"),*elements.GetActor()->GetName());
+		}
 	}
 }
 
-void APlayerCharacter::OnBeginOverlap(AActor* OverlappedActor, AActor* OtherActor)
+void APlayerCharacter::OnPickupOverlap(AActor* OverlappedActor, AActor* OtherActor)
 {
-	//UE_LOG(LogTemp, Warning, TEXT("오버랩 성공 : %s"), *OtherActor->GetName());
+	//오브젝트 Pickup류인지 체크할 조건 넣어야함
+	if (1) {
+		if (OtherActor->Implements<UPickupInterface>()) {
+			IPickupInterface::Execute_OnPickup(this,this);
+		}
+	}
+	
 }
 
 void APlayerCharacter::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit)
