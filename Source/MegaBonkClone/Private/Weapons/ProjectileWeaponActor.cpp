@@ -50,7 +50,7 @@ void AProjectileWeaponActor::InitializeProjectile(float InDamage, float InSpeed,
 		MovementComp->InitialSpeed = InSpeed * BaseSpeedMultiplier;
 		MovementComp->MaxSpeed = InSpeed * BaseSpeedMultiplier;
 
-		UE_LOG(LogTemp, Warning, TEXT("InitialSpeed : %.1f"),MovementComp->InitialSpeed);
+		//UE_LOG(LogTemp, Warning, TEXT("InitialSpeed : %.1f"),MovementComp->InitialSpeed);
 	}
 
 	// 사거리(지속시간) 적용: 속도 * 시간 = 거리 이므로, 시간 = 거리 / 속도
