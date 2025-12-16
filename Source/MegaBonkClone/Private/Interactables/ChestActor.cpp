@@ -25,7 +25,6 @@ void AChestActor::BeginPlay()
 void AChestActor::Interact_Implementation(AActor* PlayerActor)
 {
 	if(!PlayerActor) return;
-
 	FName SelectedItemID = GetRandomItemID();
 
 	if (SelectedItemID.IsNone())
