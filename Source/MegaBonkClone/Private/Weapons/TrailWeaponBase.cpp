@@ -4,6 +4,7 @@
 #include "Weapons/TrailWeaponBase.h"
 #include "Characters/PlayAbleCharacter/PlayerCharacter.h"
 #include "Characters/Components/StatusComponent.h"
+#include "Framework/ObjectPoolSubsystem.h"
 #include "Weapons/TrailWeaponActor.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -27,17 +28,25 @@ void ATrailWeaponBase::BeginPlay()
 void ATrailWeaponBase::AttackWeapon_Implementation()
 {
 	if (!TrailClass) return;
+	if (!OwnerCharacter.IsValid()) return;
 
 	FVector spawnLoction = OwnerCharacter->GetActorLocation();
-	spawnLoction.Z = 0.0f;
+	spawnLoction.Z = 0.0f; // 바닥 높이 고정 (필요 시 수정)
 
 	FRotator SpawnRot = FRotator(0.0f, FMath::RandRange(0.0f, 360.0f), 0.0f);
 
-	// 3. 장판 생성
-	FActorSpawnParameters Params;
-	Params.Owner = this; // 무기가 주인
+	// [수정] 오브젝트 풀 서브시스템 사용
+	UObjectPoolSubsystem* Pool = GetWorld()->GetSubsystem<UObjectPoolSubsystem>();
+	if (!Pool) return;
 
-	ATrailWeaponActor* NewTrail = GetWorld()->SpawnActor<ATrailWeaponActor>(TrailClass, spawnLoction, SpawnRot, Params);
+	// 3. 장판 생성 (SpawnPooledActor 사용)
+	ATrailWeaponActor* NewTrail = Pool->SpawnPoolActor<ATrailWeaponActor>(
+		TrailClass,
+		spawnLoction,
+		SpawnRot,
+		this, // Owner
+		Cast<APawn>(OwnerCharacter.Get()) // Instigator
+	);
 
 	if (NewTrail)
 	{

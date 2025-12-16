@@ -18,6 +18,11 @@ public:
 	// 초기화 함수 확장 (바운스 횟수, 탐색 범위 추가)
 	void InitializeBouncing(int32 InBounces, float InBounceRange);
 
+	//ObjectPool 인터페이스 구현부
+	virtual void OnPoolActivate_Implementation() override;
+
+	virtual void OnPoolDeactivate_Implementation() override;
+
 protected:
 	virtual void OnProjectileHit(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
 

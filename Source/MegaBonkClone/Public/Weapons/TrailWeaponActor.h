@@ -4,11 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Interfaces/ObjectPoolInterface.h"
 #include "Components/TimelineComponent.h"
 #include "TrailWeaponActor.generated.h"
 
 UCLASS()
-class MEGABONKCLONE_API ATrailWeaponActor : public AActor
+class MEGABONKCLONE_API ATrailWeaponActor : public AActor , public IObjectPoolInterface
 {
 	GENERATED_BODY()
 	
@@ -22,6 +23,13 @@ public:
 	// 매 틱(Interval)마다 장판 위의 적에게 데미지
 	UFUNCTION()
 	void OnDamageTick();
+
+	//ObjectPool 인터페이스 구현부
+	virtual void OnPoolActivate_Implementation() override;
+
+	virtual void OnPoolDeactivate_Implementation() override;
+
+	virtual void LifeSpanExpired() override;
 
 protected:
 	// Called when the game starts or when spawned

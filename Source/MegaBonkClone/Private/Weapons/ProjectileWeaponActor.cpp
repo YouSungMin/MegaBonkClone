@@ -3,7 +3,9 @@
 
 #include "Weapons/ProjectileWeaponActor.h"
 #include "Components/CapsuleComponent.h"
+#include "Framework/ObjectPoolSubsystem.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "MegaBonkClone/MegaBonkClone.h"
 #include "GameFramework/RotatingMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -62,6 +64,53 @@ void AProjectileWeaponActor::InitializeProjectile(float InDamage, float InSpeed,
 	}
 }
 
+void AProjectileWeaponActor::OnPoolActivate_Implementation()
+{
+	// 1. 다시 보이게 하고 틱 켜기
+	SetActorHiddenInGame(false);
+	SetActorEnableCollision(true);
+	SetActorTickEnabled(true);
+
+	// 2. 무브먼트 컴포넌트 리셋 (멈춰있던거 다시 날리기)
+	if (MovementComp)
+	{
+		MovementComp->SetUpdatedComponent(RootComponent);
+		MovementComp->Velocity = GetActorForwardVector() * MovementComp->InitialSpeed;
+		MovementComp->Activate();
+	}
+}
+
+void AProjectileWeaponActor::OnPoolDeactivate_Implementation()
+{
+	// 1. 숨기고 끄기
+	SetActorHiddenInGame(true);
+	SetActorEnableCollision(false);
+	SetActorTickEnabled(false);
+
+	// 2. 무브먼트 정지
+	if (MovementComp)
+	{
+		MovementComp->StopMovementImmediately();
+		MovementComp->Deactivate();
+	}
+
+	// 3. 타이머 클리어 (중요!)
+	GetWorldTimerManager().ClearAllTimersForObject(this);
+}
+
+void AProjectileWeaponActor::LifeSpanExpired()
+{
+	if (UObjectPoolSubsystem* Pool = GetWorld()->GetSubsystem<UObjectPoolSubsystem>())
+	{
+		Pool->ReturnToPool(this);
+	}
+	else
+	{
+		UE_LOG(LogWeapon, Warning, TEXT("서브시스템 : Null"));
+		Super::LifeSpanExpired(); // 서브시스템 없으면 그냥 파괴
+	}
+}
+
 // Called when the game starts or when spawned
 void AProjectileWeaponActor::BeginPlay()
 {
@@ -81,7 +130,15 @@ void AProjectileWeaponActor::OnProjectileHit(UPrimitiveComponent* OverlappedComp
 		// 관통 옵션이 꺼져있으면, 한 놈 맞추고 사라짐
 		if (!bPenetrate)
 		{
-			Destroy();
+			// Destroy() -> ReturnToPool()
+			if (UObjectPoolSubsystem* Pool = GetWorld()->GetSubsystem<UObjectPoolSubsystem>())
+			{
+				Pool->ReturnToPool(this);
+			}
+			else
+			{
+				Destroy();
+			}
 		}
 	}
 }
