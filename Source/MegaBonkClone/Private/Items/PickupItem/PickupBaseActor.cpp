@@ -62,11 +62,11 @@ void APickupBaseActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	//if (!bIsBillboard)
-	//{
-	//	Mesh->AddWorldRotation(FRotator(0, RotateSpeed * DeltaTime, 0));
-	//}
-	if(bIsBillboard)
+	if (!bIsBillboard)
+	{
+		Mesh->AddWorldRotation(FRotator(0, RotateSpeed * DeltaTime, 0));
+	}
+	else
 	{
 		if (APlayerCameraManager* CamManager = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0))
 		{
