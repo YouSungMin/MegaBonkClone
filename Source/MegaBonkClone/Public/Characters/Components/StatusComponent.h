@@ -285,6 +285,14 @@ protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character|Status")
     float CurrentHP = 0.0f;
 
+    //현재골드
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character|Status")
+    float CurrentGold = 0.0f;
+
+    //현재경험치
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character|Status")
+    float CurrentExp = 0.0f;
+
 protected:
 	//최대체력 (수치그대로)
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character|Status")
