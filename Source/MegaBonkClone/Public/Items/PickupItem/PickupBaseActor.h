@@ -28,6 +28,8 @@ public:
 
 	// IPickupable의 구현(먹기가 완료되었을 때 실행되는 함수)
 	virtual void OnPickupComplete_Implementation() override;
+
+	inline bool IsPickup() const { return bPickuped;}
 private:
 	UFUNCTION()
 	void OnTimelineUpdate(float Value);
