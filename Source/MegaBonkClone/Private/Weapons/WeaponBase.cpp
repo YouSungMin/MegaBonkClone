@@ -4,6 +4,10 @@
 #include "Weapons/WeaponBase.h"
 #include "Characters/Components/StatusComponent.h"
 #include "Characters/PlayAbleCharacter/PlayerCharacter.h"
+#include "Weapons/ProjectileWeaponActor.h"
+#include "Weapons/BoomerangProjectileWeaponActor.h"
+#include "Weapons/TrailWeaponActor.h"
+#include "Weapons/BouncingProjectileWeaponActor.h"
 #include "Data/WeaponDataStructs.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/OverlapResult.h" 
@@ -195,6 +199,13 @@ bool AWeaponBase::IsValidTarget(AActor* OtherActor)
 	}
 	//같은 클래스 종류인지 확인
 	if (OtherActor->IsA(AWeaponBase::StaticClass()))
+	{
+		return false;
+	}
+	if(OtherActor->IsA(AProjectileWeaponActor::StaticClass())
+		|| OtherActor->IsA(ABoomerangProjectileWeaponActor::StaticClass())
+		|| OtherActor->IsA(ABouncingProjectileWeaponActor::StaticClass())
+			|| OtherActor->IsA(ATrailWeaponActor::StaticClass()))
 	{
 		return false;
 	}

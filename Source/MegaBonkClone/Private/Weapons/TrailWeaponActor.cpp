@@ -29,7 +29,7 @@ ATrailWeaponActor::ATrailWeaponActor()
 void ATrailWeaponActor::InitializeTrail(float InDamage, float InDuration, float InScale, float AttackSpeed)
 {
 	Damage = InDamage;
-	UE_LOG(LogTemp, Warning, TEXT("Damage : %.1f SetLifeSpan: %.1f"), Damage, InDuration);
+	//UE_LOG(LogTemp, Warning, TEXT("Damage : %.1f SetLifeSpan: %.1f"), Damage, InDuration);
 	// 1. 크기 적용
 	SetActorScale3D(FVector(InScale));
 
@@ -68,8 +68,6 @@ void ATrailWeaponActor::OnDamageTick()
 void ATrailWeaponActor::BeginPlay()
 {
 	Super::BeginPlay();
-	
-
 
 }
 
