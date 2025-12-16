@@ -5,6 +5,7 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h" // 수학 함수용
+
 // Sets default values for this component's properties
 UStatusComponent::UStatusComponent()
 {
@@ -23,6 +24,9 @@ void UStatusComponent::BeginPlay()
 
 	OwnerCharacter = Cast<ACharacter>(GetOwner());
     Movement = OwnerCharacter->GetCharacterMovement();
+
+    //HP
+    CurrentHP = MaxHP;
 
 
     //캐릭터 존재 확인용 로그

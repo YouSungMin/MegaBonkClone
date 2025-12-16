@@ -7,6 +7,8 @@
 #include "StatusComponent.generated.h"
 
 
+class UResourceBarWidget; //HP,Shield바
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class MEGABONKCLONE_API UStatusComponent : public UActorComponent
 {
@@ -15,6 +17,12 @@ class MEGABONKCLONE_API UStatusComponent : public UActorComponent
 public:	
 	// Sets default values for this component's properties
 	UStatusComponent();
+
+public:
+    UFUNCTION(BlueprintCallable)
+    inline float GetCurrentHP() const { return CurrentHP; }
+    UFUNCTION(BlueprintCallable)
+    inline void SetCurrentHP(float NewCurrentHP) { CurrentHP = NewCurrentHP; }
 
 public:
     //생각 중인 구현방법 스탯을 건드리는 아이템을 먹거나 스탯이 변화하면 현재 캐릭터 스탯을 변경하고 
@@ -273,6 +281,11 @@ private:
 public:
 
 protected:
+    //현재체력
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character|Status")
+    float CurrentHP = 0.0f;
+
+protected:
 	//최대체력 (수치그대로)
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character|Status")
 	float MaxHP = 0.0f;
@@ -378,8 +391,6 @@ protected:
     //골드 획득량
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character|Status")
     float GoldGain = 0.0f;
-
-
     
 private:
 
