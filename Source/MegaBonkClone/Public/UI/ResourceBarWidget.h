@@ -23,8 +23,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void RefreshWidget(float InCurrent, float InMax);
 
+#if WITH_EDITOR
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+#endif
+
 protected:
-	virtual void NativeConstruct() override;
+	virtual void NativePreConstruct() override;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Resource", meta = (BindWidget))
@@ -36,4 +40,10 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Resource", meta = (BindWidget))
 	TWeakObjectPtr<class UTextBlock> Max; //최대 퍼센트
 
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Color")
+	FLinearColor FillColor = FLinearColor(0.0f, 1.0f, 0.0f); //바 퍼센트 컬러
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Color")
+	FLinearColor BackgroundColor = FLinearColor(0.0f, 1.0f, 0.0f, 0.2f); //바 뒷배경 컬러
 };
