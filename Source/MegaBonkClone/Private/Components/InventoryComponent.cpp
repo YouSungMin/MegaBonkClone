@@ -33,7 +33,7 @@ bool UInventoryComponent::AddSecretBook(FName BookID)
         UE_LOG(LogTemp, Warning, TEXT("AddSecretBook Failed: Invalid ID [%s]"), *BookID.ToString());
         return false;
     }
-    OnItemAdd.Broadcast(BookID,*FoundData);
+
 
     // 1. 이미 보유 중이면 레벨업
     for (FInventorySlot& Slot : SecretBookSlots)
@@ -42,6 +42,7 @@ bool UInventoryComponent::AddSecretBook(FName BookID)
         {
             Slot.Level++;
             UE_LOG(LogTemp, Log, TEXT("SecretBook Level Up: %s (Lv.%d)"), *BookID.ToString(), Slot.Level);
+            OnItemAdd.Broadcast(BookID, *FoundData);
             return true;
         }
     }
@@ -60,6 +61,7 @@ bool UInventoryComponent::AddSecretBook(FName BookID)
     NewSlot.Quantity = 1;
 
     SecretBookSlots.Add(NewSlot);
+    OnItemAdd.Broadcast(BookID, *FoundData);
     UE_LOG(LogTemp, Log, TEXT("SecretBook Added: %s"), *BookID.ToString());
 
     return true;
@@ -75,7 +77,7 @@ void UInventoryComponent::AddItem(FName ItemID, int32 Count)
         UE_LOG(LogTemp, Warning, TEXT("아이템 추가 실패: Invalid Item ID [%s]"), *ItemID.ToString());
         return;
     }
-    OnItemAdd.Broadcast(ItemID, *FoundData);
+
 
     // 이미 인벤토리에 있는지 확인 
     for (FInventorySlot& Slot : GeneralItems)
@@ -84,6 +86,7 @@ void UInventoryComponent::AddItem(FName ItemID, int32 Count)
         {
             Slot.Quantity += Count;
             UE_LOG(LogTemp, Log, TEXT("Item 갯수 추가: %s (Qty: %d)"), *ItemID.ToString(), Slot.Quantity);
+            OnItemAdd.Broadcast(ItemID, *FoundData);
             return;
         }
     }
@@ -95,6 +98,7 @@ void UInventoryComponent::AddItem(FName ItemID, int32 Count)
     NewSlot.Quantity = Count;
 
     GeneralItems.Add(NewSlot);
+    OnItemAdd.Broadcast(ItemID, *FoundData);
     UE_LOG(LogTemp, Log, TEXT("Item 추가: %s (Qty: %d)"), *ItemID.ToString(), Count);
 }
 
