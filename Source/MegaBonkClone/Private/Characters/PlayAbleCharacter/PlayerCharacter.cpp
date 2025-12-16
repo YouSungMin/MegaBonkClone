@@ -125,7 +125,7 @@ void APlayerCharacter::TryInteract()
 		objectTypes, 
 		false, 
 		ignoreActors, 
-		EDrawDebugTrace::Persistent, 
+		EDrawDebugTrace::ForDuration, 
 		outResults, 
 		true, 
 		FLinearColor::Red,
@@ -134,9 +134,11 @@ void APlayerCharacter::TryInteract()
 
 	
 	for (const auto& elements : outResults) {
-		if (elements.GetActor()->Implements<UInteractionInterface>()) {
-			IInteractionInterface::Execute_Interact(elements.GetActor(),this);
-			UE_LOG(LogTemp, Warning, TEXT("상호작용 : %s"),*elements.GetActor()->GetName());
+		if (IsValid(elements.GetActor())) {
+			if (elements.GetActor()->Implements<UInteractionInterface>()) {
+				IInteractionInterface::Execute_Interact(elements.GetActor(), this);
+				//UE_LOG(LogTemp, Warning, TEXT("상호작용 : %s"), *elements.GetActor()->GetName());
+			}
 		}
 	}
 }
@@ -156,13 +158,24 @@ void APlayerCharacter::OnPickupOverlap(AActor* OverlappedActor, AActor* OtherAct
 
 void APlayerCharacter::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit)
 {
-	//UE_LOG(LogTemp, Warning, TEXT("히트 성공 : %s"), *Other->GetName());
+	if (Other && Other->ActorHasTag("Enemy")) {
+		//충돌 데미지 처리
+		UE_LOG(LogTemp, Warning, TEXT("히트 성공 : %s"), *Other->GetName());
+	}
+	
 }
 
 float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
+	float resultarmor = StatusComponent->GetArmor();
+	
+	float finalTakeDamage = DamageAmount* resultarmor;
+
+	//StatusComponent->SetCurrentHp(StatusComponent->GetCurrentHp()-= finalTakeDamage);
+
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-	return 0.0f;
+
+	return finalTakeDamage;
 }
 
 
