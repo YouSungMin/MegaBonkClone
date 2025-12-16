@@ -28,7 +28,6 @@ void UStatusComponent::BeginPlay()
     //HP
     CurrentHP = MaxHP;
 
-
     //캐릭터 존재 확인용 로그
     /*if (OwnerCharacter && Movement) {
         UE_LOG(LogTemp, Warning, TEXT("UStatusComponent : 캐릭터 존재"));
