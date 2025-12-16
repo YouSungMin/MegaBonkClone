@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Components/TimelineComponent.h"
 #include "TrailWeaponActor.generated.h"
 
 UCLASS()
@@ -26,6 +27,17 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	//타임라인이 실행될 때 호출될 함수
+	UFUNCTION()
+	void OnShrinkUpdate(float Value);
+
+	//타임라인이 끝났을 때 호출될 함수
+	UFUNCTION()
+	void OnShrinkFinished();
+
+	// 작아지기 시작하는 함수
+	void StartShrink();
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon|Trail|Component")
 	TObjectPtr<USceneComponent> Root = nullptr;
@@ -35,9 +47,22 @@ protected:
 	TObjectPtr<class UCapsuleComponent> OverlapComp = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
-	TObjectPtr<class UNiagaraComponent> EffectComp = nullptr;
+	TObjectPtr<class UPaperSpriteComponent> SpriteComp = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<class UStaticMeshComponent> MeshComp = nullptr;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Timeline")
+	TObjectPtr<UTimelineComponent> ScaleTimeline;
+
+	// [2] 에디터에서 만든 커브를 넣을 변수
+	UPROPERTY(EditDefaultsOnly, Category = "Timeline")
+	TObjectPtr<class UCurveFloat> ScaleCurve;
 
 private:
 	float Damage = 0.0f;
 	FTimerHandle DamageTimerHandle;
+	FVector InitialScale; // 원래 크기 저장용
+	FOnTimelineFloat UpdateFunctionFloat; // 델리게이트 (연결 고리)
+	FOnTimelineEvent FinishedFunctionEvent; // 델리게이트
 };
