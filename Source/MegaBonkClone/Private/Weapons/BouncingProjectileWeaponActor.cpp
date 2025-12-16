@@ -13,6 +13,20 @@ void ABouncingProjectileWeaponActor::InitializeBouncing(int32 InBounces, float I
 	HitHistory.Empty();
 }
 
+void ABouncingProjectileWeaponActor::OnPoolActivate_Implementation()
+{
+	Super::OnPoolActivate_Implementation();
+
+	HitHistory.Empty();
+}
+
+void ABouncingProjectileWeaponActor::OnPoolDeactivate_Implementation()
+{
+	Super::OnPoolDeactivate_Implementation();
+
+	HitHistory.Empty();
+}
+
 void ABouncingProjectileWeaponActor::OnProjectileHit(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	// 1. 적 유효성 검사

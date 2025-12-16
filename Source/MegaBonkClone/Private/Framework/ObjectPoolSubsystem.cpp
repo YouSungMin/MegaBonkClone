@@ -4,7 +4,7 @@
 #include "Framework/ObjectPoolSubsystem.h"
 #include "Interfaces/ObjectPoolInterface.h"
 
-AActor* UObjectPoolSubsystem::SpawnPooledActor(UClass* Class, FVector location, FRotator rotation)
+AActor* UObjectPoolSubsystem::SpawnPooledActor(UClass* Class, FVector location, FRotator rotation, AActor* Owner, APawn* Instigator)
 {
 	if (!Class) return nullptr;
 
@@ -19,6 +19,7 @@ AActor* UObjectPoolSubsystem::SpawnPooledActor(UClass* Class, FVector location, 
 		if (IsValid(Candidate))
 		{
 			PooledActor = Candidate;
+			UE_LOG(LogTemp, Warning, TEXT("♻️ [ObjectPool] 재사용 성공 (Reuse): %s (남은 개수: %d)"), *PooledActor->GetName(), PoolQueue.Pool.Num());
 			break;
 		}
 	}
@@ -29,6 +30,11 @@ AActor* UObjectPoolSubsystem::SpawnPooledActor(UClass* Class, FVector location, 
 		FActorSpawnParameters Params;
 		Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		PooledActor = GetWorld()->SpawnActor<AActor>(Class, location, rotation, Params);
+
+		if (PooledActor)
+		{
+			UE_LOG(LogTemp, Error, TEXT("✨ [ObjectPool] 신규 생성 (New Spawn): %s"), *PooledActor->GetName());
+		}
 	}
 	else
 	{
@@ -62,6 +68,8 @@ void UObjectPoolSubsystem::ReturnToPool(AActor* InActor)
 
 		FObjectPoolQueue& poolQueue = PoolMap.FindOrAdd(InActor->GetClass());
 		poolQueue.Pool.Push(InActor);
+
+		UE_LOG(LogTemp, Log, TEXT("📥 [ObjectPool] 반납 완료 (Return): %s (현재 보유량: %d)"), *InActor->GetName(), poolQueue.Pool.Num());
 	}
 	
 }

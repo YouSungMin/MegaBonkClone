@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Interfaces/ObjectPoolInterface.h"
 #include "ProjectileWeaponActor.generated.h"
 
 UCLASS()
-class MEGABONKCLONE_API AProjectileWeaponActor : public AActor
+class MEGABONKCLONE_API AProjectileWeaponActor : public AActor ,public IObjectPoolInterface
 {
 	GENERATED_BODY()
 	
@@ -17,6 +18,15 @@ public:
 
 	//투사체 스탯 초기화 함수 (데미지 , 발사체속도, 범위(필요한가),넉백 ,관통형인가 아닌가)
 	void InitializeProjectile(float InDamage, float InSpeed, float InRange, float InKnockback, bool bIsPenetrate = false);
+
+
+	//ObjectPool 인터페이스 구현부
+	virtual void OnPoolActivate_Implementation() override;
+
+	virtual void OnPoolDeactivate_Implementation() override;
+
+	//발사체 컴포넌트에 있는 함수
+	virtual void LifeSpanExpired() override;
 
 protected:
 	// Called when the game starts or when spawned

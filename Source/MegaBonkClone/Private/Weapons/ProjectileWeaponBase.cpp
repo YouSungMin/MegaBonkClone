@@ -3,6 +3,7 @@
 
 #include "Weapons/ProjectileWeaponBase.h"
 #include "Weapons/ProjectileWeaponActor.h"
+#include "Framework/ObjectPoolSubsystem.h"
 #include "Characters/PlayAbleCharacter/PlayerCharacter.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -38,6 +39,8 @@ void AProjectileWeaponBase::AttackWeapon_Implementation()
 		SpawnRot = Dir.Rotation();
 	}
 	
+	UObjectPoolSubsystem* poolSystem = GetWorld()->GetSubsystem<UObjectPoolSubsystem>();
+
 
 	// 2. 투사체 개수만큼 발사 (샷건처럼 여러 발 나가는 경우 처리)
 	int32 NumProjectiles = FMath::Max(1, (int32)ProjectileCount);
@@ -58,7 +61,9 @@ void AProjectileWeaponBase::AttackWeapon_Implementation()
 		Params.Instigator = Cast<APawn>(OwnerCharacter.Get());
 
 		// 3. 스폰
-		AProjectileWeaponActor* NewProj = GetWorld()->SpawnActor<AProjectileWeaponActor>(ProjectileClass, SpawnLoc, CurrentRot, Params);
+		//AProjectileWeaponActor* NewProj = GetWorld()->SpawnActor<AProjectileWeaponActor>(ProjectileClass, SpawnLoc, CurrentRot, Params);
+		AProjectileWeaponActor* NewProj = poolSystem->SpawnPoolActor<AProjectileWeaponActor>(ProjectileClass, SpawnLoc, CurrentRot, this, Cast<APawn>(OwnerCharacter.Get()));
+
 
 		// 4. 데이터 주입
 		if (NewProj)

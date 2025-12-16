@@ -22,6 +22,11 @@ protected:
 	//UFUNCTION() //부모에서 이미 UFUNCTION이므로 생략
 	virtual void OnProjectileHit(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
 
+	//ObjectPool 인터페이스 구현부
+	virtual void OnPoolActivate_Implementation() override;
+
+	virtual void OnPoolDeactivate_Implementation() override;
+
 	void StartReturn(); // 돌아오기 시작하는 함수
 
 public:
