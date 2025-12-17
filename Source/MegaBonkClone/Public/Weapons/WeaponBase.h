@@ -107,5 +107,8 @@ public:
     UPROPERTY()
     float WeaponFinalDamage = 0.0f;
 
+    UPROPERTY()
+    float WeaponFinalCriticalDamage = 0.0f;
+
 
 };

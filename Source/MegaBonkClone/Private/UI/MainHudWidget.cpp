@@ -17,11 +17,11 @@ void UMainHudWidget::NativeConstruct()
 	{
 		//UStatusComponent* resource = player->GetStatusComponent();
 
-		//if(HealthBar.IsValid())
-		//{
-		//HealthBar->RefreshWidget(resource->GetCurrentHP(), resource->GetMaxHP());
-		//}
-		////ShieldBar->RefreshWidget(resource->)
+		if(HealthBar.IsValid())
+		{
+		HealthBar->RefreshWidget(resource->GetCurrentHP(), resource->GetResultMaxHP());
+		}
+		//ShieldBar->RefreshWidget(resource->)
 
 	}
 }

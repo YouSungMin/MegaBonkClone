@@ -23,10 +23,13 @@ public:
 	FText Description;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Visual", meta = (DisplayName = "초상화 아이콘"))
-	TSoftObjectPtr<UTexture2D> PortraitIcon;
+	TSoftObjectPtr<UTexture2D> PortraitIcon = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Visual", meta = (DisplayName = "메쉬 (Skeletal Mesh)"))
-	TSoftObjectPtr<USkeletalMesh> SkeletalMesh;
+	TSoftObjectPtr<USkeletalMesh> SkeletalMesh = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Visual", meta = (DisplayName = "기본 무기 (Base Weapon)"))
+	TSoftClassPtr<class AWeaponBase> BaseWeapon = nullptr;
 
 	// ============================================================
 	// [생존 (Survival)]

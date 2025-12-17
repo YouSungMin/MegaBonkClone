@@ -79,7 +79,7 @@ void AAuraWeaponBase::UpdateAuraScale()
 	float PlayerBonus = 1.0f;
 	if (OwnerStatusComp.IsValid())
 	{// StatusComponent의 공격 범위 스탯
-		PlayerBonus = OwnerStatusComp->GetAttackSize(); 
+		PlayerBonus = OwnerStatusComp->GetResultAttackSize(); 
 	}
 
 	// 최종 크기 적용

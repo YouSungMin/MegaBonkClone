@@ -16,7 +16,7 @@ class MEGABONKCLONE_API UResourceBarWidget : public UUserWidget
 	GENERATED_BODY()
 
 public: 
-	//HPº¯È­ ¾Ë¶÷¿ë µ¨¸®°ÔÀÌÆ®
+	//HPï¿½ï¿½È­ ï¿½Ë¶ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®
 	UPROPERTY(BlueprintAssignable, Category="Resource")
 	FOnHealthChanged OnHealthChanged;
 
@@ -32,13 +32,13 @@ protected:
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Resource", meta = (BindWidget))
-	TWeakObjectPtr<class UProgressBar> Bar; //ÇÁ·Î±×·¡½º¹Ù
+	TWeakObjectPtr<class UProgressBar> Bar; //ï¿½ï¿½ï¿½Î±×·ï¿½ï¿½ï¿½ï¿½ï¿½
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Resource", meta = (BindWidget))
-	TWeakObjectPtr<class UTextBlock> Current; //ÇöÀç ÆÛ¼¾Æ®
+	TWeakObjectPtr<class UTextBlock> Current; //ï¿½ï¿½ï¿½ï¿½ ï¿½Û¼ï¿½Æ®
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Resource", meta = (BindWidget))
-	TWeakObjectPtr<class UTextBlock> Max; //ÃÖ´ë ÆÛ¼¾Æ®
+	TWeakObjectPtr<class UTextBlock> Max; //ï¿½Ö´ï¿½ ï¿½Û¼ï¿½Æ®
 
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Color")

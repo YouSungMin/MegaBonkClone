@@ -30,7 +30,7 @@ public:
 	virtual void ReceiveItem_Implementation(FName ItemID, int32 Count) override;
 
 	//스테이터스 GETTER 함수
-	inline UStatusComponent* GetStatusComponent() { return StatusComponent; }
+	inline UStatusComponent* GetStatusComponent() { return StatusComponent2; }
 
 	//오브젝트에 오버랩 되었을때 실행할 함수
 	UFUNCTION()
@@ -72,6 +72,10 @@ protected:
 private:
 
 public:
+	
+	//캐릭터 데이터 테이블에서 Row 선택 변수
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player Setting", meta = (RowType = "/Script/MegaBonkClone.CharacterData"))
+	FDataTableRowHandle CharacterDataHandle;
 
 protected:
 
@@ -94,7 +98,7 @@ protected:
 	TObjectPtr<class UCapsuleComponent> PickupCollision = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Player|Components")
-	TObjectPtr<UStatusComponent> StatusComponent = nullptr;
+	TObjectPtr<UStatusComponent> StatusComponent2 = nullptr;
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadWrite, Category = "Player|Components")
 	TObjectPtr<class UWeaponSystemComponent> WeaponComponent = nullptr;
