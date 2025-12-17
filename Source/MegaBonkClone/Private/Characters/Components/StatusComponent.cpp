@@ -113,11 +113,13 @@ void UStatusComponent::UpdateCharacterStatus()
 	// 주의: Vision이 0이면 대미지가 0이 되는 것을 방지하기 위해, 0일 경우 100(1.0)으로 처리하거나 
 	// 기본적으로 100을 베이스로 가집니다. 여기서는 값이 0이면 100.0f(1배)로 간주합니다.
 	//1.0x 배율기준
-	float PlayerDmgFactor = 0.01f * PlayerDamage;
-	float VisionDmgFactor = (VisionDamage > 0.0f) ? (0.01f * VisionDamage) : 1.0f; // 0이면 1배
+
+	float PlayerDmgFactor = PlayerDamage;
+	float VisionDmgFactor = 1.0f + (0.01f * VisionDamage);
 	float ShrineDmgFactor = 1.0f + (0.01f * ShrineDamage);
 
-	ResultDamage = PlayerDmgFactor * VisionDmgFactor * ShrineDmgFactor * 100.0f;
+	ResultDamage = PlayerDmgFactor * VisionDmgFactor * ShrineDmgFactor;
+	UE_LOG(LogTemp, Warning, TEXT("ResultDamage: %.1f"), ResultDamage);
 	
 
 	// [치명타 확률] (단순 합산)
@@ -443,6 +445,136 @@ void UStatusComponent::InitializeStatsFromDataTable(const FDataTableRowHandle& I
     }
 }
 
+void UStatusComponent::Debug_TestAllStats()
+{
+	if (!GEngine) return;
+
+	float LogTime = 15.0f; // 로그 표시 시간 15초
+
+	UE_LOG(LogTemp, Warning, TEXT("========================================="));
+	UE_LOG(LogTemp, Warning, TEXT("       [StatusComponent] FULL TEST       "));
+	UE_LOG(LogTemp, Warning, TEXT("========================================="));
+	GEngine->AddOnScreenDebugMessage(-1, LogTime, FColor::Cyan, TEXT(">>> 모든 스탯 테스트 시작..."));
+
+	// 1. 변경 전 값 기록 (Snapshot)
+	// ---------------------------------------------------
+	float OldHP = GetResultMaxHP();
+	float OldRegen = GetResultHPRegen();
+	float OldShield = GetResultShield();
+	float OldArmor = GetResultArmor();
+	float OldEvasion = GetResultEvasionChance();
+	float OldDrain = GetResultLifeDrain();
+	float OldThorn = GetResultThorn();
+
+	float OldDmg = GetResultDamage();
+	float OldCrit = GetResultCriticalChance();
+	float OldCritDmg = GetResultCritDmgRate();
+	float OldAtkSpd = GetResultAttackSpeed();
+	float OldElite = GetResultEliteDamage();
+	float OldKnock = GetResultKnockBack();
+
+	float OldProjCnt = GetResultProjectileCount();
+	float OldReflect = GetResultProjectileReflectCount();
+	float OldSize = GetResultAttackSize();
+	float OldProjSpd = GetResultProjectileSpeed();
+	float OldDur = GetResultAttackDuration();
+
+	float OldMove = GetResultMoveSpeed();
+	float OldJump = GetResultJumpPower();
+	float OldExtraJump = GetResultExtraJump();
+
+	float OldLuck = GetResultLuck();
+	float OldPick = GetResultPickUpRange();
+	float OldExpG = GetResultExpGain();
+	float OldGoldG = GetResultGoldGain();
+
+	// 2. 능력치 강제 주입 (테스트 값 적용)
+	// ---------------------------------------------------
+	// [생존]
+	AddVisionMaxHP(100.0f);        // MaxHP +100
+	AddVisionHPRegen(60.0f);       // Regen +60 (분당 60 -> 초당 +1)
+	AddShrineOverHeal(50.0f);      // OverHeal +50
+	AddVisionShield(30.0f);        // Shield +30
+	AddShrineArmor(20.0f);         // Armor +20 (공식: 0.2 / 0.95 = 21%)
+	AddVisionEvasionChance(10.0f); // Evasion +10 (공식: 0.1 / 1.1 = 9%)
+	AddVisionLifeDrain(5.0f);      // Drain +5
+	AddShrineThorn(10.0f);         // Thorn +10
+
+	// [공격]
+	AddVisionDamage(50.0f);        // Damage +50% (1.5배)
+	AddShrineCriticalChance(0.2f); // CritChance +20% (0.2)
+	AddShrineCritDmgRate(500.0f);  // CritDmg +50% (공식: 1 + 0.001*500 = 1.5배)
+	AddVisionAttackSpeed(0.5f);    // AtkSpeed +50% (단순 합산 0.5)
+	AddShrineEliteDamage(50.0f);   // EliteDmg +50% (1.5배)
+	AddVisionKnockBack(1000.0f);   // KnockBack +100% (공식: 1 + 0.001*1000 = 2.0배)
+
+	// [발사체]
+	AddShrineProjectileCount(2.0f);       // ProjCount +2
+	AddVisionProjectileReflectCount(1.0f); // Reflect +1
+	AddVisionAttackSize(500.0f);          // Size +50% (공식: 1 + 0.001*500 = 1.5배)
+	AddShrineProjectileSpeed(200.0f);     // Spd +20% (공식: 1 + 0.001*200 = 1.2배)
+	AddVisionAttackDuration(300.0f);      // Dur +30% (공식: 1 + 0.001*300 = 1.3배)
+
+	// [이동]
+	// 공식상 1 Vision = 0.1 MoveN (+10% 이속), 1 Shrine = 1.0 MoveN (+100% 이속)
+	// 테스트를 위해 적당히 넣음
+	AddVisionMoveSpeed(5.0f);      // Vision 5 -> +50% 이속 증가 (MoveN += 0.5)
+	AddShrineJumpPower(20.0f);     // Jump +20% (1.2배)
+	AddVisionExtraJump(1.0f);      // ExtraJump +1
+
+	// [유틸리티]
+	AddVisionLuck(10.0f);          // Luck +10
+	AddVisionPickUpRange(50.0f);   // PickRange +50% (1.5배)
+	AddVisionExpGain(100.0f);      // ExpGain +100% (2.0배)
+	AddShrineGoldGain(50.0f);      // GoldGain +50% (1.5배)
+
+	// [레벨업 테스트]
+	AddExp(500.0f);                // 경험치 주입
+
+	// 3. 결과 로그 출력 (Old -> New)
+	// ---------------------------------------------------
+	auto LogStat = [&](const FString& Name, float Old, float New) {
+		float Diff = New - Old;
+		FString Sign = (Diff >= 0) ? TEXT("+") : TEXT("");
+		UE_LOG(LogTemp, Log, TEXT("%-15s : %6.1f -> %6.1f (%s%.1f)"), *Name, Old, New, *Sign, Diff);
+		};
+
+	UE_LOG(LogTemp, Warning, TEXT("----- [1. 생존 결과] -----"));
+	LogStat("MaxHP", OldHP, GetResultMaxHP());
+	LogStat("HPRegen", OldRegen, GetResultHPRegen());
+	LogStat("Shield", OldShield, GetResultShield());
+	LogStat("Armor(%)", OldArmor * 100.f, GetResultArmor() * 100.f);
+	LogStat("Evasion(%)", OldEvasion * 100.f, GetResultEvasionChance() * 100.f);
+	LogStat("LifeDrain", OldDrain, GetResultLifeDrain());
+	LogStat("Thorn", OldThorn, GetResultThorn());
+
+	UE_LOG(LogTemp, Warning, TEXT("----- [2. 공격 결과] -----"));
+	LogStat("Damage", OldDmg, GetResultDamage()/100.0f);
+	LogStat("CritChance(%)", OldCrit, GetResultCriticalChance()); // 코드상 이미 *100 되어있음
+	LogStat("CritDmg", OldCritDmg, GetResultCritDmgRate());
+	LogStat("AtkSpeed(%)", OldAtkSpd, GetResultAttackSpeed());
+	LogStat("EliteDmg", OldElite, GetResultEliteDamage());
+	LogStat("KnockBack", OldKnock, GetResultKnockBack());
+
+	UE_LOG(LogTemp, Warning, TEXT("----- [3. 발사체 결과] -----"));
+	LogStat("ProjCount", OldProjCnt, GetResultProjectileCount());
+	LogStat("Reflect", OldReflect, GetResultProjectileReflectCount());
+	LogStat("Size", OldSize, GetResultAttackSize());
+	LogStat("ProjSpeed", OldProjSpd, GetResultProjectileSpeed());
+	LogStat("Duration", OldDur, GetResultAttackDuration());
+
+	UE_LOG(LogTemp, Warning, TEXT("----- [4. 이동/유틸 결과] -----"));
+	LogStat("MoveSpeed", OldMove, GetResultMoveSpeed());
+	LogStat("JumpPower", OldJump, GetResultJumpPower());
+	LogStat("ExtraJump", OldExtraJump, GetResultExtraJump());
+	LogStat("Luck", OldLuck, GetResultLuck());
+	LogStat("PickRange", OldPick, GetResultPickUpRange());
+	LogStat("ExpGain", OldExpG, GetResultExpGain());
+
+	// 화면 메시지
+	GEngine->AddOnScreenDebugMessage(-1, LogTime, FColor::Green, TEXT(">>> 테스트 완료! 로그 창을 확인하세요."));
+}
+
 
 
 // -----------------------------------------------------------------
@@ -475,17 +607,49 @@ void UStatusComponent::AddCurrentHP(float Amount)
 
 void UStatusComponent::AddGold(float Amount)
 {
-	CurrentGold += Amount;
+	CurrentGold += Amount * ResultGoldGain;
 	// (선택) 돈이 0보다 작아지지 않게 하려면: FMath::Max(0.0f, CurrentGold + Amount);
 	UE_LOG(LogTemp, Log, TEXT("골드 변경: %.0f -> 현재: %.0f"), Amount, CurrentGold);
 }
 
 void UStatusComponent::AddExp(float Amount)
 {
-	CurrentExp += Amount;
-	// (선택) 여기서 레벨업 로직 체크 가능
-	// if (CurrentExp >= MaxExp) { LevelUp(); }
-	UE_LOG(LogTemp, Log, TEXT("경험치 획득: %.0f -> 현재: %.0f"), Amount, CurrentExp);
+	//경험치 획득 (획득량 배율 ResultExpGain 적용)
+	float FinalExp = Amount * ResultExpGain;
+
+	CurrentExp += FinalExp;
+	UE_LOG(LogTemp, Log, TEXT("[Exp] 획득: +%.1f (현재: %.1f / 목표: %.1f)"), FinalExp, CurrentExp, MaxExp);
+
+	//레벨업 체크 (한 번에 여러 레벨이 오를 수 있으므로 while 사용)
+	bool bLeveledUp = false;
+
+	while (CurrentExp >= MaxExp)
+	{
+		//경험치 차감 (통 비우기)
+		CurrentExp -= MaxExp;
+
+		//레벨 증가
+		CurrentLevel++;
+
+		//다음 레벨 필요 경험치 증가 (성장 배율 적용)
+		MaxExp *= ExpGrowthRate;
+
+		bLeveledUp = true;
+		UE_LOG(LogTemp, Warning, TEXT("★★★ [Exp] LEVEL UP! Lv.%d (Next Exp: %.1f) ★★★"), CurrentLevel, MaxExp);
+	}
+
+	// 3. [Exp 관련] 레벨업 후처리
+	if (bLeveledUp)
+	{
+		//게임멈추고
+		//레벨업시 아이템 랜덤 선택창 구현
+
+		//스탯 재계산 (레벨 비례 스탯이 있다면 필수)
+		UpdateCharacterStatus();
+
+		//레벨업 델리게이트 호출 (UI, 효과음 등)
+		// OnLevelUp.Broadcast(CurrentLevel);
+	}
 }
 
 

@@ -30,12 +30,6 @@ public:
 
 public:
 
-    //몬스터에 적용할 최종 데미지 함수
-    // 최종 데미지 계산 (무기 깡뎀 * 플레이어 데미지 배율)
-    UFUNCTION(BlueprintPure, Category = "Weapon")
-    virtual float GetFinalDamage() const;
-
-
     //공격속도 영향
     //공격 타이머 시작/재시작 (쿨타임 변경 시 재호출 가능)
     UFUNCTION(BlueprintCallable, Category = "Weapon")

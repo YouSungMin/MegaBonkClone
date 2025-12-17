@@ -35,13 +35,14 @@ void AAuraWeaponBase::AttackWeapon_Implementation()
 
 	// 이 함수는 타이머에 의해 '공격 속도' 주기로 계속 불립니다.
 	// 즉, 0.5초마다 불리면 0.5초마다 범위 내 적에게 데미지를 줍니다.
+	if (Implements<UWeapon>()) {
+		IWeapon::Execute_GetDamageWeapon(this);
+	}
 
-	// 1. 범위 내에 겹쳐있는 모든 액터 가져오기
 	TArray<AActor*> OverlappingActors;
 	Collision->GetOverlappingActors(OverlappingActors);
 
-	// 2. 데미지 계산 (WeaponBase의 GetFinalDamage 활용)
-	float DamageToApply = GetFinalDamage();
+		float DamageToApply = WeaponFinalDamage;
 
 	// 3. 반복문으로 데미지 적용
 	bool bHitAny = false;
@@ -62,8 +63,8 @@ void AAuraWeaponBase::AttackWeapon_Implementation()
 
 			if (bHitAny)
 			{
+				//UE_LOG(LogTemp, Log, TEXT("Aura Hit! %s에 Damage: %f"), *Actor->GetName(), DamageToApply);
 				// (선택) 타격감이 필요하면 여기서 사운드나 이펙트 재생
-				UE_LOG(LogTemp, Log, TEXT("Aura Hit! %s에 Damage: %f"), *Actor->GetName(), DamageToApply);
 			}
 
 		}

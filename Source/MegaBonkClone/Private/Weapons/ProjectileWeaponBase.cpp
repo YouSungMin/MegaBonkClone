@@ -33,6 +33,12 @@ void AProjectileWeaponBase::AttackWeapon_Implementation()
 	//가장 가까운 적 찾기
 	
 	AActor* NearestEnemy = FindNearestEnemy(); 
+
+	if (bOnlyFireWhenTargetFound && NearestEnemy == nullptr)
+	{
+		return;
+	}
+
 	if (NearestEnemy)
 	{
 		FVector Dir = NearestEnemy->GetActorLocation() - SpawnLoc;
@@ -69,7 +75,7 @@ void AProjectileWeaponBase::AttackWeapon_Implementation()
 		if (NewProj)
 		{
 			// WeaponBase가 가지고 있는 계산된 스탯들을 넘겨줌
-			float FinalDmg = GetFinalDamage();
+			float FinalDmg = WeaponFinalDamage;
 			// ProjectileAttackSize, ProjectileSpeed 등 WeaponBase 변수 활용
 			float Duration = 5.0f; // 혹은 사거리
 
