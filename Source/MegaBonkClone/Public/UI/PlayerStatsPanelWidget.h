@@ -16,14 +16,20 @@ class MEGABONKCLONE_API UPlayerStatsPanelWidget : public UUserWidget
 	
 
 protected:
-	virtual void NativeConstruct() override; 
+	//virtual void NativeConstruct() override; 
+	//virtual void NativeDestruct() override;
+	//virtual void NativeOnVisibilityChanged(ESlateVisibility, InVisibility) override;
 
+	//UFUNCTION()
+	//void OnStatsUpdated();	//델리게이트 콜백
+
+	//void RefreshUI();	//Getter 전체 호출해 UI 갱신
 public:
-	UFUNCTION(BlueprintCallable, Category = "Stat")
-	void InitWithStatus(class UStatusComponent* InStatusComp);	//StatusComponent 넣어주기
+	//UFUNCTION(BlueprintCallable, Category = "Stat")
+	//void InitWithStatus(class UStatusComponent* InStatusComp);	//StatusComponent 넣어주기
 
 private: 
-	void BuildRows_Auto();	//StatusComponent안 변수들 Row에 생성해 화면에 자동나열 
+	//void BuildRows_Auto();	//StatusComponent안 변수들 Row에 생성해 화면에 자동나열 
 
 protected:
 	UPROPERTY(meta = (BindWidget))
@@ -32,10 +38,10 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Stat")
 	TSubclassOf<class UPlayerStatWidget> PlayerStatRowClass;	//Row 클래스 -> WBP_PlayerStat넣어주기
 
-private:
-	UPROPERTY()
-	TObjectPtr<class UStatusComponent> StatusComp;	//플레이어가 가진 
-
-	UPROPERTY()
-	TMap<FName, TObjectPtr<class UPlayerStatWidget>> RowByProp;
+//private:
+//	UPROPERTY()
+//	TObjectPtr<class UStatusComponent> StatusComp;	//플레이어가 가진 
+//
+//	UPROPERTY()
+//	TMap<FName, TObjectPtr<class UPlayerStatWidget>> RowByProp;
 };
