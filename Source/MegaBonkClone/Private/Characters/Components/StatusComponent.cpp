@@ -442,6 +442,73 @@ void UStatusComponent::InitializeStatsFromDataTable(const FDataTableRowHandle& I
     }
 }
 
+void UStatusComponent::Debug_TestAllStats()
+{
+	if (!GEngine) return;
+
+	// 화면에 출력되는 로그 시간을 길게 설정 (10초)
+	float LogTime = 10.0f;
+
+	UE_LOG(LogTemp, Warning, TEXT("========================================="));
+	UE_LOG(LogTemp, Warning, TEXT("       [StatusComponent] TEST START      "));
+	UE_LOG(LogTemp, Warning, TEXT("========================================="));
+
+	GEngine->AddOnScreenDebugMessage(-1, LogTime, FColor::White, TEXT(">>> 테스트 시작: 초기 상태 확인..."));
+
+	// 1. 변경 전 스탯 기록 (간단히 몇 개만)
+	float OldHP = GetResultMaxHP();
+	float OldDmg = GetResultDamage();
+	float OldSpeed = GetResultMoveSpeed();
+
+	// 2. 능력치 강제 주입 (Add 함수 테스트)
+	// ---------------------------------------------------
+	GEngine->AddOnScreenDebugMessage(-1, LogTime, FColor::Yellow, TEXT(">>> 능력치 주입 중... (비전서/성소/경험치)"));
+
+	// [생존]
+	AddVisionMaxHP(500.0f);       // 체력 +500
+	AddShrineArmor(20.0f);        // 방어력 +20 (공식: n / 0.75+n)
+	AddVisionEvasionChance(10.0f); // 회피 +10
+
+	// [공격]
+	AddVisionDamage(50.0f);       // 데미지 +50 (배율 공식 확인용)
+	AddShrineCriticalChance(100.0f); // 치명타 +100 (확정 치명타)
+	AddVisionAttackSpeed(2.0f);   // 공속
+
+	// [이동]
+	AddVisionMoveSpeed(0.5f);     // 이속 +0.5 (배율)
+
+	// [경험치] (레벨업 테스트)
+	// 레벨업이 될 만큼 대량의 경험치 주입
+	AddExp(1000.0f);
+
+	// 3. 결과 확인 및 검증 로그
+	// ---------------------------------------------------
+	UE_LOG(LogTemp, Warning, TEXT("----- [1. 생존 스탯 결과] -----"));
+	UE_LOG(LogTemp, Log, TEXT("MaxHP: %.1f -> %.1f (증가량: +%.1f)"), OldHP, GetResultMaxHP(), GetResultMaxHP() - OldHP);
+	UE_LOG(LogTemp, Log, TEXT("Armor(방어율): %.2f%% (입력값 합계: %.1f)"), GetResultArmor() * 100.0f, PlayerArmor + VisionArmor + ShrineArmor);
+
+	UE_LOG(LogTemp, Warning, TEXT("----- [2. 공격 스탯 결과] -----"));
+	UE_LOG(LogTemp, Log, TEXT("Damage: %.2f -> %.2f"), OldDmg, GetResultDamage());
+	UE_LOG(LogTemp, Log, TEXT("CritChance: %.1f%%"), GetResultCriticalChance());
+
+	UE_LOG(LogTemp, Warning, TEXT("----- [3. 이동 스탯 결과] -----"));
+	UE_LOG(LogTemp, Log, TEXT("MoveSpeed: %.1f -> %.1f"), OldSpeed, GetResultMoveSpeed());
+
+	UE_LOG(LogTemp, Warning, TEXT("----- [4. 성장(레벨) 결과] -----"));
+	UE_LOG(LogTemp, Log, TEXT("Level: %d"), GetCurrentLevel());
+	UE_LOG(LogTemp, Log, TEXT("Exp: %.1f / %.1f"), GetCurrentExp(), GetMaxExp());
+
+	// 화면 출력
+	FString ResultMsg = FString::Printf(TEXT(">>> 테스트 완료! \nLv: %d | HP: %.0f | Dmg: %.1f | Armor: %.1f%%"),
+		GetCurrentLevel(), GetResultMaxHP(), GetResultDamage(), GetResultArmor() * 100.0f);
+
+	GEngine->AddOnScreenDebugMessage(-1, LogTime, FColor::Green, ResultMsg);
+
+	UE_LOG(LogTemp, Warning, TEXT("========================================="));
+	UE_LOG(LogTemp, Warning, TEXT("       [StatusComponent] TEST END        "));
+	UE_LOG(LogTemp, Warning, TEXT("========================================="));
+}
+
 
 
 // -----------------------------------------------------------------
@@ -481,24 +548,24 @@ void UStatusComponent::AddGold(float Amount)
 
 void UStatusComponent::AddExp(float Amount)
 {
-	// 1. [Exp 관련] 경험치 획득 (획득량 배율 ResultExpGain 적용)
+	//경험치 획득 (획득량 배율 ResultExpGain 적용)
 	float FinalExp = Amount * ResultExpGain;
 
 	CurrentExp += FinalExp;
 	UE_LOG(LogTemp, Log, TEXT("[Exp] 획득: +%.1f (현재: %.1f / 목표: %.1f)"), FinalExp, CurrentExp, MaxExp);
 
-	// 2. [Exp 관련] 레벨업 체크 (한 번에 여러 레벨이 오를 수 있으므로 while 사용)
+	//레벨업 체크 (한 번에 여러 레벨이 오를 수 있으므로 while 사용)
 	bool bLeveledUp = false;
 
 	while (CurrentExp >= MaxExp)
 	{
-		// [Exp 관련] 경험치 차감 (통 비우기)
+		//경험치 차감 (통 비우기)
 		CurrentExp -= MaxExp;
 
-		// [Exp 관련] 레벨 증가
+		//레벨 증가
 		CurrentLevel++;
 
-		// [Exp 관련] 다음 레벨 필요 경험치 증가 (성장 배율 적용)
+		//다음 레벨 필요 경험치 증가 (성장 배율 적용)
 		MaxExp *= ExpGrowthRate;
 
 		bLeveledUp = true;
@@ -508,7 +575,10 @@ void UStatusComponent::AddExp(float Amount)
 	// 3. [Exp 관련] 레벨업 후처리
 	if (bLeveledUp)
 	{
-		// (선택) 스탯 재계산 (레벨 비례 스탯이 있다면 필수)
+		//게임멈추고
+		//레벨업시 아이템 랜덤 선택창 구현
+
+		//스탯 재계산 (레벨 비례 스탯이 있다면 필수)
 		UpdateCharacterStatus();
 
 		//레벨업 델리게이트 호출 (UI, 효과음 등)

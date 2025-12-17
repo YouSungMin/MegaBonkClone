@@ -30,5 +30,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "ProjectileWeaponBase")
 	TSubclassOf<class AProjectileWeaponActor> ProjectileClass;
 
+	UPROPERTY(EditDefaultsOnly, Category = "ProjectileWeaponBase")
+	bool bOnlyFireWhenTargetFound = false;
+
 
 };

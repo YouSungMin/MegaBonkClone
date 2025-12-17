@@ -24,4 +24,5 @@ public:
 	float Amount = 10.0f;
 
 	virtual void OnPickupComplete_Implementation() override;
+
 };

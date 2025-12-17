@@ -33,6 +33,12 @@ void AProjectileWeaponBase::AttackWeapon_Implementation()
 	//가장 가까운 적 찾기
 	
 	AActor* NearestEnemy = FindNearestEnemy(); 
+
+	if (bOnlyFireWhenTargetFound && NearestEnemy == nullptr)
+	{
+		return;
+	}
+
 	if (NearestEnemy)
 	{
 		FVector Dir = NearestEnemy->GetActorLocation() - SpawnLoc;

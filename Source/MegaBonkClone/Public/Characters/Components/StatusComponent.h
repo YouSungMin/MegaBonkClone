@@ -211,6 +211,9 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Status")
     void InitializeStatsFromDataTable(const FDataTableRowHandle& InDataHandle);
 
+	UFUNCTION(BlueprintCallable, Exec, Category = "Debug")
+	void Debug_TestAllStats();
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
