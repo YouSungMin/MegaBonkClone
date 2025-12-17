@@ -6,6 +6,6 @@
 
 void UPlayerStatWidget::RefreshStat(const FText& InName, float InValue)
 {
-	StatName->SetText(InName);
-	StatValue->SetText(FText::AsNumber(InValue));
+	//StatName->SetText(InName);
+	//StatValue->SetText(FText::AsNumber(InValue));
 }

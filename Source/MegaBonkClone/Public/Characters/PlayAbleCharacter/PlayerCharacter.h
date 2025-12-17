@@ -30,6 +30,7 @@ public:
 	virtual void ReceiveItem_Implementation(FName ItemID, int32 Count) override;
 
 	//스테이터스 GETTER 함수
+	UFUNCTION(BlueprintCallable, Category = "Player|Components")
 	inline UStatusComponent* GetStatusComponent() { return StatusComponent2; }
 
 	//오브젝트에 오버랩 되었을때 실행할 함수
