@@ -22,10 +22,11 @@ UENUM(BlueprintType)
 enum class EItemGrade : uint8
 {
 	None,
-	Common			UMETA(DisplayName = "일반 (Common)"),
-	UnCommon		UMETA(DisplayName = "고급 (UnCommon)"),
-	Rare			UMETA(DisplayName = "희귀 (Rare)"),
-	Legendary		UMETA(DisplayName = "전설 (Legendary)")
+	Common		UMETA(DisplayName = "커먼 (Common)"),
+	UnCommon	UMETA(DisplayName = "언커먼 (UnCommon)"),
+	Rare		UMETA(DisplayName = "레어 (Rare)"),
+	Epic		UMETA(DisplayName = "에픽 (Epic)"),
+	Legendary	UMETA(DisplayName = "전설 (Legendary)")
 };
 
 // 스탯 유형

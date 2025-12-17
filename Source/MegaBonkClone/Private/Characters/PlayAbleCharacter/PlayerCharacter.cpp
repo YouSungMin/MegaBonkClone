@@ -12,6 +12,7 @@
 #include "Weapons/WeaponBase.h"
 #include "Characters/Components/StatusComponent.h"
 #include "Characters/Components/WeaponSystemComponent.h"
+#include "Components/InventoryComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "InputActionValue.h"
@@ -45,6 +46,8 @@ void APlayerCharacter::InitializeCharacterComponents()
 
 	StatusComponent2 = CreateDefaultSubobject<UStatusComponent>(TEXT("Status"));
 	WeaponComponent = CreateDefaultSubobject<UWeaponSystemComponent>(TEXT("WeaponSystem"));
+	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("Inventory"));
+	
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -70.0f), FRotator(0.0f, -90.0f, 0.0f));
 
 	//컴포넌트 세부 수치 설정
@@ -159,6 +162,15 @@ void APlayerCharacter::TryInteract()
 				//UE_LOG(LogTemp, Warning, TEXT("상호작용 : %s"), *elements.GetActor()->GetName());
 			}
 		}
+	}
+}
+
+void APlayerCharacter::ReceiveItem_Implementation(FName ItemID, int32 Count)
+{
+	if (InventoryComponent)
+	{
+		// 단순 AddItem 호출
+		InventoryComponent->AddItem(ItemID, Count);
 	}
 }
 

@@ -15,7 +15,7 @@ void UMainHudWidget::NativeConstruct()
 	
 	if(player && player->GetStatusComponent())
 	{
-		UStatusComponent* resource = player->GetStatusComponent();
+		//UStatusComponent* resource = player->GetStatusComponent();
 
 		if(HealthBar.IsValid())
 		{
