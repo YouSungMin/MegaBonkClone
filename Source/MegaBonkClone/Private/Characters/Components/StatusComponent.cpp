@@ -481,10 +481,39 @@ void UStatusComponent::AddGold(float Amount)
 
 void UStatusComponent::AddExp(float Amount)
 {
-	CurrentExp += Amount;
-	// (선택) 여기서 레벨업 로직 체크 가능
-	// if (CurrentExp >= MaxExp) { LevelUp(); }
-	UE_LOG(LogTemp, Log, TEXT("경험치 획득: %.0f -> 현재: %.0f"), Amount, CurrentExp);
+	// 1. [Exp 관련] 경험치 획득 (획득량 배율 ResultExpGain 적용)
+	float FinalExp = Amount * ResultExpGain;
+
+	CurrentExp += FinalExp;
+	UE_LOG(LogTemp, Log, TEXT("[Exp] 획득: +%.1f (현재: %.1f / 목표: %.1f)"), FinalExp, CurrentExp, MaxExp);
+
+	// 2. [Exp 관련] 레벨업 체크 (한 번에 여러 레벨이 오를 수 있으므로 while 사용)
+	bool bLeveledUp = false;
+
+	while (CurrentExp >= MaxExp)
+	{
+		// [Exp 관련] 경험치 차감 (통 비우기)
+		CurrentExp -= MaxExp;
+
+		// [Exp 관련] 레벨 증가
+		CurrentLevel++;
+
+		// [Exp 관련] 다음 레벨 필요 경험치 증가 (성장 배율 적용)
+		MaxExp *= ExpGrowthRate;
+
+		bLeveledUp = true;
+		UE_LOG(LogTemp, Warning, TEXT("★★★ [Exp] LEVEL UP! Lv.%d (Next Exp: %.1f) ★★★"), CurrentLevel, MaxExp);
+	}
+
+	// 3. [Exp 관련] 레벨업 후처리
+	if (bLeveledUp)
+	{
+		// (선택) 스탯 재계산 (레벨 비례 스탯이 있다면 필수)
+		UpdateCharacterStatus();
+
+		//레벨업 델리게이트 호출 (UI, 효과음 등)
+		// OnLevelUp.Broadcast(CurrentLevel);
+	}
 }
 
 

@@ -143,6 +143,8 @@ public:
 	UFUNCTION(BlueprintCallable) inline float GetCurrentExp() const { return CurrentExp; }
 	UFUNCTION(BlueprintCallable) void AddExp(float Amount);       // [추가]
 
+	UFUNCTION(BlueprintCallable) inline int32 GetCurrentLevel() const { return CurrentLevel; }
+	UFUNCTION(BlueprintCallable) inline float GetMaxExp() const { return MaxExp; }
 
 	// =================================================================
 	// [생존 (Survival)] - 최종 결과값 Getter만 유지
@@ -223,14 +225,30 @@ protected:
 	// =================================================================
 	// [상태 변수 (Dynamic State)] - 변동되는 값 (분리 대상 아님)
 	// =================================================================
+	
+	//현재체력
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character|State")
 	float CurrentHP = 0.0f;
 
+	//현재골드
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character|State")
 	float CurrentGold = 0.0f;
 
+	//현재 EXP양
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character|State")
 	float CurrentExp = 0.0f;
+
+	//현재 LV
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Growth")
+	int32 CurrentLevel = 1;
+
+	//경험치 통 크기
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Growth")
+	float MaxExp = 60.0f; // 1레벨 필요 경험치 (경험치 통)
+	
+	// 레벨업 시 필요 경험치 증가 배율 (예: 20% 증가)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Growth")
+	float ExpGrowthRate = 1.2f; 
 
 
 	// =================================================================

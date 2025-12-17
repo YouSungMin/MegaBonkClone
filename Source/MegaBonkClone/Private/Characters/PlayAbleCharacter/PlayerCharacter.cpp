@@ -76,7 +76,7 @@ void APlayerCharacter::BeginPlay()
 		FCharacterData* rowData = CharacterDataHandle.GetRow<FCharacterData>(TEXT("Get Weapon"));
 		if (rowData) {
 			
-			UE_LOG(LogTemp, Warning, TEXT("AddWeapon : %s"), *rowData->BaseWeapon->GetName());
+			//UE_LOG(LogTemp, Warning, TEXT("AddWeapon : %s"), *rowData->BaseWeapon->GetName());
 			WeaponComponent->AddWeapon(rowData->BaseWeapon.LoadSynchronous());
 		}
 		
