@@ -2,10 +2,10 @@
 
 
 #include "Characters/Components/StatusComponent.h"
+#include "Data/CharacterDataStruct.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "Kismet/KismetMathLibrary.h" // 수학 함수용
-
+#include "Kismet/KismetMathLibrary.h" 
 // Sets default values for this component's properties
 UStatusComponent::UStatusComponent()
 {
@@ -32,6 +32,7 @@ void UStatusComponent::BeginPlay()
     /*if (OwnerCharacter && Movement) {
         UE_LOG(LogTemp, Warning, TEXT("UStatusComponent : 캐릭터 존재"));
     }*/
+    
 }
 
 void UStatusComponent::UpdateCharacterStatus()
@@ -154,6 +155,97 @@ float UStatusComponent::GetStatusDamage()
 
     //엘리트면
     //return CalculatedEliteDamage;
+}
+
+void UStatusComponent::InitializeStatsFromDataTable(const FDataTableRowHandle& InDataHandle)
+{
+    // 1. 데이터 테이블이 유효한지 확인
+    if (InDataHandle.IsNull())
+    {
+        UE_LOG(LogTemp, Error, TEXT("InitializeStatsFromDataTable - 데이터 핸들이 비어있습니다."));
+        return;
+    }
+
+    // 2. GetRow 함수로 바로 데이터 가져오기 (매우 간편!)
+    static const FString ContextString(TEXT("StatusComponent Initialization"));
+    FCharacterData* RowData = InDataHandle.GetRow<FCharacterData>(ContextString);
+
+    if (RowData)
+    {
+        UE_LOG(LogTemp, Log, TEXT("캐릭터 데이터 로드 성공: %s"), *InDataHandle.RowName.ToString());
+        // ============================================================
+        //  메쉬 설정
+        // ============================================================
+        
+        if (!RowData->SkeletalMesh.IsNull())
+        {
+          
+            USkeletalMesh* NewMesh = RowData->SkeletalMesh.LoadSynchronous();
+            if (OwnerCharacter && NewMesh)
+            {
+                OwnerCharacter->GetMesh()->SetSkeletalMesh(NewMesh);
+            }
+        }
+
+        // ============================================================
+        //  생명력 및 방어 관련 (Health & Defense)
+        // ============================================================
+        MaxHP = RowData->MaxHP;
+        CurrentHP = MaxHP; //최대 체력으로 현재 체력 초기화
+        HPRegen = RowData->HPRegen;
+        OverHeal = RowData->OverHeal;
+        Shield = RowData->Shield;
+        Armor = RowData->Armor;
+        EvasionChance = RowData->EvasionChance;
+        LifeDrain = RowData->LifeDrain;
+        Thorn = RowData->Thorn;
+
+        // ============================================================
+        // [공격 (Offense)]
+        // ============================================================
+        Damage = RowData->Damage;
+        CriticalChance = RowData->CriticalChance;
+        PlayerCritDmgRate = RowData->PlayerCritDmgRate;
+        AttackSpeed = RowData->AttackSpeed;
+
+        // ============================================================
+        // [발사체 (Projectile)]
+        // ============================================================
+        ProjectileCount = RowData->ProjectileCount;
+        ProjectileReflectCount = RowData->ProjectileReflectCount;
+        AttackSize = RowData->AttackSize;
+        PlayerProjectileSpeed = RowData->PlayerProjectileSpeed;
+        AttackDuration = RowData->AttackDuration;
+        EliteDamage = RowData->EliteDamage;
+        KnockBack = RowData->KnockBack;
+
+        // ============================================================
+        // [이동 (Movement)]
+        // ============================================================
+        MoveSpeed = RowData->MoveSpeed;
+        ExtraJump = RowData->ExtraJump;
+        JumpPower = RowData->JumpPower;
+
+        // ============================================================
+        // [유틸리티 (Utility)]
+        // ============================================================
+        Luck = RowData->Luck;
+        Difficulty = RowData->Difficulty;
+        PickUpRange = RowData->PickUpRange;
+        ExpGain = RowData->ExpGain;
+        GoldGain = RowData->GoldGain;
+        SilverGain = RowData->SilverGain;
+        //EliteSpawnRate = RowData->EliteSpawnRate;
+        PowerUPRate = RowData->PowerUPRate;
+        PowerUPDropRate = RowData->PowerUPDropRate;
+
+        // 2. 값 설정이 끝났으니, 실제 게임 로직(무브먼트 속도 등)에 적용
+        UpdateCharacterStatus();
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("데이터를 찾을 수 없습니다. (RowName: %s)"), *InDataHandle.RowName.ToString());
+    }
 }
 
 

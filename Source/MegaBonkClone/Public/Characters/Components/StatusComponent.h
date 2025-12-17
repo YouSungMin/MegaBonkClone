@@ -6,7 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "StatusComponent.generated.h"
 
-
+struct FCharacterData;
 class UResourceBarWidget; //HP,Shield바
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -19,10 +19,7 @@ public:
 	UStatusComponent();
 
 public:
-    UFUNCTION(BlueprintCallable)
-    inline float GetCurrentHP() const { return CurrentHP; }
-    UFUNCTION(BlueprintCallable)
-    inline void SetCurrentHP(float NewCurrentHP) { CurrentHP = NewCurrentHP; }
+   
 
 public:
     //생각 중인 구현방법 스탯을 건드리는 아이템을 먹거나 스탯이 변화하면 현재 캐릭터 스탯을 변경하고 
@@ -30,6 +27,13 @@ public:
     // =================================================================
     // 생명력 및 방어 관련 (Health & Defense)
     // =================================================================
+
+    //현재HP
+    UFUNCTION(BlueprintCallable)
+    inline float GetCurrentHP() const { return CurrentHP; }
+    UFUNCTION(BlueprintCallable)
+    inline void SetCurrentHP(float NewCurrentHP) { CurrentHP = NewCurrentHP; }
+
 
     // MaxHP
     UFUNCTION(BlueprintCallable)
@@ -81,7 +85,7 @@ public:
 
 
     // =================================================================
-    // 재화 및 성장 관련 (Resources & Growth)
+    // [유틸리티 (Utility)]
     // =================================================================
 
     // ExpGain
@@ -134,7 +138,7 @@ public:
 
 
     // =================================================================
-    // 공격 및 전투 관련 (Attack & Combat)
+    // 공격 관련 (Attack)
     // =================================================================
 
     // Damage
@@ -269,6 +273,9 @@ public:
 
     UFUNCTION(BlueprintCallable)
     float GetStatusDamage();
+
+    UFUNCTION(BlueprintCallable, Category = "Status")
+    void InitializeStatsFromDataTable(const FDataTableRowHandle& InDataHandle);
 
 protected:
 	// Called when the game starts

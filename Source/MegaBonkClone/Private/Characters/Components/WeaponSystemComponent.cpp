@@ -3,6 +3,7 @@
 
 #include "Characters/Components/WeaponSystemComponent.h"
 #include "Weapons/WeaponBase.h"
+#include "MegaBonkClone/MegaBonkClone.h"
 #include "GameFramework/Character.h"
 // Sets default values for this component's properties
 UWeaponSystemComponent::UWeaponSystemComponent()
@@ -13,9 +14,11 @@ UWeaponSystemComponent::UWeaponSystemComponent()
 
 	// ...
 	//고정 무기 슬롯
-	int32 MaxWeaponNum = 3;
+	
 	PlayerWeapons.Empty();
 	PlayerWeapons.SetNum(MaxWeaponNum);
+
+	
 
 }
 
@@ -30,6 +33,28 @@ void UWeaponSystemComponent::EquipWeapon()
 	}
 }
 
+void UWeaponSystemComponent::AddWeapon(TSubclassOf<AActor> InWeapon)
+{
+	if (!InWeapon) return;
+
+
+	for (int32 i = 0; i < PlayerWeapons.Num(); i++)
+	{
+		// 현재 슬롯이 비어있다면?
+		if (PlayerWeapons[i] == nullptr)
+		{
+			PlayerWeapons[i] = InWeapon;
+			UE_LOG(LogWeapon, Log, TEXT("무기 장착 성공: 슬롯 %d"), i);
+			EquipWeapon();
+			return;
+		}
+	}
+
+
+	UE_LOG(LogWeapon, Warning, TEXT("무기 슬롯이 가득 찼습니다! (추가 실패)"));
+	
+}
+
 
 // Called when the game starts
 void UWeaponSystemComponent::BeginPlay()
@@ -38,8 +63,6 @@ void UWeaponSystemComponent::BeginPlay()
 
 	// ...
 
-
-	
 }
 
 
