@@ -112,16 +112,16 @@ void UStatusComponent::UpdateCharacterStatus()
 	// 공식: (0.01 * Player) * (0.01 * Vision) * (1 + (0.01 * Shrine))
 	// 주의: Vision이 0이면 대미지가 0이 되는 것을 방지하기 위해, 0일 경우 100(1.0)으로 처리하거나 
 	// 기본적으로 100을 베이스로 가집니다. 여기서는 값이 0이면 100.0f(1배)로 간주합니다.
+	//1.0x 배율기준
 	float PlayerDmgFactor = 0.01f * PlayerDamage;
 	float VisionDmgFactor = (VisionDamage > 0.0f) ? (0.01f * VisionDamage) : 1.0f; // 0이면 1배
 	float ShrineDmgFactor = 1.0f + (0.01f * ShrineDamage);
 
-	ResultDamage = PlayerDmgFactor * VisionDmgFactor * ShrineDmgFactor;
-
+	ResultDamage = PlayerDmgFactor * VisionDmgFactor * ShrineDmgFactor * 100.0f;
+	
 
 	// [치명타 확률] (단순 합산)
-	ResultCriticalChance = PlayerCriticalChance + VisionCriticalChance + ShrineCriticalChance;
-
+	ResultCriticalChance = (PlayerCriticalChance + VisionCriticalChance + ShrineCriticalChance)*100.0f;
 
 	// [치명타 대미지 배율 (Crit Dmg Rate)]
 	// 공식 n: (0.01 * Player) * (1 + (0.001 * Shrine))
@@ -129,11 +129,11 @@ void UStatusComponent::UpdateCharacterStatus()
 	float PlayerCritFactor = 0.01f * PlayerCritDmgRate;
 	float ShrineCritFactor = 1.0f + (0.001f * ShrineCritDmgRate);
 
-	ResultCritDmgRate = PlayerCritFactor * ShrineCritFactor;
+	ResultCritDmgRate = PlayerCritFactor * ShrineCritFactor * 100.0f;
 
 
 	// [공격 속도] (단순 합산)
-	ResultAttackSpeed = PlayerAttackSpeed + VisionAttackSpeed + ShrineAttackSpeed;
+	ResultAttackSpeed = (PlayerAttackSpeed + VisionAttackSpeed + ShrineAttackSpeed)*100.0f;
 
 
 	// [엘리트 대미지]
@@ -152,7 +152,7 @@ void UStatusComponent::UpdateCharacterStatus()
 	float KnockbackOtherFactor = 1.0f + (0.001f * VisionKnockBack) + (0.001f * ShrineKnockBack);
 
 	// ResultKnockBack은 무기 Base에 곱해질 '배율'로 저장합니다.
-	ResultKnockBack = KnockbackPlayerFactor * KnockbackOtherFactor;
+	ResultKnockBack = KnockbackPlayerFactor * KnockbackOtherFactor * 100.0f;
 
 
 	// ==========================================================
@@ -177,10 +177,10 @@ void UStatusComponent::UpdateCharacterStatus()
 	// [발사체 속도 & 지속 시간]
 	// 공식: n = (0.01 * Player) * (1 + (0.001 * Vision) + (0.001 * Shrine))
 	float ProjSpeedOtherFactor = 1.0f + (0.001f * VisionProjectileSpeed) + (0.001f * ShrineProjectileSpeed);
-	ResultProjectileSpeed = (0.01f * PlayerProjectileSpeed) * ProjSpeedOtherFactor;
+	ResultProjectileSpeed = (0.01f * PlayerProjectileSpeed) * ProjSpeedOtherFactor * 100.0f;
 
 	float DurationOtherFactor = 1.0f + (0.001f * VisionAttackDuration) + (0.001f * ShrineAttackDuration);
-	ResultAttackDuration = (0.01f * PlayerAttackDuration) * DurationOtherFactor;
+	ResultAttackDuration = (0.01f * PlayerAttackDuration) * DurationOtherFactor * 100.0f;
 
 
 	// ==========================================================
@@ -194,8 +194,9 @@ void UStatusComponent::UpdateCharacterStatus()
 		// n = (0.01 * Player) + (0.001 * Vision) + (0.01 * Shrine) -> 예시: 0.01*15 -> 0.15
 		// * PlayerMoveSpeed가 100(기본)이라면 0.01*100 = 1.0. 
 		// * Result는 실제 언리얼 유닛 속도로 변환하여 적용합니다.
+	
 
-		float MoveN = (0.01f * PlayerMoveSpeed) + (0.001f * VisionMoveSpeed) + (0.01f * ShrineMoveSpeed);
+		float MoveN = ((0.01f * PlayerMoveSpeed) + (0.001f * VisionMoveSpeed) + (0.01f * ShrineMoveSpeed))*100.0f;
 
 		// 기본 걷기 속도 (예: 400)
 		float DefaultWalkSpeed = 400.0f;
@@ -203,6 +204,8 @@ void UStatusComponent::UpdateCharacterStatus()
 		// 공식 해석: n이 배율이므로 기본 속도 * n (예: 1.45배)
 		ResultMoveSpeed = DefaultWalkSpeed * MoveN;
 		Movement->MaxWalkSpeed = ResultMoveSpeed;
+		//UE_LOG(LogTemp, Warning, TEXT("%.1f"), PlayerMoveSpeed);
+		//UE_LOG(LogTemp, Warning, TEXT("%.1f , %.1f : %.1f"), DefaultWalkSpeed, MoveN, ResultMoveSpeed);
 
 
 		// [점프 높이 (Power)]
@@ -269,42 +272,83 @@ void UStatusComponent::UpdateCharacterStatus()
 	ResultPowerUPRate = PlayerPowerUPRate + VisionPowerUPRate + ShrinePowerUPRate;
 	ResultPowerUPDropRate = PlayerPowerUPDropRate + VisionPowerUPDropRate + ShrinePowerUPDropRate;
 
+	//UI 델리게이트 갱신용 BroadCast
+	//
+
     //디버그용 프린트 
-    if (GEngine)
-    {
-        FString DebugMsg = FString::Printf(TEXT(
-            "--- Status Update ---\n"
-            "Final MoveSpeed: %f\n"
-            "Final JumpZ: %f\n"
-            "Result CritDmg: %f\n"
-            "Result ProjSpeed: %f"
-        ),
-            Movement ? Movement->MaxWalkSpeed : 0.0f, // 실제 적용된 이동속도
-            Movement ? Movement->JumpZVelocity : 0.0f, // 실제 적용된 점프력
-            ResultCritDmgRate,
-            ResultProjectileSpeed
-        );
+	if (GEngine)
+	{
+		FString DebugMsg = FString::Printf(TEXT(
+			"===== [Status Debug] =====\n"
+			"[생존]\n"
+			" MaxHP: %.1f | Regen: %.2f | Shield: %.1f\n"
+			" Armor: %.1f%% | Evasion: %.1f%%\n"
+			" LifeDrain: %.1f | Thorn: %.1f | OverHeal: %.1f\n"
+			"\n"
+			"[공격]\n"
+			" Damage: %.2fx | CritChance: %.1f%%\n"
+			" CritDmg: %.2fx | AtkSpeed: %.1f%%\n"
+			" EliteDmg: %.2fx | KnockBack: %.2fx\n"
+			"\n"
+			"[발사체]\n"
+			" Count: %.1f | Reflect: %.1f\n"
+			" Size: %.2fx | Speed: %.2fx | Duration: %.2fx\n"
+			"\n"
+			"[이동]\n"
+			" MoveSpeed: %.1f (UnrealUnit)\n"
+			" JumpPower: %.1f | ExtraJump: %.1f\n"
+			"\n"
+			"[유틸리티]\n"
+			" Luck: %.1f | Difficulty: %.1f | Range: %.1f\n"
+			" Exp: %.2fx | Gold: %.2fx | Silver: %.2fx\n"
+			" PowerUpRate: %.2fx | DropRate: %.1f%%"
+		),
+			// [Survival]
+			ResultMaxHP,
+			ResultHPRegen,
+			ResultShield,
+			ResultArmor * 100.0f,         // 0.4 -> 40.0% 표기
+			ResultEvasionChance * 100.0f, // 0.1 -> 10.0% 표기
+			ResultLifeDrain,
+			ResultThorn,
+			ResultOverHeal,
 
-        GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, DebugMsg);
-    }
+			// [Offense]
+			ResultDamage,
+			ResultCriticalChance,
+			ResultCritDmgRate,
+			ResultAttackSpeed,
+			ResultEliteDamage,
+			ResultKnockBack,
+
+			// [Projectile]
+			ResultProjectileCount,
+			ResultProjectileReflectCount,
+			ResultAttackSize,
+			ResultProjectileSpeed,
+			ResultAttackDuration,
+
+			// [Movement]
+			ResultMoveSpeed,
+			ResultJumpPower,
+			ResultExtraJump,
+
+			// [Utility]
+			ResultLuck,
+			ResultDifficulty,
+			ResultPickUpRange,
+			ResultExpGain,
+			ResultGoldGain,
+			ResultSilverGain,
+			ResultPowerUPRate,
+			ResultPowerUPDropRate
+		);
+
+		// 메시지가 너무 길어서 화면 밖으로 나갈 수 있으므로 Key를 1로 고정하여 갱신
+		// 지속시간(Duration)을 조금 길게(10초) 잡아서 읽을 수 있게 함
+		GEngine->AddOnScreenDebugMessage(1, 10.0f, FColor::Green, DebugMsg);
+	}
   
-}
-
-float UStatusComponent::GetStatusDamage()
-{
-
-    // [데미지] (기본 데미지 * 배율)
-    //float FinalDamage = (1.0f + (0.01f * Damage));
-
-    // [엘리트 데미지]
-    //float CalculatedEliteDamage = FinalDamage * (1.0f + (0.01f * EliteDamage));
-
-    //return FinalDamage;
-
-    //엘리트면
-    //return CalculatedEliteDamage;
-
-	return 0.0f;
 }
 
 void UStatusComponent::InitializeStatsFromDataTable(const FDataTableRowHandle& InDataHandle)
@@ -400,4 +444,150 @@ void UStatusComponent::InitializeStatsFromDataTable(const FDataTableRowHandle& I
 
 
 
+// -----------------------------------------------------------------
+// [생존 (Survival)]
+// -----------------------------------------------------------------
+void UStatusComponent::AddVisionMaxHP(float Amount)
+{
+	VisionMaxHP += Amount;
+	if (Amount > 0.0f) CurrentHP += Amount; // 늘어난 만큼 현재 체력도 회복
+	UpdateCharacterStatus();
+}
+void UStatusComponent::AddShrineMaxHP(float Amount)
+{
+	ShrineMaxHP += Amount;
+	if (Amount > 0.0f) CurrentHP += Amount;
+	UpdateCharacterStatus();
+}
+
+void UStatusComponent::AddCurrentHP(float Amount)
+{
+	// 현재 체력 변경 (0 ~ 최대 체력 사이로 제한)
+	// Amount가 양수면 회복, 음수면 데미지
+	CurrentHP = FMath::Clamp(CurrentHP + Amount, 0.0f, ResultMaxHP);
+
+	if (Amount < 0.0f)
+	{
+		// (선택) 피격 효과나 UI 깜빡임 처리 델리게이트 호출
+	}
+}
+
+void UStatusComponent::AddGold(float Amount)
+{
+	CurrentGold += Amount;
+	// (선택) 돈이 0보다 작아지지 않게 하려면: FMath::Max(0.0f, CurrentGold + Amount);
+	UE_LOG(LogTemp, Log, TEXT("골드 변경: %.0f -> 현재: %.0f"), Amount, CurrentGold);
+}
+
+void UStatusComponent::AddExp(float Amount)
+{
+	CurrentExp += Amount;
+	// (선택) 여기서 레벨업 로직 체크 가능
+	// if (CurrentExp >= MaxExp) { LevelUp(); }
+	UE_LOG(LogTemp, Log, TEXT("경험치 획득: %.0f -> 현재: %.0f"), Amount, CurrentExp);
+}
+
+
+void UStatusComponent::AddVisionHPRegen(float Amount) { VisionHPRegen += Amount; UpdateCharacterStatus(); }
+void UStatusComponent::AddShrineHPRegen(float Amount) { ShrineHPRegen += Amount; UpdateCharacterStatus(); }
+
+void UStatusComponent::AddVisionOverHeal(float Amount) { VisionOverHeal += Amount; UpdateCharacterStatus(); }
+void UStatusComponent::AddShrineOverHeal(float Amount) { ShrineOverHeal += Amount; UpdateCharacterStatus(); }
+
+void UStatusComponent::AddVisionShield(float Amount) { VisionShield += Amount; UpdateCharacterStatus(); }
+void UStatusComponent::AddShrineShield(float Amount) { ShrineShield += Amount; UpdateCharacterStatus(); }
+
+void UStatusComponent::AddVisionArmor(float Amount) { VisionArmor += Amount; UpdateCharacterStatus(); }
+void UStatusComponent::AddShrineArmor(float Amount) { ShrineArmor += Amount; UpdateCharacterStatus(); }
+
+void UStatusComponent::AddVisionEvasionChance(float Amount) { VisionEvasionChance += Amount; UpdateCharacterStatus(); }
+void UStatusComponent::AddShrineEvasionChance(float Amount) { ShrineEvasionChance += Amount; UpdateCharacterStatus(); }
+
+void UStatusComponent::AddVisionLifeDrain(float Amount) { VisionLifeDrain += Amount; UpdateCharacterStatus(); }
+void UStatusComponent::AddShrineLifeDrain(float Amount) { ShrineLifeDrain += Amount; UpdateCharacterStatus(); }
+
+void UStatusComponent::AddVisionThorn(float Amount) { VisionThorn += Amount; UpdateCharacterStatus(); }
+void UStatusComponent::AddShrineThorn(float Amount) { ShrineThorn += Amount; UpdateCharacterStatus(); }
+
+
+// -----------------------------------------------------------------
+// [공격 (Offense)]
+// -----------------------------------------------------------------
+void UStatusComponent::AddVisionDamage(float Amount) { VisionDamage += Amount; UpdateCharacterStatus(); }
+void UStatusComponent::AddShrineDamage(float Amount) { ShrineDamage += Amount; UpdateCharacterStatus(); }
+
+void UStatusComponent::AddVisionCriticalChance(float Amount) { VisionCriticalChance += Amount; UpdateCharacterStatus(); }
+void UStatusComponent::AddShrineCriticalChance(float Amount) { ShrineCriticalChance += Amount; UpdateCharacterStatus(); }
+
+void UStatusComponent::AddVisionCritDmgRate(float Amount) { VisionCritDmgRate += Amount; UpdateCharacterStatus(); }
+void UStatusComponent::AddShrineCritDmgRate(float Amount) { ShrineCritDmgRate += Amount; UpdateCharacterStatus(); }
+
+void UStatusComponent::AddVisionAttackSpeed(float Amount) { VisionAttackSpeed += Amount; UpdateCharacterStatus(); }
+void UStatusComponent::AddShrineAttackSpeed(float Amount) { ShrineAttackSpeed += Amount; UpdateCharacterStatus(); }
+
+void UStatusComponent::AddVisionEliteDamage(float Amount) { VisionEliteDamage += Amount; UpdateCharacterStatus(); }
+void UStatusComponent::AddShrineEliteDamage(float Amount) { ShrineEliteDamage += Amount; UpdateCharacterStatus(); }
+
+void UStatusComponent::AddVisionKnockBack(float Amount) { VisionKnockBack += Amount; UpdateCharacterStatus(); }
+void UStatusComponent::AddShrineKnockBack(float Amount) { ShrineKnockBack += Amount; UpdateCharacterStatus(); }
+
+
+// -----------------------------------------------------------------
+// [발사체 (Projectile)]
+// -----------------------------------------------------------------
+void UStatusComponent::AddVisionProjectileCount(float Amount) { VisionProjectileCount += Amount; UpdateCharacterStatus(); }
+void UStatusComponent::AddShrineProjectileCount(float Amount) { ShrineProjectileCount += Amount; UpdateCharacterStatus(); }
+
+void UStatusComponent::AddVisionProjectileReflectCount(float Amount) { VisionProjectileReflectCount += Amount; UpdateCharacterStatus(); }
+void UStatusComponent::AddShrineProjectileReflectCount(float Amount) { ShrineProjectileReflectCount += Amount; UpdateCharacterStatus(); }
+
+void UStatusComponent::AddVisionAttackSize(float Amount) { VisionAttackSize += Amount; UpdateCharacterStatus(); }
+void UStatusComponent::AddShrineAttackSize(float Amount) { ShrineAttackSize += Amount; UpdateCharacterStatus(); }
+
+void UStatusComponent::AddVisionProjectileSpeed(float Amount) { VisionProjectileSpeed += Amount; UpdateCharacterStatus(); }
+void UStatusComponent::AddShrineProjectileSpeed(float Amount) { ShrineProjectileSpeed += Amount; UpdateCharacterStatus(); }
+
+void UStatusComponent::AddVisionAttackDuration(float Amount) { VisionAttackDuration += Amount; UpdateCharacterStatus(); }
+void UStatusComponent::AddShrineAttackDuration(float Amount) { ShrineAttackDuration += Amount; UpdateCharacterStatus(); }
+
+
+// -----------------------------------------------------------------
+// [이동 (Movement)]
+// -----------------------------------------------------------------
+void UStatusComponent::AddVisionMoveSpeed(float Amount) { VisionMoveSpeed += Amount; UpdateCharacterStatus(); }
+void UStatusComponent::AddShrineMoveSpeed(float Amount) { ShrineMoveSpeed += Amount; UpdateCharacterStatus(); }
+
+void UStatusComponent::AddVisionExtraJump(float Amount) { VisionExtraJump += Amount; UpdateCharacterStatus(); }
+void UStatusComponent::AddShrineExtraJump(float Amount) { ShrineExtraJump += Amount; UpdateCharacterStatus(); }
+
+void UStatusComponent::AddVisionJumpPower(float Amount) { VisionJumpPower += Amount; UpdateCharacterStatus(); }
+void UStatusComponent::AddShrineJumpPower(float Amount) { ShrineJumpPower += Amount; UpdateCharacterStatus(); }
+
+
+// -----------------------------------------------------------------
+// [유틸리티 (Utility)]
+// -----------------------------------------------------------------
+void UStatusComponent::AddVisionLuck(float Amount) { VisionLuck += Amount; UpdateCharacterStatus(); }
+void UStatusComponent::AddShrineLuck(float Amount) { ShrineLuck += Amount; UpdateCharacterStatus(); }
+
+void UStatusComponent::AddVisionDifficulty(float Amount) { VisionDifficulty += Amount; UpdateCharacterStatus(); }
+void UStatusComponent::AddShrineDifficulty(float Amount) { ShrineDifficulty += Amount; UpdateCharacterStatus(); }
+
+void UStatusComponent::AddVisionPickUpRange(float Amount) { VisionPickUpRange += Amount; UpdateCharacterStatus(); }
+void UStatusComponent::AddShrinePickUpRange(float Amount) { ShrinePickUpRange += Amount; UpdateCharacterStatus(); }
+
+void UStatusComponent::AddVisionExpGain(float Amount) { VisionExpGain += Amount; UpdateCharacterStatus(); }
+void UStatusComponent::AddShrineExpGain(float Amount) { ShrineExpGain += Amount; UpdateCharacterStatus(); }
+
+void UStatusComponent::AddVisionGoldGain(float Amount) { VisionGoldGain += Amount; UpdateCharacterStatus(); }
+void UStatusComponent::AddShrineGoldGain(float Amount) { ShrineGoldGain += Amount; UpdateCharacterStatus(); }
+
+void UStatusComponent::AddVisionSilverGain(float Amount) { VisionSilverGain += Amount; UpdateCharacterStatus(); }
+void UStatusComponent::AddShrineSilverGain(float Amount) { ShrineSilverGain += Amount; UpdateCharacterStatus(); }
+
+void UStatusComponent::AddVisionPowerUPRate(float Amount) { VisionPowerUPRate += Amount; UpdateCharacterStatus(); }
+void UStatusComponent::AddShrinePowerUPRate(float Amount) { ShrinePowerUPRate += Amount; UpdateCharacterStatus(); }
+
+void UStatusComponent::AddVisionPowerUPDropRate(float Amount) { VisionPowerUPDropRate += Amount; UpdateCharacterStatus(); }
+void UStatusComponent::AddShrinePowerUPDropRate(float Amount) { ShrinePowerUPDropRate += Amount; UpdateCharacterStatus(); }
 

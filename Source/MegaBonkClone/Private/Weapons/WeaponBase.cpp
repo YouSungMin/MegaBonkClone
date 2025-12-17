@@ -173,8 +173,11 @@ void AWeaponBase::InitializeWeaponStatus(const FWeaponData& InWeaponData)
 void AWeaponBase::GetDamageWeapon_Implementation()
 {
 	if (OwnerStatusComp.IsValid()) {
-		WeaponFinalDamage = OwnerStatusComp->GetStatusDamage();
-		//UE_LOG(LogTemp, Warning, TEXT("데미지 : %.1f"),GetFinalDamage());
+		WeaponFinalDamage = WeaponDamage * OwnerStatusComp->GetResultDamage();
+		UE_LOG(LogTemp, Warning, TEXT("무기데미지 : %.1f"), WeaponFinalDamage);
+
+		WeaponFinalCriticalDamage = (1.0f + (0.1f*CritDmgRate))* OwnerStatusComp->GetResultCritDmgRate()* WeaponFinalDamage;
+		UE_LOG(LogTemp, Warning, TEXT("무기크리데미지 : %.1f"), WeaponFinalCriticalDamage);
 	}
 }
 
