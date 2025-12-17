@@ -8,6 +8,8 @@
 #include "Interfaces/PickupInterface.h"
 #include "Interfaces/InteractionInterface.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Data/CharacterDataStruct.h"
+#include "Weapons/WeaponBase.h"
 #include "Characters/Components/StatusComponent.h"
 #include "Characters/Components/WeaponSystemComponent.h"
 #include "Components/InventoryComponent.h"
@@ -42,7 +44,7 @@ void APlayerCharacter::InitializeCharacterComponents()
 	PickupCollision->SetCapsuleSize(100.0f, 100.0f);
 
 
-	StatusComponent = CreateDefaultSubobject<UStatusComponent>(TEXT("Status"));
+	StatusComponent2 = CreateDefaultSubobject<UStatusComponent>(TEXT("Status"));
 	WeaponComponent = CreateDefaultSubobject<UWeaponSystemComponent>(TEXT("WeaponSystem"));
 	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("Inventory"));
 	
@@ -66,6 +68,22 @@ void APlayerCharacter::BeginPlay()
 	Super::BeginPlay();
 	
 	OnActorBeginOverlap.AddDynamic(this, &APlayerCharacter::OnPickupOverlap);
+
+	if (StatusComponent2)
+	{
+		// CharacterDataHandle 안에 테이블과 RowName이 다 들어있으므로 이것만 넘기면 끝!
+		StatusComponent2->InitializeStatsFromDataTable(CharacterDataHandle);
+	}
+
+	if (WeaponComponent) {
+		FCharacterData* rowData = CharacterDataHandle.GetRow<FCharacterData>(TEXT("Get Weapon"));
+		if (rowData) {
+			
+			UE_LOG(LogTemp, Warning, TEXT("AddWeapon : %s"), *rowData->BaseWeapon->GetName());
+			WeaponComponent->AddWeapon(rowData->BaseWeapon.LoadSynchronous());
+		}
+		
+	}
 
 }
 
@@ -173,21 +191,21 @@ void APlayerCharacter::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPr
 {
 	if (Other && Other->ActorHasTag("Enemy")) {
 		//충돌 데미지 처리
-		UE_LOG(LogTemp, Warning, TEXT("히트 성공 : %s"), *Other->GetName());
+		//UE_LOG(LogTemp, Warning, TEXT("히트 성공 : %s"), *Other->GetName());
 	}
 	
 }
 
 float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	float resultarmor = StatusComponent->GetArmor();
+	float resultarmor = 1.0f - StatusComponent2->GetResultArmor();
 	
 	float finalTakeDamage = DamageAmount* resultarmor;
 
-	//StatusComponent->SetCurrentHp(StatusComponent->GetCurrentHp()-= finalTakeDamage);
+	StatusComponent2->AddCurrentHP(-finalTakeDamage);
+	UE_LOG(LogTemp, Warning, TEXT("%.1f / %.1f"), StatusComponent2->GetCurrentHP(), StatusComponent2->GetResultMaxHP());
 
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-
 	return finalTakeDamage;
 }
 

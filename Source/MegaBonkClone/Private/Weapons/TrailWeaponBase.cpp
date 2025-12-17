@@ -53,8 +53,8 @@ void ATrailWeaponBase::AttackWeapon_Implementation()
 		// 4. 데이터 주입
 		float FinalDamage = GetFinalDamage();
 		float Size = ProjectileAttackSize > 0.0f ? ProjectileAttackSize : 1.0f;
-		float Duration = OwnerStatusComp.Get()->GetAttackDuration()+1.0f; 
-		float attackSpeed = OwnerStatusComp.Get()->GetAttackSpeed();
+		float Duration = OwnerStatusComp.Get()->GetResultAttackDuration()+1.0f; 
+		float attackSpeed = OwnerStatusComp.Get()->GetResultAttackSpeed();
 		// (데미지, 지속시간, 크기, 공격속도)
 		NewTrail->InitializeTrail(FinalDamage, Duration, Size, attackSpeed);
 	}

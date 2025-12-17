@@ -21,6 +21,4 @@ void UMainHudWidget::NativeConstruct()
 	//	//resource->OnHealthChanged.AddDynamic(HealthBar.Get(), &UResourceBarWidget::RefreshWidget);
 	//	//HealthBar->RefreshWidget(resource->GetCurrentHP(), resource->GetMaxHP());
 	//	///*ShieldBar->RefreshWidget(resource->)*/
-
-	//}
 }

@@ -129,7 +129,7 @@ void AWeaponBase::StartAttackTimer()
 	if (!OwnerStatusComp.IsValid())return;
 	UE_LOG(LogTemp, Warning, TEXT("StartAttackTimer"));
 	if (OwnerStatusComp.IsValid()) {
-		float attackSpeed = OwnerStatusComp.Get()->GetAttackSpeed();
+		float attackSpeed = OwnerStatusComp.Get()->GetResultAttackSpeed();
 		UE_LOG(LogTemp, Log, TEXT("attackSpeed: %f"), attackSpeed);
 		//기존 타이머가 돌고 있다면 초기화 (스탯 변경 시 재설정 위함)
 		GetWorldTimerManager().ClearTimer(AttackTimerHandle);
@@ -173,8 +173,11 @@ void AWeaponBase::InitializeWeaponStatus(const FWeaponData& InWeaponData)
 void AWeaponBase::GetDamageWeapon_Implementation()
 {
 	if (OwnerStatusComp.IsValid()) {
-		WeaponFinalDamage = OwnerStatusComp->GetStatusDamage();
-		//UE_LOG(LogTemp, Warning, TEXT("데미지 : %.1f"),GetFinalDamage());
+		WeaponFinalDamage = WeaponDamage * OwnerStatusComp->GetResultDamage();
+		UE_LOG(LogTemp, Warning, TEXT("무기데미지 : %.1f"), WeaponFinalDamage);
+
+		WeaponFinalCriticalDamage = (1.0f + (0.1f*CritDmgRate))* OwnerStatusComp->GetResultCritDmgRate()* WeaponFinalDamage;
+		UE_LOG(LogTemp, Warning, TEXT("무기크리데미지 : %.1f"), WeaponFinalCriticalDamage);
 	}
 }
 

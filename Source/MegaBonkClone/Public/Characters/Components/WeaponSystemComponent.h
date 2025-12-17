@@ -23,6 +23,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void EquipWeapon();
 
+	UFUNCTION(BlueprintCallable)
+	void AddWeapon(TSubclassOf<AActor> InWeapon);
+
+
 	FOnWeaponChanged OnWeaponChanged;
 
 protected:
@@ -32,4 +36,7 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "WeaponComponent|Weapons")
 	TArray<TSubclassOf<AActor>> PlayerWeapons;
 
+private:
+	//무기 슬롯 크기
+	int32 MaxWeaponNum = 3;
 };
