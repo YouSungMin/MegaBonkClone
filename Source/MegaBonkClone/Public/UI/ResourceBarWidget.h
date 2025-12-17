@@ -28,6 +28,7 @@ public:
 #endif
 
 protected:
+	//virtual void NativeConstruct() override;
 	virtual void NativePreConstruct() override;
 
 protected:
@@ -41,6 +42,7 @@ protected:
 	TWeakObjectPtr<class UTextBlock> Max; //ï¿½Ö´ï¿½ ï¿½Û¼ï¿½Æ®
 
 
+	//ÄÃ·¯
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Color")
 	FLinearColor FillColor = FLinearColor(0.0f, 1.0f, 0.0f); //¹Ù ÆÛ¼¾Æ® ÄÃ·¯
 

@@ -9,19 +9,16 @@
 
 void UMainHudWidget::NativeConstruct()
 {
-	Super::NativeConstruct();
+	//Super::NativeConstruct();
 
-	APlayerCharacter* player = Cast<APlayerCharacter>(GetOwningPlayerPawn());
-	
-	if(player && player->GetStatusComponent())
-	{
-		//UStatusComponent* resource = player->GetStatusComponent();
-
-		if(HealthBar.IsValid())
-		{
-		HealthBar->RefreshWidget(resource->GetCurrentHP(), resource->GetResultMaxHP());
-		}
-		//ShieldBar->RefreshWidget(resource->)
-
-	}
+	//APlayerCharacter* player = Cast<APlayerCharacter>(GetOwningPlayerPawn());
+	//
+	//if(player && player->GetStatusComponent())
+	//{
+	//	//UStatusComponent* resource = player->GetStatusComponent();
+	//	////HealthBar->OnHealthChanged.Broadcast(resource->GetCurrentHP(), resource->GetMaxHP());
+	//	//
+	//	//resource->OnHealthChanged.AddDynamic(HealthBar.Get(), &UResourceBarWidget::RefreshWidget);
+	//	//HealthBar->RefreshWidget(resource->GetCurrentHP(), resource->GetMaxHP());
+	//	///*ShieldBar->RefreshWidget(resource->)*/
 }

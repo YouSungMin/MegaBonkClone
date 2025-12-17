@@ -27,6 +27,7 @@ void UResourceBarWidget::PostEditChangeProperty(FPropertyChangedEvent& PropertyC
 }
 #endif
 
+
 void UResourceBarWidget::NativePreConstruct()
 {
 	Super::NativePreConstruct();
