@@ -129,7 +129,7 @@ void AWeaponBase::StartAttackTimer()
 	if (!OwnerStatusComp.IsValid())return;
 	UE_LOG(LogTemp, Warning, TEXT("StartAttackTimer"));
 	if (OwnerStatusComp.IsValid()) {
-		float attackSpeed = OwnerStatusComp.Get()->GetAttackSpeed();
+		float attackSpeed = OwnerStatusComp.Get()->GetResultAttackSpeed();
 		UE_LOG(LogTemp, Log, TEXT("attackSpeed: %f"), attackSpeed);
 		//기존 타이머가 돌고 있다면 초기화 (스탯 변경 시 재설정 위함)
 		GetWorldTimerManager().ClearTimer(AttackTimerHandle);

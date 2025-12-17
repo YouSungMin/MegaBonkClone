@@ -43,8 +43,8 @@ void APlayerCharacter::InitializeCharacterComponents()
 	PickupCollision->SetCapsuleSize(100.0f, 100.0f);
 
 
-	StatusComponent2 = CreateDefaultSubobject<UStatusComponent>(TEXT("Status"));
-	WeaponComponent2 = CreateDefaultSubobject<UWeaponSystemComponent>(TEXT("WeaponSystem"));
+	StatusComponent = CreateDefaultSubobject<UStatusComponent>(TEXT("Status"));
+	WeaponComponent = CreateDefaultSubobject<UWeaponSystemComponent>(TEXT("WeaponSystem"));
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -70.0f), FRotator(0.0f, -90.0f, 0.0f));
 
 	//컴포넌트 세부 수치 설정
@@ -66,18 +66,18 @@ void APlayerCharacter::BeginPlay()
 	
 	OnActorBeginOverlap.AddDynamic(this, &APlayerCharacter::OnPickupOverlap);
 
-	if (StatusComponent2)
+	if (StatusComponent)
 	{
 		// CharacterDataHandle 안에 테이블과 RowName이 다 들어있으므로 이것만 넘기면 끝!
-		StatusComponent2->InitializeStatsFromDataTable(CharacterDataHandle);
+		StatusComponent->InitializeStatsFromDataTable(CharacterDataHandle);
 	}
 
-	if (WeaponComponent2) {
+	if (WeaponComponent) {
 		FCharacterData* rowData = CharacterDataHandle.GetRow<FCharacterData>(TEXT("Get Weapon"));
 		if (rowData) {
 			
 			UE_LOG(LogTemp, Warning, TEXT("AddWeapon : %s"), *rowData->BaseWeapon->GetName());
-			WeaponComponent2->AddWeapon(rowData->BaseWeapon.LoadSynchronous());
+			WeaponComponent->AddWeapon(rowData->BaseWeapon.LoadSynchronous());
 		}
 		
 	}
@@ -186,7 +186,7 @@ void APlayerCharacter::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPr
 
 float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	float resultarmor = StatusComponent2->GetArmor();
+	float resultarmor = StatusComponent->GetResultArmor();
 	
 	float finalTakeDamage = DamageAmount* resultarmor;
 

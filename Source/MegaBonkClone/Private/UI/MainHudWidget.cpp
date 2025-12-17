@@ -19,7 +19,7 @@ void UMainHudWidget::NativeConstruct()
 
 		if(HealthBar.IsValid())
 		{
-		HealthBar->RefreshWidget(resource->GetCurrentHP(), resource->GetMaxHP());
+		HealthBar->RefreshWidget(resource->GetCurrentHP(), resource->GetResultMaxHP());
 		}
 		//ShieldBar->RefreshWidget(resource->)
 
