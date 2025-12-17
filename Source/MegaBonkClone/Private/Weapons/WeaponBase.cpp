@@ -125,12 +125,11 @@ void AWeaponBase::InvokeAttack()
 void AWeaponBase::StartAttackTimer()
 {
 	
-
 	if (!OwnerStatusComp.IsValid())return;
-	UE_LOG(LogTemp, Warning, TEXT("StartAttackTimer"));
+	//UE_LOG(LogTemp, Warning, TEXT("StartAttackTimer : %.1f"), OwnerStatusComp.Get()->GetResultAttackSpeed() / 100.0f);
 	if (OwnerStatusComp.IsValid()) {
-		float attackSpeed = OwnerStatusComp.Get()->GetResultAttackSpeed();
-		UE_LOG(LogTemp, Log, TEXT("attackSpeed: %f"), attackSpeed);
+		float attackSpeed = OwnerStatusComp.Get()->GetResultAttackSpeed() / 100.0f;
+		//UE_LOG(LogTemp, Log, TEXT("attackSpeed: %f"), attackSpeed);
 		//기존 타이머가 돌고 있다면 초기화 (스탯 변경 시 재설정 위함)
 		GetWorldTimerManager().ClearTimer(AttackTimerHandle);
 
@@ -183,9 +182,7 @@ void AWeaponBase::GetDamageWeapon_Implementation()
 
 void AWeaponBase::AttackWeapon_Implementation()
 {
-	
-	//UE_LOG(LogTemp, Warning, TEXT("%s : AttackWeapon_Implementation : %.1f"),*this->GetName(), WeaponFinalDamage);
-	
+	UE_LOG(LogTemp, Warning, TEXT("%s : AttackWeapon_Implementation : %.1f"),*this->GetName(), WeaponFinalDamage);
 }
 
 
@@ -217,7 +214,3 @@ bool AWeaponBase::IsValidTarget(AActor* OtherActor)
 
 
 
-float AWeaponBase::GetFinalDamage() const
-{
-	return WeaponDamage* WeaponFinalDamage;
-}

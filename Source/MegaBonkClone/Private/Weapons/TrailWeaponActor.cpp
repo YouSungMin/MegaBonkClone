@@ -56,7 +56,8 @@ void ATrailWeaponActor::InitializeTrail(float InDamage, float InDuration, float 
 		this,
 		&ATrailWeaponActor::OnDamageTick,
 		AttackSpeed,
-		true
+		true,
+		0.0f
 	);
 
 	InitialScale = FVector(InScale);

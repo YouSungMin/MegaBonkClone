@@ -154,6 +154,7 @@ void APlayerCharacter::TryInteract()
 	
 	for (const auto& elements : outResults) {
 		if (IsValid(elements.GetActor())) {
+			//인터페이스 구현부 체크
 			if (elements.GetActor()->Implements<UInteractionInterface>()) {
 				IInteractionInterface::Execute_Interact(elements.GetActor(), this);
 				//UE_LOG(LogTemp, Warning, TEXT("상호작용 : %s"), *elements.GetActor()->GetName());
@@ -164,14 +165,12 @@ void APlayerCharacter::TryInteract()
 
 void APlayerCharacter::OnPickupOverlap(AActor* OverlappedActor, AActor* OtherActor)
 {
-	
-	//오브젝트 Pickup류인지 체크할 조건 넣어야함
-	if (true) {
+	//인터페이스 구현부 체크
+	if (OtherActor->Implements<UPickupInterface>()) {
 		UE_LOG(LogTemp, Warning, TEXT("Pickup : %s"), *OtherActor->GetName());
-		if (OtherActor->Implements<UPickupInterface>()) {
-			IPickupInterface::Execute_OnPickup(OtherActor,this);
-		}
+		IPickupInterface::Execute_OnPickup(OtherActor,this);
 	}
+	
 	
 }
 
