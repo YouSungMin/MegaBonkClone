@@ -35,8 +35,10 @@ void AAuraWeaponBase::AttackWeapon_Implementation()
 
 	// 이 함수는 타이머에 의해 '공격 속도' 주기로 계속 불립니다.
 	// 즉, 0.5초마다 불리면 0.5초마다 범위 내 적에게 데미지를 줍니다.
+	if (Implements<UWeapon>()) {
+		IWeapon::Execute_GetDamageWeapon(this);
+	}
 
-	
 	TArray<AActor*> OverlappingActors;
 	Collision->GetOverlappingActors(OverlappingActors);
 
