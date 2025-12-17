@@ -606,7 +606,7 @@ void UStatusComponent::AddCurrentHP(float Amount)
 
 void UStatusComponent::AddGold(float Amount)
 {
-	CurrentGold += Amount;
+	CurrentGold += Amount * ResultGoldGain;
 	// (선택) 돈이 0보다 작아지지 않게 하려면: FMath::Max(0.0f, CurrentGold + Amount);
 	UE_LOG(LogTemp, Log, TEXT("골드 변경: %.0f -> 현재: %.0f"), Amount, CurrentGold);
 }
