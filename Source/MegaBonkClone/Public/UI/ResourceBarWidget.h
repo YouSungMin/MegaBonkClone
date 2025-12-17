@@ -28,6 +28,7 @@ public:
 #endif
 
 protected:
+	//virtual void NativeConstruct() override;
 	virtual void NativePreConstruct() override;
 
 protected:
@@ -41,6 +42,7 @@ protected:
 	TWeakObjectPtr<class UTextBlock> Max; //최대 퍼센트
 
 
+	//컬러
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Color")
 	FLinearColor FillColor = FLinearColor(0.0f, 1.0f, 0.0f); //바 퍼센트 컬러
 
