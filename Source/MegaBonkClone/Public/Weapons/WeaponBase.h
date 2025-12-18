@@ -57,6 +57,10 @@ protected:
     UFUNCTION()
     bool CheckIsCritical();
 
+    UFUNCTION()
+    virtual void UpdateWeaponStats();
+
+
 public:
     // ==========================================
     // 무기 기본 스탯 (테이블에서 가져올예정)
@@ -71,7 +75,7 @@ public:
     float ProjectileSpeed = 1.0f; // 발사체 속도
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Stats")
-    float ProjectileAttackSize = 1.0f; // 발사체 크기
+    float AttackSize = 1.0f; //크기
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Stats")
     float ProjectileReflectCount = 1.0f; // 발사체 반사
@@ -108,5 +112,10 @@ public:
     UPROPERTY()
     float WeaponFinalCriticalDamage = 0.0f;
 
+    float FinalProjectileCount = 1.0f;
+    float FinalProjectileSpeed = 1.0f;
+    float FinalAttackSize = 1.0f;
+    float FinalReflectCount = 0.0f;
+    float FinalDuration = 0.0f;
 
 };

@@ -38,6 +38,7 @@ void AAuraWeaponBase::AttackWeapon_Implementation()
 	if (Implements<UWeapon>()) {
 		IWeapon::Execute_GetDamageWeapon(this);
 	}
+	UpdateAuraScale();
 
 	TArray<AActor*> OverlappingActors;
 	Collision->GetOverlappingActors(OverlappingActors);

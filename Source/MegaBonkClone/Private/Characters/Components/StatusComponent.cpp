@@ -123,7 +123,7 @@ void UStatusComponent::UpdateCharacterStatus()
 	
 
 	// [치명타 확률] (단순 합산)
-	ResultCriticalChance = (PlayerCriticalChance + VisionCriticalChance + ShrineCriticalChance)*100.0f;
+	ResultCriticalChance = (PlayerCriticalChance + VisionCriticalChance + ShrineCriticalChance);
 
 	// [치명타 대미지 배율 (Crit Dmg Rate)]
 	// 공식 n: (0.01 * Player) * (1 + (0.001 * Shrine))
@@ -135,7 +135,7 @@ void UStatusComponent::UpdateCharacterStatus()
 
 
 	// [공격 속도] (단순 합산)
-	ResultAttackSpeed = (PlayerAttackSpeed + VisionAttackSpeed + ShrineAttackSpeed)*100.0f;
+	ResultAttackSpeed = (PlayerAttackSpeed + VisionAttackSpeed + ShrineAttackSpeed);
 
 
 	// [엘리트 대미지]
@@ -192,10 +192,10 @@ void UStatusComponent::UpdateCharacterStatus()
 	if (Movement)
 	{
 		// [이동 속도]
-		// 공식: PlayerInitial + n  (PlayerInitial을 기본 배율 1로 보거나, 기본 속도에 곱함)
+		// 공식: PlayerInitial + n  (PlayerInitial에곱함)
 		// n = (0.01 * Player) + (0.001 * Vision) + (0.01 * Shrine) -> 예시: 0.01*15 -> 0.15
-		// * PlayerMoveSpeed가 100(기본)이라면 0.01*100 = 1.0. 
-		// * Result는 실제 언리얼 유닛 속도로 변환하여 적용합니다.
+	
+
 	
 
 		float MoveN = ((0.01f * PlayerMoveSpeed) + (0.001f * VisionMoveSpeed) + (0.01f * ShrineMoveSpeed))*100.0f;
@@ -203,7 +203,7 @@ void UStatusComponent::UpdateCharacterStatus()
 		// 기본 걷기 속도 (예: 400)
 		float DefaultWalkSpeed = 400.0f;
 
-		// 공식 해석: n이 배율이므로 기본 속도 * n (예: 1.45배)
+		//n이 배율이므로 기본 속도 * n (예: 1.45배)
 		ResultMoveSpeed = DefaultWalkSpeed * MoveN;
 		Movement->MaxWalkSpeed = ResultMoveSpeed;
 		//UE_LOG(LogTemp, Warning, TEXT("%.1f"), PlayerMoveSpeed);
@@ -317,9 +317,9 @@ void UStatusComponent::UpdateCharacterStatus()
 
 			// [Offense]
 			ResultDamage,
-			ResultCriticalChance,
+			ResultCriticalChance * 100.0f,
 			ResultCritDmgRate,
-			ResultAttackSpeed,
+			ResultAttackSpeed * 100.0f,
 			ResultEliteDamage,
 			ResultKnockBack,
 
@@ -548,7 +548,7 @@ void UStatusComponent::Debug_TestAllStats()
 	LogStat("Thorn", OldThorn, GetResultThorn());
 
 	UE_LOG(LogTemp, Warning, TEXT("----- [2. 공격 결과] -----"));
-	LogStat("Damage", OldDmg, GetResultDamage()/100.0f);
+	LogStat("Damage", OldDmg, GetResultDamage());
 	LogStat("CritChance(%)", OldCrit, GetResultCriticalChance()); // 코드상 이미 *100 되어있음
 	LogStat("CritDmg", OldCritDmg, GetResultCritDmgRate());
 	LogStat("AtkSpeed(%)", OldAtkSpd, GetResultAttackSpeed());

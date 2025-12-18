@@ -40,7 +40,7 @@ AProjectileWeaponActor::AProjectileWeaponActor()
 
 void AProjectileWeaponActor::InitializeProjectile(float InDamage, float InSpeed, float InRange, float InKnockback, bool bIsPenetrate)
 {
-	float BaseSpeedMultiplier = 5000.0f;
+	float BaseSpeedMultiplier = 700.0f;
 
 	Damage = InDamage;
 	Knockback = InKnockback;

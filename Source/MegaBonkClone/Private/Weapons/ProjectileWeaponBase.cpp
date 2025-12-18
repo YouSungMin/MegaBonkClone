@@ -5,6 +5,8 @@
 #include "Weapons/ProjectileWeaponActor.h"
 #include "Framework/ObjectPoolSubsystem.h"
 #include "Characters/PlayAbleCharacter/PlayerCharacter.h"
+#include "Characters/Components/StatusComponent.h"
+#include "Weapons/BouncingProjectileWeaponActor.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -49,7 +51,7 @@ void AProjectileWeaponBase::AttackWeapon_Implementation()
 
 
 	// 2. 투사체 개수만큼 발사 (샷건처럼 여러 발 나가는 경우 처리)
-	int32 NumProjectiles = FMath::Max(1, (int32)ProjectileCount);
+	int32 NumProjectiles = FMath::Max(1, FMath::FloorToInt(FinalProjectileCount));
 
 	for (int32 i = 0; i < NumProjectiles; ++i)
 	{
@@ -78,6 +80,7 @@ void AProjectileWeaponBase::AttackWeapon_Implementation()
 			if (Implements<UWeapon>()) {
 				IWeapon::Execute_GetDamageWeapon(this);
 			}
+			UpdateWeaponStats();
 
 			float FinalDmg;
 
@@ -87,20 +90,33 @@ void AProjectileWeaponBase::AttackWeapon_Implementation()
 			else {
 				FinalDmg = WeaponFinalDamage;
 			}
-
+			
 			// ProjectileAttackSize, ProjectileSpeed 등 WeaponBase 변수 활용
 			float Duration = 5.0f; // 혹은 사거리
+			UE_LOG(LogTemp, Warning, TEXT("FinalProjectileSpeed : %.1f"), FinalProjectileSpeed);
+			NewProj->InitializeProjectile(
+				FinalDmg,
+				FinalProjectileSpeed,
+				5.0f /*사거리/지속시간*/,
+				KnockBack,
+				false
+			);
 
-			NewProj->InitializeProjectile(FinalDmg, ProjectileSpeed, Duration, KnockBack,false);
-
-			// 크기 조절
-			if (ProjectileAttackSize > 0.0f)
+			if (FinalAttackSize > 0.0f)
 			{
-				NewProj->SetActorScale3D(FVector(ProjectileAttackSize));
+				UE_LOG(LogTemp, Warning, TEXT("FinalAttackSize : %.1f"), FinalAttackSize);
+				NewProj->SetActorScale3D(FVector(FinalAttackSize));
+			}
+
+			if (ABouncingProjectileWeaponActor* BouncingProj = Cast<ABouncingProjectileWeaponActor>(NewProj))
+			{
+				BouncingProj->InitializeBouncing(FMath::FloorToInt(FinalReflectCount), 1000.0f);
 			}
 		}
 	}
 }
+
+
 
 
 

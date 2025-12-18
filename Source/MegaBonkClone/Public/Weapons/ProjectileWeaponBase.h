@@ -22,6 +22,7 @@ protected:
 
 	virtual void AttackWeapon_Implementation() override;
 
+
 public:
 
 protected:
@@ -33,5 +34,5 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "ProjectileWeaponBase")
 	bool bOnlyFireWhenTargetFound = false;
 
-
+	
 };

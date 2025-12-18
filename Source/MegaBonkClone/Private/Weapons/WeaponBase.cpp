@@ -128,10 +128,10 @@ bool AWeaponBase::CheckIsCritical()
 
 	if (OwnerStatusComp.IsValid()) {
 		totalCriticalChance += OwnerStatusComp.Get()->GetResultCriticalChance();
-		UE_LOG(LogTemp, Warning, TEXT("totalCriticalChance : %.1f"), totalCriticalChance);
+		//UE_LOG(LogTemp, Warning, TEXT("totalCriticalChance : %.1f"), totalCriticalChance);
 	}
 
-	if (FMath::RandRange(0.0f, 100.0f) <= totalCriticalChance) {
+	if (FMath::RandRange(0.0f, 1.0f) <= totalCriticalChance) {
 		return true;
 	}
 
@@ -144,8 +144,10 @@ void AWeaponBase::StartAttackTimer()
 	if (!OwnerStatusComp.IsValid())return;
 	//UE_LOG(LogTemp, Warning, TEXT("StartAttackTimer : %.1f"), OwnerStatusComp.Get()->GetResultAttackSpeed() / 100.0f);
 	if (OwnerStatusComp.IsValid()) {
-		float attackSpeed = OwnerStatusComp.Get()->GetResultAttackSpeed() / 100.0f;
-		//UE_LOG(LogTemp, Log, TEXT("attackSpeed: %f"), attackSpeed);
+
+		float AttackSpeedRate = OwnerStatusComp.Get()->GetResultAttackSpeed();
+		if (AttackSpeedRate <= 0.01f) AttackSpeedRate = 0.01f;
+		float AttackInterval = 1.0f / AttackSpeedRate;
 		//기존 타이머가 돌고 있다면 초기화
 		GetWorldTimerManager().ClearTimer(AttackTimerHandle);
 
@@ -155,7 +157,7 @@ void AWeaponBase::StartAttackTimer()
 			AttackTimerHandle,
 			this,
 			&AWeaponBase::InvokeAttack,
-			attackSpeed,
+			AttackInterval,
 			true
 		);
 	}
@@ -170,7 +172,7 @@ void AWeaponBase::InitializeWeaponStatus(const FWeaponData& InWeaponData)
 	WeaponDamage = InWeaponData.WeaponDamage;
 	ProjectileCount = InWeaponData.ProjectileCount;
 	ProjectileSpeed = InWeaponData.ProjectileSpeed;
-	ProjectileAttackSize = InWeaponData.ProjectileScale; 
+	AttackSize = InWeaponData.ProjectileScale;
 	ProjectileReflectCount = InWeaponData.ChainCount;     
 	CriticalChance = InWeaponData.CriticalChance;
 	CritDmgRate = InWeaponData.CriticalDamage; 
@@ -198,7 +200,8 @@ void AWeaponBase::GetDamageWeapon_Implementation()
 
 void AWeaponBase::AttackWeapon_Implementation()
 {
-	UE_LOG(LogTemp, Warning, TEXT("%s : AttackWeapon_Implementation : %.1f"),*this->GetName(), WeaponFinalDamage);
+	UpdateWeaponStats();
+	//UE_LOG(LogTemp, Warning, TEXT("%s : AttackWeapon_Implementation : %.1f"),*this->GetName(), WeaponFinalDamage);
 }
 
 
@@ -230,3 +233,71 @@ bool AWeaponBase::IsValidTarget(AActor* OtherActor)
 
 
 
+void AWeaponBase::UpdateWeaponStats()
+{
+	if (!OwnerStatusComp.IsValid())
+	{
+		UE_LOG(LogTemp, Error, TEXT("UpdateWeaponStats 실패: StatusComponent가 없습니다!"));
+		return;
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("========================================="));
+	UE_LOG(LogTemp, Warning, TEXT("      [WeaponBase] Update Stats Log      "));
+	UE_LOG(LogTemp, Warning, TEXT("========================================="));
+
+	// 1. 발사체 수 (단순 합산)
+	float StatusProjCount = OwnerStatusComp->GetResultProjectileCount();
+	FinalProjectileCount = ProjectileCount + StatusProjCount;
+
+	UE_LOG(LogTemp, Log, TEXT("[Count] Base(%.1f) + Status(%.1f) = Final(%.1f)"),
+		ProjectileCount, StatusProjCount, FinalProjectileCount);
+
+
+	// 2. 발사체 속도 (배율 적용)
+	// StatusComponent의 ResultProjectileSpeed가 %단위(100.0 = 100%)라고 가정
+	float StatusSpeedPct = OwnerStatusComp->GetResultProjectileSpeed();
+	float SpeedMult = StatusSpeedPct;
+	if (SpeedMult <= 0.0f) SpeedMult = 1.0f; // 0이면 1배로 보정
+
+	FinalProjectileSpeed = ProjectileSpeed * SpeedMult;
+
+	UE_LOG(LogTemp, Log, TEXT("[Speed] Base(%.1f) * Status(%.0f%% -> x%.2f) = Final(%.1f)"),
+		ProjectileSpeed, StatusSpeedPct, SpeedMult, FinalProjectileSpeed);
+
+
+	// 3. 발사체 크기 (배율 적용)
+	float StatusSizePct = OwnerStatusComp->GetResultAttackSize();
+	float SizeMult = StatusSizePct;
+	if (SizeMult <= 0.0f) SizeMult = 1.0f;
+
+	FinalAttackSize = AttackSize * SizeMult;
+
+	UE_LOG(LogTemp, Log, TEXT("[Size]  Base(%.1f) * Status(%.0f%% -> x%.2f) = Final(%.1f)"),
+		AttackSize, StatusSizePct, SizeMult, FinalAttackSize);
+
+
+	// 4. 반사 횟수 (단순 합산)
+	float StatusReflect = OwnerStatusComp->GetResultProjectileReflectCount();
+	FinalReflectCount = ProjectileReflectCount + StatusReflect;
+
+	UE_LOG(LogTemp, Log, TEXT("[Refl]  Base(%.1f) + Status(%.1f) = Final(%.1f)"),
+		ProjectileReflectCount, StatusReflect, FinalReflectCount);
+
+
+	// 5. 지속 시간 (배율 적용) - 필요 시
+	float StatusDurPct = OwnerStatusComp->GetResultAttackDuration();
+	float DurMult = StatusDurPct / 100.0f;
+	if (DurMult <= 0.0f) DurMult = 1.0f;
+
+	// WeaponData에 Duration 변수가 없다면 임시로 5.0f 사용
+	float BaseDuration = 5.0f;
+	FinalDuration = BaseDuration * DurMult;
+
+	UE_LOG(LogTemp, Log, TEXT("[Dur]   Base(%.1f) * Status(%.0f%% -> x%.2f) = Final(%.1f)"),
+		BaseDuration, StatusDurPct, DurMult, FinalDuration);
+
+	UE_LOG(LogTemp, Warning, TEXT("========================================="));
+
+	StartAttackTimer();
+	
+}
