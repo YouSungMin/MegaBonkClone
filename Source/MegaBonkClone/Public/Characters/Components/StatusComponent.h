@@ -10,7 +10,7 @@ struct FCharacterData;
 class UResourceBarWidget; //HP,Shield바
 
 
-//DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStatsUpdated);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStatusUpdated);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class MEGABONKCLONE_API UStatusComponent : public UActorComponent
@@ -21,6 +21,10 @@ public:
 	// Sets default values for this component's properties
 	UStatusComponent();
 
+public:
+	//스탯 델리게이트
+	UPROPERTY(BlueprintAssignable, Category = "Status|Event")
+	FOnStatusUpdated OnStatusUpdated;
 
 public:
 
@@ -257,10 +261,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Growth")
 	float ExpGrowthRate = 1.2f; 
 
-
-	//스탯 델리게이트
-	/*UPROPERTY(BlueprintAssignable, Category = "Stats|Event")
-	FOnStatsUpdated OnStatsUpdated;*/
 
 	// =================================================================
 	// [생존 (Survival)]

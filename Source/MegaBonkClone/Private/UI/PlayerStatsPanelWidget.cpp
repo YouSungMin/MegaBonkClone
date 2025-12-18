@@ -4,52 +4,132 @@
 #include "UI/PlayerStatsPanelWidget.h"
 
 #include "Components/VerticalBox.h"
+#include "Components/VerticalBoxSlot.h"
 #include "UI/PlayerStatWidget.h"
 #include "Characters/Components/StatusComponent.h"
 
-#include "UObject/UnrealType.h"        // ∏Æ«√∑∫º«: FProperty, TFieldIterator, FFloatProperty
+#include "Internationalization/Text.h"	//FNumberFormattingOptions
+#include "UObject/UnrealType.h"        // Î¶¨ÌîåÎ†âÏÖò: FProperty, TFieldIterator, FFloatProperty
 
+void UPlayerStatsPanelWidget::NativeConstruct()
+{
+	Super::NativeConstruct();
+	BuildRows();
+}
 
+void UPlayerStatsPanelWidget::NativeDestruct()
+{
+	if (Status.IsValid())
+	{
+		Status->OnStatusUpdated.RemoveAll(this);
+	}
+	Super::NativeDestruct();
+}
 
-//void UPlayerStatsPanelWidget::NativeConstruct()
-//{
-//	Super::NativeConstruct();
-//}
-//
-//void UPlayerStatsPanelWidget::InitWithStatus(UStatusComponent* InStatusComp)
-//{
-//	//StatusComp = InStatusComp;
-//
-//	//BuildRows_Auto();
-//}
-//
-//void UPlayerStatsPanelWidget::BuildRows_Auto()
-//{
-//	//if (RowByProp.Num() > 0) return;
-//
-//	//StatBox->ClearChildren(); //±‚¡∏UI∫ÒøÏ±‚
-//	//RowByProp.Empty();	//∏  √ ±‚»≠
-//
-//	////StatusComponent ≈¨∑°Ω∫ UPROPERTY º¯»∏
-//	//for (TFieldIterator<FProperty> It(StatusComp->GetClass()); It; ++It)
-//	//{
-//	//	FProperty* Prop = *It;	//«ˆ¿Á ∫Øºˆ¡§∫∏
-//
-//	//	if (!Prop->HasMetaData(TEXT("StatUI")))	//StatusComponent ∫Øºˆø° meta=(StatUI) ∫Ÿæ˙¿ª∂ß
-//	//		continue;
-//
-//	//	FFloatProperty* FloatProp = CastField<FFloatProperty>(Prop);
-//	//	if (!FloatProp)
-//	//		continue;
-//
-//	//	//∞™ ¿–±‚
-//	//	const float Value = FloatProp->GetPropertyValue_InContainer(StatusComp);
-//
-//	//	//¿Ã∏ß ¿–±‚
-//	//	const FText Label = Prop->GetDisplayNameText();
-//
-//	//	UPlayerStatWidget* Row = CreateWidget<UPlayerStatWidget>
-//	//}
-//
-//
-//}
+void UPlayerStatsPanelWidget::BindToStatus(UStatusComponent* InStatus)
+{
+	if (Status.IsValid())
+	{
+		Status->OnStatusUpdated.RemoveAll(this);
+	}
+
+	Status = InStatus;
+
+	if (Status.IsValid())
+	{
+		Status->OnStatusUpdated.AddDynamic(this, &UPlayerStatsPanelWidget::HandleStatusUpdated);
+		RefreshValues(); // ÏµúÏ¥à 1Ìöå Í∞±Ïã†
+	}
+}
+
+void UPlayerStatsPanelWidget::HandleStatusUpdated()
+	{
+		RefreshValues();
+}
+
+void UPlayerStatsPanelWidget::BuildRows()
+	{
+		if (!StatsBox || !StatRowClass || !StatUITable) return;
+
+		StatsBox->ClearChildren();
+		RowWidgets.Reset();
+		StatDefs.Reset();
+
+		// 1) Îç∞Ïù¥ÌÑ∞ÌÖåÏù¥Î∏îÏóêÏÑú UI Ï†ïÏùò ÏùΩÍ∏∞
+		TArray<FStatUIRow*> Rows;
+		StatUITable->GetAllRows(TEXT("StatUI"), Rows);
+
+		for (FStatUIRow* R : Rows)
+		{
+			if (R) StatDefs.Add(*R);
+		}
+
+		StatDefs.Sort([](const FStatUIRow& A, const FStatUIRow& B) { return A.Order < B.Order; });
+
+		// 2) Row ÏúÑÏ†Ø ÏÉùÏÑ±
+		for (const FStatUIRow& Def : StatDefs)
+		{
+			UPlayerStatWidget* Row = CreateWidget<UPlayerStatWidget>(GetWorld(), StatRowClass);
+			if (!Row) continue;
+
+			StatsBox->AddChild(Row);
+			Row->SetRowStat(Def.DisplayName, FText::FromString(TEXT("-")));
+
+			RowWidgets.Add(Row);
+		}
+	}
+
+	void UPlayerStatsPanelWidget::RefreshValues()
+	{
+		if (!Status.IsValid()) return;
+
+		// RowWidgets <-> StatDefs Ïù∏Îç±Ïä§ Îß§Ïπ≠
+		const int32 N = FMath::Min(RowWidgets.Num(), StatDefs.Num());
+
+		for (int32 i = 0; i < N; ++i)
+		{
+			const FStatUIRow& Def = StatDefs[i];
+			UPlayerStatWidget* Row = RowWidgets[i];
+			if (!Row) continue;
+
+			FFloatProperty* Prop = FindFProperty<FFloatProperty>(Status->GetClass(), Def.PropertyName);
+			if (!Prop)
+			{
+				Row->SetRowStat(Def.DisplayName, FText::FromString(TEXT("N/A")));
+				continue;
+			}
+
+			const float Raw = Prop->GetPropertyValue_InContainer(Status.Get());
+			Row->SetRowStat(Def.DisplayName, FormatValue(Def, Raw));
+		}
+	}
+
+	FText UPlayerStatsPanelWidget::FormatValue(const FStatUIRow& Def, float Raw) const
+	{
+		FNumberFormattingOptions Opt;
+		Opt.SetMinimumFractionalDigits(Def.Decimals);
+		Opt.SetMaximumFractionalDigits(Def.Decimals);
+
+		auto ToFixed = [&](float V)
+			{
+				return FText::AsNumber(V, &Opt);
+			};
+
+		switch (Def.Format)
+		{
+		case EStatDisplayFormat::Percent01:
+			return FText::FromString(FString::Printf(TEXT("%.*f%%"), Def.Decimals, Raw * 100.f));
+
+		case EStatDisplayFormat::Percent100:
+			return FText::FromString(FString::Printf(TEXT("%.*f%%"), Def.Decimals, Raw));
+
+		case EStatDisplayFormat::MultiplierX:
+			return FText::FromString(FString::Printf(TEXT("%.*fx"), Def.Decimals, Raw));
+
+		case EStatDisplayFormat::Integer:
+			return FText::AsNumber(FMath::RoundToInt(Raw));
+
+		default:
+			return ToFixed(Raw);
+		}
+	}

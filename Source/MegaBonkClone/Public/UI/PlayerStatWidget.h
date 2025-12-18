@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "PlayerStatWidget.generated.h"
 
+class UTextBlock;
 /**
  * 
  */
@@ -16,12 +17,12 @@ class MEGABONKCLONE_API UPlayerStatWidget : public UUserWidget
 
 public:
 	UFUNCTION(BlueprintCallable)
-	void RefreshStat(const FText& InName, float InValue);
+	void SetRowStat(const FText& InLabel, const FText& InValue);
 	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat", meta = (BindWidget))
-	TWeakObjectPtr<class UTextBlock> StatName;	//Ω∫≈» ¿Ã∏ß
+	TWeakObjectPtr<UTextBlock> StatLabel;	//Ïä§ÌÉØ Ïù¥Î¶Ñ
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat", meta = (BindWidget))
-	TWeakObjectPtr<class UTextBlock> StatValue; //Ω∫≈» ∞™
+	TWeakObjectPtr<UTextBlock> StatValue; //Ïä§ÌÉØ Í∞í
 };
