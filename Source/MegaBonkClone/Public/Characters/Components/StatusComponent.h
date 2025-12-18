@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Data/TypeEnums.h"
 #include "StatusComponent.generated.h"
 
 struct FCharacterData;
@@ -220,8 +221,15 @@ public:
 	void Debug_TestAllStats();
 
 	UFUNCTION(BlueprintCallable)
-	void TestSpeed();
+	int32 CalculateChestCost(int32 BaseCost) const;
 
+	UFUNCTION(BlueprintCallable)
+	void IncreaseChestOpenCount();
+
+	UFUNCTION(BlueprintCallable)
+	bool SpendGold(float Amount);
+
+	void ApplyBuff(EBuffType BuffType, float Duration);
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -229,7 +237,12 @@ protected:
    
 
 private:
+	// 실제 스탯을 올리고 내리는 내부 함수 
+	UFUNCTION()
+	void ProcessStatChange(EBuffType BuffType, float Amount);
 
+	// 버프 값을 정의하는 헬퍼 함수
+	float GetBuffAmount(EBuffType BuffType);
 public:
 
 	//스탯 델리게이트
@@ -593,6 +606,12 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stats|Result")
 	float ResultPowerUPDropRate = 0.0f;
 
+	// 상자 관련 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Status|Economy")
+	int32 ChestOpenCount = 0;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Status|Economy")
+	TObjectPtr<UCurveFloat> ChestCostCurve;
 private:
 
     TObjectPtr<ACharacter> OwnerCharacter = nullptr;

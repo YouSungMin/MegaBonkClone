@@ -4,17 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Items/PickupItem/PickupBaseActor.h"
+#include "Data/TypeEnums.h"
 #include "BuffPickup.generated.h"
 
-UENUM(BlueprintType)
-enum class EBuffType : uint8 
-{ 
-    SpeedUp,        // 이동 속도 증가
-    Invincible,     // 일정시간 무적 
-    AttackSpeed,    // 공격 속도 증가
-    GoldBoost,      // 골드 획득량 증가
-    Stopwatch       // 일정 시간 적 정지
-};
 /**
  * 
  */

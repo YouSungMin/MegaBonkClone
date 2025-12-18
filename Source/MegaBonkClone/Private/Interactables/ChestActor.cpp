@@ -25,6 +25,9 @@ void AChestActor::BeginPlay()
 void AChestActor::Interact_Implementation(AActor* PlayerActor)
 {
 	if(!PlayerActor) return;
+
+	if (!PlayerActor->Implements<UInventoryOwner>()) return;
+
 	FName SelectedItemID = GetRandomItemID();
 
 	if (SelectedItemID.IsNone())
@@ -34,13 +37,25 @@ void AChestActor::Interact_Implementation(AActor* PlayerActor)
 		return;
 	}
 
-	if (PlayerActor->Implements<UInventoryOwner>())
+	if (OpenCost > 0)
 	{
-		IInventoryOwner::Execute_ReceiveItem(PlayerActor, SelectedItemID, 1);
-		UE_LOG(LogTemp, Log,TEXT("아이템 추가 %s"),*SelectedItemID.ToString());
-		//Destroy();
+		int32 FinalCost = IInventoryOwner::Execute_GetAdjustedCost(PlayerActor, OpenCost);
+
+		bool bPaymentSuccess = IInventoryOwner::Execute_UseGold(PlayerActor, FinalCost);
+
+		if (!bPaymentSuccess)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("돈이 부족합니다!"));
+			return;
+		}
+
+		IInventoryOwner::Execute_NotifyChestOpened(PlayerActor);
 	}
-	
+
+	IInventoryOwner::Execute_ReceiveItem(PlayerActor, SelectedItemID, 1);
+	UE_LOG(LogTemp, Log,TEXT("아이템 추가 %s"),*SelectedItemID.ToString());
+	// 아이템 획득 이펙트 추가
+	Destroy();
 }
 
 FName AChestActor::GetRandomItemID()

@@ -4,6 +4,7 @@
 #include "Items/PickupItem/SpecialActionPickup.h"
 #include "Interfaces/PickupInterface.h"
 #include "Items/PickupItem/ResourcePickup.h"
+#include "Characters/PlayAbleCharacter/PlayerCharacter.h"
 #include <Kismet/GameplayStatics.h>
 
 void ASpecialActionPickup::OnPickupComplete_Implementation()
@@ -16,6 +17,12 @@ void ASpecialActionPickup::OnPickupComplete_Implementation()
 	case ESpecialActionType::Magnet:
 		ExecuteMagnet();
 		break;
+	case ESpecialActionType::Stopwatch:
+		ExecuteStopwatch();
+		break;
+	case ESpecialActionType::Invincible:
+		ExecuteInvincible();
+		break;
 	default:
 		break;
 	}
@@ -25,25 +32,28 @@ void ASpecialActionPickup::OnPickupComplete_Implementation()
 void ASpecialActionPickup::ExecuteNuke()
 {
 	UE_LOG(LogTemp, Log, TEXT("모든 적 제거 효과"));
-
-
 }
 
 void ASpecialActionPickup::ExecuteMagnet()
 {
-	UE_LOG(LogTemp,Log, TEXT("자석 효과"));
-
-	TArray<AActor*> FoundItems;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AResourcePickup::StaticClass(), FoundItems);
-
-	for (AActor* Item : FoundItems)
+	if (auto* player = Cast<APlayerCharacter>(PickupOwner.Get()))
 	{
-		if (AResourcePickup* resourceItem = Cast<AResourcePickup>(Item))
-		{
-			if (resourceItem->ResourceType == EResourceType::Exp && !resourceItem->IsPickup())
-			{
-				IPickupInterface::Execute_OnPickup(resourceItem, PickupOwner.Get());
-			}
-		}
+		player->ActivateMagnetEffect();
+	}
+}
+
+void ASpecialActionPickup::ExecuteStopwatch()
+{
+	if (auto* player = Cast<APlayerCharacter>(PickupOwner.Get()))
+	{
+		player->ActivateStopwatch(BuffDuration);
+	}
+}
+
+void ASpecialActionPickup::ExecuteInvincible()
+{
+	if (auto* player = Cast<APlayerCharacter>(PickupOwner.Get()))
+	{
+		player->ActivateInvincibility(BuffDuration);
 	}
 }

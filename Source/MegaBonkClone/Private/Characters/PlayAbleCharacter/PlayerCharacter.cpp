@@ -16,7 +16,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "InputActionValue.h"
-
+#include "Items/PickupItem/ResourcePickup.h"
+#include <Kismet/GameplayStatics.h>
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -109,9 +110,6 @@ void APlayerCharacter::OnJumpInput(const FInputActionValue& InValue)
 	Jump();
 }
 
-
-
-
 // Called to bind functionality to input
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -192,6 +190,95 @@ void APlayerCharacter::ReceiveItem_Implementation(FName ItemID, int32 Count)
 	}
 }
 
+float APlayerCharacter::GetAdjustedCost_Implementation(float BaseCost)
+{
+	if (StatusComponent2)
+	{
+		return StatusComponent2->CalculateChestCost(BaseCost);
+	}
+	return BaseCost;
+}
+
+bool APlayerCharacter::UseGold_Implementation(float Amount)
+{
+	if (StatusComponent2) return StatusComponent2->SpendGold(Amount);
+	return 0;
+}
+
+void APlayerCharacter::NotifyChestOpened_Implementation()
+{
+	if (StatusComponent2)
+	{
+		StatusComponent2->IncreaseChestOpenCount();
+	}
+}
+
+void APlayerCharacter::ActivateMagnetEffect()
+{
+	UE_LOG(LogTemp, Log, TEXT("자석 효과"));
+
+	TArray<AActor*> FoundItems;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AResourcePickup::StaticClass(), FoundItems);
+
+	for (AActor* Item : FoundItems)
+	{
+		if (AResourcePickup* resourceItem = Cast<AResourcePickup>(Item))
+		{
+			if (resourceItem->ResourceType == EResourceType::Exp && !resourceItem->IsPickup())
+			{
+				IPickupInterface::Execute_OnPickup(resourceItem, this);
+			}
+		}
+	}
+}
+
+void APlayerCharacter::ActivateInvincibility(float Duration)
+{
+	if (bIsInvincible)
+	{
+		GetWorldTimerManager().ClearTimer(InvincibleTimerHandle);
+	}
+	bIsInvincible = true;
+
+	UE_LOG(LogTemp, Log, TEXT("무적 상태 시작"));
+
+	GetWorldTimerManager().SetTimer(InvincibleTimerHandle, this, &APlayerCharacter::OnInvincibleEnd, Duration, false);
+}
+
+void APlayerCharacter::OnInvincibleEnd()
+{
+	bIsInvincible = false;
+	// TODO: 무적 이펙트 끄기
+	UE_LOG(LogTemp, Log, TEXT("무적 상태 종료."));
+}
+
+void APlayerCharacter::ActivateStopwatch(float Duration)
+{
+	// 이미 시간 정지 중이면 타이머만 연장하고 리턴
+	if (GetWorldTimerManager().IsTimerActive(StopwatchTimerHandle))
+	{
+		GetWorldTimerManager().SetTimer(StopwatchTimerHandle, this, &APlayerCharacter::OnStopwatchEnd, Duration, false);
+		return;
+	}
+
+	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.05f);
+
+	this->CustomTimeDilation = 20.0f;
+
+	UE_LOG(LogTemp, Log, TEXT("시간 정지 시작"));
+
+	GetWorldTimerManager().SetTimer(StopwatchTimerHandle, this, &APlayerCharacter::OnStopwatchEnd, Duration * 0.05f, false);
+}
+
+void APlayerCharacter::OnStopwatchEnd()
+{
+	// 원래대로 복구
+	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.0f);
+	this->CustomTimeDilation = 1.0f;
+
+	UE_LOG(LogTemp, Log, TEXT("시간 정지 종료."));
+}
+
 void APlayerCharacter::OnPickupOverlap(AActor* OverlappedActor, AActor* OtherActor)
 {
 	//인터페이스 구현부 체크
@@ -218,6 +305,10 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 	
 	float finalTakeDamage = DamageAmount* resultarmor;
 
+	if (bIsInvincible)
+	{
+		finalTakeDamage = 0.0f;
+	}
 	StatusComponent2->AddCurrentHP(-finalTakeDamage);
 	UE_LOG(LogTemp, Warning, TEXT("%.1f / %.1f"), StatusComponent2->GetCurrentHP(), StatusComponent2->GetResultMaxHP());
 

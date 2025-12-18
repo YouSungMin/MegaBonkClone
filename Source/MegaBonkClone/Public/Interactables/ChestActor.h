@@ -44,6 +44,6 @@ protected:
 
 	// 상자 여는 비용 (0이면 무료, 100이면 100골드 필요)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loot Settings")
-	int32 OpenCost = 0;
+	float OpenCost = 0;
 
 };
