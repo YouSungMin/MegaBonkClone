@@ -16,7 +16,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "InputActionValue.h"
-
+#include "Items/PickupItem/ResourcePickup.h"
+#include <Kismet/GameplayStatics.h>
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -195,6 +196,25 @@ void APlayerCharacter::NotifyChestOpened_Implementation()
 	if (StatusComponent2)
 	{
 		StatusComponent2->IncreaseChestOpenCount();
+	}
+}
+
+void APlayerCharacter::ActivateMagnetEffect()
+{
+	UE_LOG(LogTemp, Log, TEXT("자석 효과"));
+
+	TArray<AActor*> FoundItems;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AResourcePickup::StaticClass(), FoundItems);
+
+	for (AActor* Item : FoundItems)
+	{
+		if (AResourcePickup* resourceItem = Cast<AResourcePickup>(Item))
+		{
+			if (resourceItem->ResourceType == EResourceType::Exp && !resourceItem->IsPickup())
+			{
+				IPickupInterface::Execute_OnPickup(resourceItem, this);
+			}
+		}
 	}
 }
 

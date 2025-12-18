@@ -86,10 +86,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Visual")
 	bool bIsBillboard = false;
 
-	FRotator InitialMeshRotation;
+	FRotator InitialMeshRotation = FRotator(0,0,0);
 private:
 	// 획득했을 때 메시 위치(월드)
-	FVector PickupStartLocation;
+	FVector PickupStartLocation = FVector(0,0,0);
 
 	// 획득 되었는지 여부(true면 획득 처리 중)
 	bool bPickuped = false;
