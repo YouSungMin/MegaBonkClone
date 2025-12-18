@@ -175,6 +175,29 @@ void APlayerCharacter::ReceiveItem_Implementation(FName ItemID, int32 Count)
 	}
 }
 
+float APlayerCharacter::GetAdjustedCost_Implementation(float BaseCost)
+{
+	if (StatusComponent2)
+	{
+		return StatusComponent2->CalculateChestCost(BaseCost);
+	}
+	return BaseCost;
+}
+
+bool APlayerCharacter::UseGold_Implementation(float Amount)
+{
+	if (StatusComponent2) return StatusComponent2->SpendGold(Amount);
+	return 0;
+}
+
+void APlayerCharacter::NotifyChestOpened_Implementation()
+{
+	if (StatusComponent2)
+	{
+		StatusComponent2->IncreaseChestOpenCount();
+	}
+}
+
 void APlayerCharacter::OnPickupOverlap(AActor* OverlappedActor, AActor* OtherActor)
 {
 	//인터페이스 구현부 체크

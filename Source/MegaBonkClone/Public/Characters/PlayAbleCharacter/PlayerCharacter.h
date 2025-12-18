@@ -27,7 +27,18 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void TryInteract();
 
+	// 아이템 추가 인터페이스 함수
 	virtual void ReceiveItem_Implementation(FName ItemID, int32 Count) override;
+
+
+	// 상자 가격을 묻는 함수
+	virtual float GetAdjustedCost_Implementation(float BaseCost) override;
+
+	// 상자 가격에 따라 골드를 사용하는 함수
+	virtual bool UseGold_Implementation(float Amount) override;
+
+	// 상자를 연 횟수를 증가시키는 함수
+	virtual void NotifyChestOpened_Implementation() override;
 
 	//스테이터스 GETTER 함수
 	UFUNCTION(BlueprintCallable, Category = "Player|Components")

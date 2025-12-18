@@ -575,6 +575,43 @@ void UStatusComponent::Debug_TestAllStats()
 	GEngine->AddOnScreenDebugMessage(-1, LogTime, FColor::Green, TEXT(">>> 테스트 완료! 로그 창을 확인하세요."));
 }
 
+int32 UStatusComponent::CalculateChestCost(int32 BaseCost) const
+{
+	// 무료 상자면 0원
+	if (BaseCost <= 0) return 0;
+
+	// 커브가 없으면 그냥 기본 가격 리턴
+	if (!ChestCostCurve) return BaseCost;
+
+	// 커브에서 로그값 가져오기 (예: 3.724)
+	float LogValue = ChestCostCurve->GetFloatValue((float)ChestOpenCount);
+
+	// 10의 거듭제곱으로 복구 (10^3.724 = 5301)
+	float RealCost = FMath::Pow(10.0f, LogValue);
+
+	
+	UE_LOG(LogTemp, Log, TEXT("상자 가격: %d"), FMath::RoundToInt(RealCost));
+
+	// 반올림해서 리턴
+	return FMath::RoundToInt(RealCost);
+}
+
+void UStatusComponent::IncreaseChestOpenCount()
+{
+	ChestOpenCount++;
+	UE_LOG(LogTemp, Log, TEXT("상자 오픈 횟수 증가: %d"), ChestOpenCount);
+}
+
+bool UStatusComponent::SpendGold(float Amount)
+{
+	if (CurrentGold >= Amount)
+	{
+		CurrentGold -= Amount;
+		return true;
+	}
+	return false;
+}
+
 
 
 // -----------------------------------------------------------------

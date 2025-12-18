@@ -22,6 +22,19 @@ class MEGABONKCLONE_API IInventoryOwner
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
+	// 아이템 추가 함수
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Inventory")
 	void ReceiveItem(FName ItemID, int32 Count);
+
+	// 상자를 열때 필요한 골드 체크 함수
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Status")
+	float GetAdjustedCost(float BaseCost) ;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Status")
+	// 골드를 사용하는 함수
+	bool UseGold(float Amount);
+
+	// 상자를 연 횟수를 증가시키는 함수
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Status")
+	void NotifyChestOpened();
 };

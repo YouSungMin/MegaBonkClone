@@ -3,7 +3,6 @@
 
 #include "Interactables/ChestActor.h"
 #include "Interfaces/InventoryOwner.h"
-#include "Characters/Components/StatusComponent.h"
 
 // Sets default values
 AChestActor::AChestActor()
@@ -27,18 +26,7 @@ void AChestActor::Interact_Implementation(AActor* PlayerActor)
 {
 	if(!PlayerActor) return;
 
-	UStatusComponent* StatusComp = PlayerActor->FindComponentByClass<UStatusComponent>();
-	if (StatusComp)
-	{
-		UE_LOG(LogTemp,Log,TEXT("StatusComp 확인"));
-		UE_LOG(LogTemp,Log,TEXT("현재 골드 : %f , 필요 골드 : %f"), StatusComp->GetCurrentGold(), OpenCost);
-
-		if (StatusComp->GetCurrentGold() < OpenCost)
-		{
-			UE_LOG(LogTemp,Log,TEXT("상자 오픈 실패, 골드가 부족합니다."));
-			return;
-		}
-	}
+	if (!PlayerActor->Implements<UInventoryOwner>()) return;
 
 	FName SelectedItemID = GetRandomItemID();
 
@@ -49,14 +37,25 @@ void AChestActor::Interact_Implementation(AActor* PlayerActor)
 		return;
 	}
 
-	if (PlayerActor->Implements<UInventoryOwner>())
+	if (OpenCost > 0)
 	{
-		IInventoryOwner::Execute_ReceiveItem(PlayerActor, SelectedItemID, 1);
-		UE_LOG(LogTemp, Log,TEXT("아이템 추가 %s"),*SelectedItemID.ToString());
-		// 아이템 획득 이펙트 추가
-		Destroy();
+		int32 FinalCost = IInventoryOwner::Execute_GetAdjustedCost(PlayerActor, OpenCost);
+
+		bool bPaymentSuccess = IInventoryOwner::Execute_UseGold(PlayerActor, FinalCost);
+
+		if (!bPaymentSuccess)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("돈이 부족합니다!"));
+			return;
+		}
+
+		IInventoryOwner::Execute_NotifyChestOpened(PlayerActor);
 	}
-	
+
+	IInventoryOwner::Execute_ReceiveItem(PlayerActor, SelectedItemID, 1);
+	UE_LOG(LogTemp, Log,TEXT("아이템 추가 %s"),*SelectedItemID.ToString());
+	// 아이템 획득 이펙트 추가
+	Destroy();
 }
 
 FName AChestActor::GetRandomItemID()

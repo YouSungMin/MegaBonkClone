@@ -218,6 +218,15 @@ public:
 	UFUNCTION(BlueprintCallable, Exec, Category = "Debug")
 	void Debug_TestAllStats();
 
+	UFUNCTION(BlueprintCallable)
+	int32 CalculateChestCost(int32 BaseCost) const;
+
+	UFUNCTION(BlueprintCallable)
+	void IncreaseChestOpenCount();
+
+	UFUNCTION(BlueprintCallable)
+	bool SpendGold(float Amount);
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -585,6 +594,12 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stats|Result")
 	float ResultPowerUPDropRate = 0.0f;
 
+	// 상자 관련 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Status|Economy")
+	int32 ChestOpenCount = 0;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Status|Economy")
+	TObjectPtr<UCurveFloat> ChestCostCurve;
 private:
 
     TObjectPtr<ACharacter> OwnerCharacter = nullptr;
