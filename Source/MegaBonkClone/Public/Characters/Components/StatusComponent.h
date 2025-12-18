@@ -222,6 +222,9 @@ public:
 	UFUNCTION(BlueprintCallable, Exec, Category = "Debug")
 	void Debug_TestAllStats();
 
+	UFUNCTION(BlueprintCallable)
+	void TestSpeed();
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;

@@ -260,7 +260,7 @@ void UStatusComponent::UpdateCharacterStatus()
 	// 공식: Initial * n
 	// n = (1 + (0.01 * Vision) + (0.01 * Shrine))
 	// * Player 수치를 Initial(기본 배율)로 사용
-
+	
 	float XPN = 1.0f + (0.01f * VisionExpGain) + (0.01f * ShrineExpGain);
 	ResultExpGain = PlayerExpGain * XPN;
 
@@ -574,6 +574,12 @@ void UStatusComponent::Debug_TestAllStats()
 //
 //	// 화면 메시지
 //	GEngine->AddOnScreenDebugMessage(-1, LogTime, FColor::Green, TEXT(">>> 테스트 완료! 로그 창을 확인하세요."));
+}
+
+void UStatusComponent::TestSpeed()
+{
+	Movement->MaxWalkSpeed = Movement->GetMaxSpeed() + 300.0f;
+	ResultAttackSpeed += 1.0f;
 }
 
 
