@@ -147,7 +147,7 @@ void AWeaponBase::StartAttackTimer()
 	if (AttackSpeedRate <= 0.01f) AttackSpeedRate = 0.01f;
 
 	// 새로 계산된 간격
-	float NewInterval = 1.0f / AttackSpeedRate;
+	float NewInterval = 2.0f / AttackSpeedRate;
 
 	// [핵심] 기존 간격과 거의 차이가 없다면(변화 없음), 타이머를 건드리지 않고 리턴!
 	if (FMath::IsNearlyEqual(CurrentAttackInterval, NewInterval, 0.001f))
@@ -261,20 +261,20 @@ void AWeaponBase::UpdateWeaponStats()
 	if (SizeMult <= 0.0f) SizeMult = 1.0f;
 
 	FinalAttackSize = AttackSize * SizeMult;
-	UE_LOG(LogTemp, Warning, TEXT("FinalAttackSize : %.1f"), FinalAttackSize);
 
 
 	// 4. 반사 횟수 (단순 합산)
 	float StatusReflect = OwnerStatusComp->GetResultProjectileReflectCount();
 	FinalReflectCount = ProjectileReflectCount + StatusReflect;
+	UE_LOG(LogTemp, Warning, TEXT("FinalReflectCount : %.1f"), FinalReflectCount);
 
 	// 5. 지속 시간 (배율 적용) - 필요 시
 	float StatusDurPct = OwnerStatusComp->GetResultAttackDuration();
-	float DurMult = StatusDurPct / 100.0f;
+	float DurMult = StatusDurPct;
 	if (DurMult <= 0.0f) DurMult = 1.0f;
 
 	// WeaponData에 Duration 변수가 없다면 임시로 5.0f 사용
-	float BaseDuration = 5.0f;
+	float BaseDuration = 1.0f;
 	FinalDuration = BaseDuration * DurMult;
 
 	if (Implements<UWeapon>()) {

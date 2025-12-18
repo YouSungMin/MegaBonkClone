@@ -11,6 +11,8 @@ void ABouncingProjectileWeaponActor::InitializeBouncing(int32 InBounces, float I
 	BouncesLeft = InBounces;
 	BounceRange = InBounceRange;
 	HitHistory.Empty();
+
+	bPenetrate = true;
 }
 
 void ABouncingProjectileWeaponActor::OnPoolActivate_Implementation()

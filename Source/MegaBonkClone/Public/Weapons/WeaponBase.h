@@ -121,6 +121,6 @@ public:
     float FinalProjectileSpeed = 1.0f;
     float FinalAttackSize = 1.0f;
     float FinalReflectCount = 0.0f;
-    float FinalDuration = 0.0f;
+    float FinalDuration = 1.0f;
 
 };

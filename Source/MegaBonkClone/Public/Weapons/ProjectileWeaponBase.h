@@ -22,6 +22,9 @@ protected:
 
 	virtual void AttackWeapon_Implementation() override;
 
+	UFUNCTION()
+	void FireSingleProjectile();
+
 
 public:
 
@@ -33,6 +36,13 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "ProjectileWeaponBase")
 	bool bOnlyFireWhenTargetFound = false;
+
+
+	// [추가] 연사(Burst)를 위한 타이머 핸들
+	FTimerHandle BurstTimerHandle;
+
+	// [추가] 이번 공격에서 남은 발사체 수
+	int32 BurstShotsLeft = 0;
 
 	
 };

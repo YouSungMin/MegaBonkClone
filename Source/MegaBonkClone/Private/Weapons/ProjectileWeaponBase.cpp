@@ -26,20 +26,56 @@ void AProjectileWeaponBase::BeginPlay()
 
 void AProjectileWeaponBase::AttackWeapon_Implementation()
 {
+
 	if (!ProjectileClass) return;
 
+	// 1. 공격 시작 시 스탯 최신화 (한 번만 계산)
 	UpdateWeaponStats();
 
-	// 1. 발사 위치: 플레이어 위치
-	FVector SpawnLoc = OwnerCharacter.Get()->GetActorLocation();
-	FRotator SpawnRot = OwnerCharacter.Get()->GetActorRotation(); // 기본은 플레이어가 보는 방향
+	// 2. 발사해야 할 총 개수 설정
+	BurstShotsLeft = FMath::Max(1, FMath::FloorToInt(FinalProjectileCount));
 
-	//가장 가까운 적 찾기
+	// 3. 연사 간격 (Delay) 설정 (예: 0.1초마다 발사)
+	// 필요하다면 WeaponData에 'BurstInterval' 같은 변수를 추가해서 쓰셔도 됩니다.
+	float BurstDelay = 0.1f;
+
+	// 4. 타이머 시작 (즉시 첫 발 발사하고, 0.1초마다 반복)
+	GetWorldTimerManager().SetTimer(
+		BurstTimerHandle,
+		this,
+		&AProjectileWeaponBase::FireSingleProjectile,
+		BurstDelay,
+		true, // 반복(Loop) 활성화
+		0.0f  // 첫 발은 대기 없이 0초에 즉시 발사
+	);
 	
-	AActor* NearestEnemy = FindNearestEnemy(); 
+}
 
+void AProjectileWeaponBase::FireSingleProjectile()
+{
+	// 남은 횟수가 없으면 타이머 종료
+	if (BurstShotsLeft <= 0)
+	{
+		GetWorldTimerManager().ClearTimer(BurstTimerHandle);
+		return;
+	}
+
+	// 횟수 차감
+	BurstShotsLeft--;
+
+	
+
+	// 매 발사마다 타겟 다시 찾기
+	FVector SpawnLoc = OwnerCharacter.Get()->GetActorLocation();
+	FRotator SpawnRot = OwnerCharacter.Get()->GetActorRotation();
+
+	AActor* NearestEnemy = FindNearestEnemy();
+
+	// 타겟팅 모드일 때 적 없으면 쏘지 않음 (취향에 따라 삭제 가능)
 	if (bOnlyFireWhenTargetFound && NearestEnemy == nullptr)
 	{
+		// 적이 없어서 안 쐈어도 횟수는 까는 게 일반적이지만, 
+		// 아끼고 싶으면 BurstShotsLeft++ 하셔도 됩니다.
 		return;
 	}
 
@@ -48,59 +84,46 @@ void AProjectileWeaponBase::AttackWeapon_Implementation()
 		FVector Dir = NearestEnemy->GetActorLocation() - SpawnLoc;
 		SpawnRot = Dir.Rotation();
 	}
-	
+
 	UObjectPoolSubsystem* poolSystem = GetWorld()->GetSubsystem<UObjectPoolSubsystem>();
 
+	//스폰 
+	AProjectileWeaponActor* NewProj = poolSystem->SpawnPoolActor<AProjectileWeaponActor>(
+		ProjectileClass,
+		SpawnLoc,
+		SpawnRot,
+		this,
+		Cast<APawn>(OwnerCharacter.Get())
+	);
 
-	// 2. 투사체 개수만큼 발사 (샷건처럼 여러 발 나가는 경우 처리)
-	int32 NumProjectiles = FMath::Max(1, FMath::FloorToInt(FinalProjectileCount));
-
-	for (int32 i = 0; i < NumProjectiles; ++i)
+	//데이터 주입
+	if (NewProj)
 	{
-		// 여러 발이면 각도를 약간씩 틀어줌 (예: -10도, 0도, +10도)
-		FRotator CurrentRot = SpawnRot;
-		if (NumProjectiles > 1)
-		{
-			float SpreadAngle = 15.0f; // 부채꼴 각도
-			float AngleOffset = SpreadAngle * (i - (NumProjectiles - 1) / 2.0f);
-			CurrentRot.Yaw += AngleOffset;
+		// WeaponBase 함수 사용하지 않고 직접 확률 계산 (Per-Hit를 위해 확률 전달)
+		float TotalCritChance = CriticalChance;
+		if (OwnerStatusComp.IsValid()) {
+			TotalCritChance += OwnerStatusComp->GetResultCriticalChance();
 		}
 
-		FActorSpawnParameters Params;
-		Params.Owner = this;
-		Params.Instigator = Cast<APawn>(OwnerCharacter.Get());
+		// 확률(TotalCritChance)을 인자로 넘겨줌 (ProjectileActor 수정본 기준)
+		NewProj->InitializeProjectile(
+			WeaponFinalDamage,         // 일반 뎀
+			WeaponFinalCriticalDamage, // 크리 뎀
+			TotalCritChance,           // 확률
+			FinalProjectileSpeed,
+			5.0f,
+			KnockBack,
+			false
+		);
 
-		// 3. 스폰
-		//AProjectileWeaponActor* NewProj = GetWorld()->SpawnActor<AProjectileWeaponActor>(ProjectileClass, SpawnLoc, CurrentRot, Params);
-		AProjectileWeaponActor* NewProj = poolSystem->SpawnPoolActor<AProjectileWeaponActor>(ProjectileClass, SpawnLoc, CurrentRot, this, Cast<APawn>(OwnerCharacter.Get()));
-
-
-		// 4. 데이터 주입
-		if (NewProj)
+		if (FinalAttackSize > 0.0f)
 		{
-			float totalCriticalChance = CriticalChance+OwnerStatusComp->GetResultCriticalChance();
-			
-			// ProjectileAttackSize, ProjectileSpeed 등 WeaponBase 변수 활용
-			float Duration = 5.0f; // 혹은 사거리
-			//UE_LOG(LogTemp, Warning, TEXT("FinalProjectileSpeed : %.1f"), FinalProjectileSpeed);
-			NewProj->InitializeProjectile(
-				WeaponFinalDamage,WeaponFinalCriticalDamage, totalCriticalChance,
-				FinalProjectileSpeed,
-				5.0f /*사거리/지속시간*/,
-				KnockBack,
-				false
-			);
+			NewProj->SetActorScale3D(FVector(FinalAttackSize));
+		}
 
-			if (FinalAttackSize > 0.0f)
-			{
-				//UE_LOG(LogTemp, Warning, TEXT("FinalAttackSize : %.1f"), FinalAttackSize);
-				NewProj->SetActorScale3D(FVector(FinalAttackSize));
-			}
-
-			if (ABouncingProjectileWeaponActor* BouncingProj = Cast<ABouncingProjectileWeaponActor>(NewProj))
-			{
-				BouncingProj->InitializeBouncing(FMath::FloorToInt(FinalReflectCount), 1000.0f);
-			}
+		if (ABouncingProjectileWeaponActor* BouncingProj = Cast<ABouncingProjectileWeaponActor>(NewProj))
+		{
+			BouncingProj->InitializeBouncing(FMath::FloorToInt(FinalReflectCount), 1000.0f);
 		}
 	}
 }
