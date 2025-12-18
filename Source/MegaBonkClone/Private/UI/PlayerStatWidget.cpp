@@ -4,8 +4,8 @@
 #include "UI/PlayerStatWidget.h"
 #include "Components/TextBlock.h"
 
-void UPlayerStatWidget::RefreshStat(const FText& InName, float InValue)
+void UPlayerStatWidget::SetRowStat(const FText& InLabel, const FText& InValue)
 {
-	//StatName->SetText(InName);
-	//StatValue->SetText(FText::AsNumber(InValue));
+	StatLabel->SetText(InLabel);
+	StatValue->SetText(InValue);
 }

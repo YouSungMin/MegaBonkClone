@@ -18,7 +18,7 @@ public:
 	ATrailWeaponActor();
 
 	//장판의 능력치 (데미지 , 지속시간 , 크기 , 공격속도)
-	void InitializeTrail(float InDamage, float InDuration, float InScale, float AttackSpeed);
+	void InitializeTrail(float InDamage, float InCritDmg, float InCritChance, float InDuration, float InScale, float AttackSpeed);
 
 	// 매 틱(Interval)마다 장판 위의 적에게 데미지
 	UFUNCTION()
@@ -69,7 +69,10 @@ protected:
 	TObjectPtr<class UCurveFloat> ScaleCurve;
 
 private:
-	float Damage = 0.0f;
+	float WeaponFinalDamage = 0.0f;
+	float WeaponFinalCriticalDamage = 0.0f;
+	float WeaponFinalCriticalChance = 0.0f;
+
 	FTimerHandle DamageTimerHandle;
 	FVector InitialScale; // 원래 크기 저장용
 	FOnTimelineFloat UpdateFunctionFloat; // 델리게이트 (연결 고리)

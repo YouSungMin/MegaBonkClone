@@ -45,7 +45,7 @@ void APlayerCharacter::InitializeCharacterComponents()
 	PickupCollision->SetCapsuleSize(100.0f, 100.0f);
 
 
-	StatusComponent2 = CreateDefaultSubobject<UStatusComponent>(TEXT("Status"));
+	StatusComponent = CreateDefaultSubobject<UStatusComponent>(TEXT("Status"));
 	WeaponComponent = CreateDefaultSubobject<UWeaponSystemComponent>(TEXT("WeaponSystem"));
 	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("Inventory"));
 	
@@ -70,10 +70,10 @@ void APlayerCharacter::BeginPlay()
 	
 	OnActorBeginOverlap.AddDynamic(this, &APlayerCharacter::OnPickupOverlap);
 
-	if (StatusComponent2)
+	if (StatusComponent)
 	{
 		// CharacterDataHandle 안에 테이블과 RowName이 다 들어있으므로 이것만 넘기면 끝!
-		StatusComponent2->InitializeStatsFromDataTable(CharacterDataHandle);
+		StatusComponent->InitializeStatsFromDataTable(CharacterDataHandle);
 	}
 
 	if (WeaponComponent) {
@@ -284,7 +284,7 @@ void APlayerCharacter::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPr
 
 float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	float resultarmor = 1.0f - StatusComponent2->GetResultArmor();
+	float resultarmor = 1.0f - StatusComponent->GetResultArmor();
 	
 	float finalTakeDamage = DamageAmount* resultarmor;
 

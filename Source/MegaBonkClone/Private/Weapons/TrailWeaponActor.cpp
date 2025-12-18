@@ -40,9 +40,12 @@ ATrailWeaponActor::ATrailWeaponActor()
 
 }
 
-void ATrailWeaponActor::InitializeTrail(float InDamage, float InDuration, float InScale, float AttackSpeed)
+void ATrailWeaponActor::InitializeTrail(float InDamage, float InCritDmg, float InCritChance, float InDuration, float InScale, float AttackSpeed)
 {
-	Damage = InDamage;
+	WeaponFinalDamage = InDamage;
+	WeaponFinalCriticalDamage = InCritDmg;
+	WeaponFinalCriticalChance = InCritChance;
+
 	//UE_LOG(LogTemp, Warning, TEXT("Damage : %.1f SetLifeSpan: %.1f"), Damage, InDuration);
 	// 1. 크기 적용
 	SetActorScale3D(FVector(InScale));
@@ -59,7 +62,7 @@ void ATrailWeaponActor::InitializeTrail(float InDamage, float InDuration, float 
 		true,
 		0.0f
 	);
-
+	
 	InitialScale = FVector(InScale);
 	SetActorScale3D(InitialScale);
 
@@ -78,14 +81,24 @@ void ATrailWeaponActor::OnDamageTick()
 {
 	TArray<AActor*> OverlappingActors;
 	OverlapComp->GetOverlappingActors(OverlappingActors);
-
+	float applyDamage = 1.0f;
 	for (AActor* Actor : OverlappingActors)
 	{
 		//Enemy 태그를 가진 적만 데미지주기
 		if (Actor && Actor->ActorHasTag("Enemy"))
 		{
+			bool bIsCrit = FMath::RandRange(0.0f, 1.0f) <= WeaponFinalCriticalChance;
+
+			if (bIsCrit) {
+				applyDamage = WeaponFinalCriticalDamage;
+			}
+			else {
+				applyDamage = WeaponFinalDamage;
+			}
+
+
 			UE_LOG(LogTemp, Warning, TEXT("OnDamageTick : %s"), *Actor->GetName());
-			UGameplayStatics::ApplyDamage(Actor, Damage, nullptr, this, UDamageType::StaticClass());
+			UGameplayStatics::ApplyDamage(Actor, applyDamage, nullptr, this, UDamageType::StaticClass());
 		}
 	}
 }
