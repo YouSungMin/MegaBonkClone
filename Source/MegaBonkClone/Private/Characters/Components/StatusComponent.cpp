@@ -602,6 +602,9 @@ void UStatusComponent::AddShrineMaxHP(float Amount)
 
 void UStatusComponent::AddCurrentHP(float Amount)
 {
+	if (bIsDead) return;
+
+
 	// 현재 체력 변경 (0 ~ 최대 체력 사이로 제한)
 	// Amount가 양수면 회복, 음수면 데미지
 	CurrentHP = FMath::Clamp(CurrentHP + Amount, 0.0f, ResultMaxHP);
@@ -609,6 +612,11 @@ void UStatusComponent::AddCurrentHP(float Amount)
 	if (Amount < 0.0f)
 	{
 		// (선택) 피격 효과나 UI 깜빡임 처리 델리게이트 호출
+	}
+
+	if (CurrentHP <= 0.0f && !bIsDead) {
+		bIsDead = true;
+		OnPlayerDied.Broadcast();
 	}
 }
 

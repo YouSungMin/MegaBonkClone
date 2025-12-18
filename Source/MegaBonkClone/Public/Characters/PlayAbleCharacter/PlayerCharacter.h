@@ -27,6 +27,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void TryInteract();
 
+	UFUNCTION()
+	void OnCharacterDie();
+
 	virtual void ReceiveItem_Implementation(FName ItemID, int32 Count) override;
 
 	//스테이터스 GETTER 함수

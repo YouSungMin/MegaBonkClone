@@ -69,10 +69,13 @@ void APlayerCharacter::BeginPlay()
 	
 	OnActorBeginOverlap.AddDynamic(this, &APlayerCharacter::OnPickupOverlap);
 
+
+
 	if (StatusComponent2)
 	{
 		// CharacterDataHandle 안에 테이블과 RowName이 다 들어있으므로 이것만 넘기면 끝!
 		StatusComponent2->InitializeStatsFromDataTable(CharacterDataHandle);
+		StatusComponent2->OnPlayerDied.AddDynamic(this, &APlayerCharacter::OnCharacterDie);
 	}
 
 	if (WeaponComponent) {
@@ -164,6 +167,20 @@ void APlayerCharacter::TryInteract()
 			}
 		}
 	}
+}
+
+void APlayerCharacter::OnCharacterDie()
+{
+	UE_LOG(LogTemp, Warning, TEXT("플레이어 죽음"));
+
+	
+	if (APlayerController* PC = Cast<APlayerController>(GetController()))
+	{
+		DisableInput(PC);
+	}
+
+	
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void APlayerCharacter::ReceiveItem_Implementation(FName ItemID, int32 Count)
