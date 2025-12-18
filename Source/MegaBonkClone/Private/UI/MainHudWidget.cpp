@@ -12,16 +12,13 @@ void UMainHudWidget::NativeConstruct()
 	Super::NativeConstruct();
 
 	APlayerCharacter* player = Cast<APlayerCharacter>(GetOwningPlayerPawn());
-	
-	if(player && player->GetStatusComponent())
+
+	if (player && player->GetStatusComponent())
 	{
-		UStatusComponent* resource = player->GetStatusComponent();
-
-		if(HealthBar.IsValid())
-		{
-		HealthBar->RefreshWidget(resource->GetCurrentHP(), resource->GetResultMaxHP());
-		}
+		//if (HealthBar.IsValid())
+		//{
+		//	HealthBar->RefreshWidget(resource->GetCurrentHP(), resource->GetResultMaxHP());
+		//}
 		//ShieldBar->RefreshWidget(resource->)
-
 	}
 }

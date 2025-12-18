@@ -4,12 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Interfaces/InventoryOwner.h"
 #include "PlayerCharacter.generated.h"
 
 struct FInputActionValue;
 class UStatusComponent;
 UCLASS()
-class MEGABONKCLONE_API APlayerCharacter : public ACharacter
+class MEGABONKCLONE_API APlayerCharacter : public ACharacter, public IInventoryOwner
 {
 	GENERATED_BODY()
 
@@ -26,6 +27,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void TryInteract();
 
+	virtual void ReceiveItem_Implementation(FName ItemID, int32 Count) override;
 
 	//스테이터스 GETTER 함수
 	inline UStatusComponent* GetStatusComponent() { return StatusComponent; }
@@ -100,6 +102,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadWrite, Category = "Player|Components")
 	TObjectPtr<class UWeaponSystemComponent> WeaponComponent = nullptr;
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite, Category = "Player|Components")
+	TObjectPtr<class UInventoryComponent> InventoryComponent = nullptr;
 
 
 private:

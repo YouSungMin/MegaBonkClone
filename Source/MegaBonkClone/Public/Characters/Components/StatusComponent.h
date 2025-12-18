@@ -9,6 +9,9 @@
 struct FCharacterData;
 class UResourceBarWidget; //HP,Shield바
 
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStatusUpdated);
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class MEGABONKCLONE_API UStatusComponent : public UActorComponent
 {
@@ -17,6 +20,11 @@ class MEGABONKCLONE_API UStatusComponent : public UActorComponent
 public:	
 	// Sets default values for this component's properties
 	UStatusComponent();
+
+public:
+	//스탯 델리게이트
+	UPROPERTY(BlueprintAssignable, Category = "Status|Event")
+	FOnStatusUpdated OnStatusUpdated;
 
 public:
 
