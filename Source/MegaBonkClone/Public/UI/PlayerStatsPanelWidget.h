@@ -69,8 +69,8 @@ protected:
 
 
 private:
-	UFUNCTION()
-	void HandleStatusUpdated();
+	//UFUNCTION()
+	//void HandleStatusUpdated();
 
 	void BuildRows();
 	void RefreshValues();

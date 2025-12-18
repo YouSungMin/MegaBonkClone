@@ -37,15 +37,11 @@ void UPlayerStatsPanelWidget::BindToStatus(UStatusComponent* InStatus)
 
 	if (Status.IsValid())
 	{
-		Status->OnStatusUpdated.AddDynamic(this, &UPlayerStatsPanelWidget::HandleStatusUpdated);
+		//Status->OnStatusUpdated.AddDynamic(this, &UPlayerStatsPanelWidget::HandleStatusUpdated);
 		RefreshValues(); // 최초 1회 갱신
 	}
 }
 
-void UPlayerStatsPanelWidget::HandleStatusUpdated()
-	{
-		RefreshValues();
-}
 
 void UPlayerStatsPanelWidget::BuildRows()
 	{
