@@ -27,7 +27,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void TryInteract();
 
-	// 아이템 추가 인터페이스 함수
+	UFUNCTION()
+	void OnCharacterDie();
+
 	virtual void ReceiveItem_Implementation(FName ItemID, int32 Count) override;
 
 	// 상자 가격을 묻는 함수
@@ -52,7 +54,7 @@ public:
 	void ActivateStopwatch(float Duration);
 
 	//스테이터스 GETTER 함수
-	inline UStatusComponent* GetStatusComponent() { return StatusComponent; }
+	inline UStatusComponent* GetStatusComponent() { return StatusComponent2; }
 
 	//오브젝트에 오버랩 되었을때 실행할 함수
 	UFUNCTION()
@@ -124,7 +126,7 @@ protected:
 	TObjectPtr<class UCapsuleComponent> PickupCollision = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Player|Components")
-	TObjectPtr<UStatusComponent> StatusComponent = nullptr;
+	TObjectPtr<UStatusComponent> StatusComponent2 = nullptr;
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadWrite, Category = "Player|Components")
 	TObjectPtr<class UWeaponSystemComponent> WeaponComponent = nullptr;
