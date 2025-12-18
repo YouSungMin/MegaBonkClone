@@ -41,8 +41,15 @@ void AAuraWeaponBase::AttackWeapon_Implementation()
 
 	TArray<AActor*> OverlappingActors;
 	Collision->GetOverlappingActors(OverlappingActors);
+	float DamageToApply;
+	if (CheckIsCritical()) {
+		DamageToApply = WeaponFinalCriticalDamage;
+	}
+	else {
+		DamageToApply= WeaponFinalDamage;
+	}
 
-		float DamageToApply = WeaponFinalDamage;
+	
 
 	// 3. 반복문으로 데미지 적용
 	bool bHitAny = false;

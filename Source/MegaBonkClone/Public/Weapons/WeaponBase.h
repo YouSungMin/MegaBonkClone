@@ -53,6 +53,10 @@ protected:
     UFUNCTION()
     void InvokeAttack();
 
+    // 크리티컬 발동 여부를 체크하는 헬퍼 함수
+    UFUNCTION()
+    bool CheckIsCritical();
+
 public:
     // ==========================================
     // 무기 기본 스탯 (테이블에서 가져올예정)

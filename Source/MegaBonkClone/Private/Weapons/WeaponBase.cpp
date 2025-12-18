@@ -122,6 +122,22 @@ void AWeaponBase::InvokeAttack()
 	}
 }
 
+bool AWeaponBase::CheckIsCritical()
+{
+	float totalCriticalChance = CriticalChance;
+
+	if (OwnerStatusComp.IsValid()) {
+		totalCriticalChance += OwnerStatusComp.Get()->GetResultCriticalChance();
+		UE_LOG(LogTemp, Warning, TEXT("totalCriticalChance : %.1f"), totalCriticalChance);
+	}
+
+	if (FMath::RandRange(0.0f, 100.0f) <= totalCriticalChance) {
+		return true;
+	}
+
+	return false;
+}
+
 void AWeaponBase::StartAttackTimer()
 {
 	
@@ -130,7 +146,7 @@ void AWeaponBase::StartAttackTimer()
 	if (OwnerStatusComp.IsValid()) {
 		float attackSpeed = OwnerStatusComp.Get()->GetResultAttackSpeed() / 100.0f;
 		//UE_LOG(LogTemp, Log, TEXT("attackSpeed: %f"), attackSpeed);
-		//기존 타이머가 돌고 있다면 초기화 (스탯 변경 시 재설정 위함)
+		//기존 타이머가 돌고 있다면 초기화
 		GetWorldTimerManager().ClearTimer(AttackTimerHandle);
 
 		//타이머 설정
@@ -173,10 +189,10 @@ void AWeaponBase::GetDamageWeapon_Implementation()
 {
 	if (OwnerStatusComp.IsValid()) {
 		WeaponFinalDamage = WeaponDamage * OwnerStatusComp->GetResultDamage();
-		UE_LOG(LogTemp, Warning, TEXT("무기데미지 : %.1f"), WeaponFinalDamage);
+		//UE_LOG(LogTemp, Warning, TEXT("무기데미지 : %.1f"), WeaponFinalDamage);
 
 		WeaponFinalCriticalDamage = (1.0f + (0.1f*CritDmgRate))* OwnerStatusComp->GetResultCritDmgRate()* WeaponFinalDamage;
-		UE_LOG(LogTemp, Warning, TEXT("무기크리데미지 : %.1f"), WeaponFinalCriticalDamage);
+		//UE_LOG(LogTemp, Warning, TEXT("무기크리데미지 : %.1f"), WeaponFinalCriticalDamage);
 	}
 }
 

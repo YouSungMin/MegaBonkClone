@@ -74,8 +74,20 @@ void AProjectileWeaponBase::AttackWeapon_Implementation()
 		// 4. 데이터 주입
 		if (NewProj)
 		{
-			// WeaponBase가 가지고 있는 계산된 스탯들을 넘겨줌
-			float FinalDmg = WeaponFinalDamage;
+			//데미지 갱신
+			if (Implements<UWeapon>()) {
+				IWeapon::Execute_GetDamageWeapon(this);
+			}
+
+			float FinalDmg;
+
+			if (CheckIsCritical()) {
+				FinalDmg = WeaponFinalCriticalDamage;
+			}
+			else {
+				FinalDmg = WeaponFinalDamage;
+			}
+
 			// ProjectileAttackSize, ProjectileSpeed 등 WeaponBase 변수 활용
 			float Duration = 5.0f; // 혹은 사거리
 

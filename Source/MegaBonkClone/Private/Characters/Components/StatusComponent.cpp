@@ -435,7 +435,7 @@ void UStatusComponent::InitializeStatsFromDataTable(const FDataTableRowHandle& I
         PlayerPowerUPRate = RowData->PowerUPRate;
         PlayerPowerUPDropRate = RowData->PowerUPDropRate;
 
-        // 2. 값 설정이 끝났으니, 실제 게임 로직(무브먼트 속도 등)에 적용
+        //게임에 적용
         UpdateCharacterStatus();
     }
     else
