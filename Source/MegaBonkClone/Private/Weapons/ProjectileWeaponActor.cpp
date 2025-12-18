@@ -2,6 +2,7 @@
 
 
 #include "Weapons/ProjectileWeaponActor.h"
+#include "Weapons/ProjectileWeaponBase.h"
 #include "Components/CapsuleComponent.h"
 #include "Framework/ObjectPoolSubsystem.h"
 #include "GameFramework/ProjectileMovementComponent.h"
@@ -38,11 +39,12 @@ AProjectileWeaponActor::AProjectileWeaponActor()
 	RotatingComp->RotationRate = FRotator(0.0f, 720.0f, 0.0f);
 }
 
-void AProjectileWeaponActor::InitializeProjectile(float InDamage, float InSpeed, float InRange, float InKnockback, bool bIsPenetrate)
+void AProjectileWeaponActor::InitializeProjectile(float InDamage, float InCritDmg, float InCritChance, float InSpeed, float InRange, float InKnockback, bool bIsPenetrate)
 {
 	float BaseSpeedMultiplier = 700.0f;
-
-	Damage = InDamage;
+	WeaponFinalDamage = InDamage;
+	WeaponFinalCriticalDamage = InCritDmg;
+	WeaponFinalCriticalChance = InCritChance;
 	Knockback = InKnockback;
 	bPenetrate = bIsPenetrate;
 
@@ -116,21 +118,29 @@ void AProjectileWeaponActor::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	//SetLifeSpan(10.0f);
 }
 
 void AProjectileWeaponActor::OnProjectileHit(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	float applyDamage=1.0f;
 	// Enemy 태그를 가져야 hit함
 	if (OtherActor && OtherActor->ActorHasTag("Enemy"))
 	{
+		bool bIsCrit = FMath::RandRange(0.0f, 1.0f) <= WeaponFinalCriticalChance;
+
+		if (bIsCrit) {
+			applyDamage = WeaponFinalCriticalDamage;
+		}
+		else{
+			applyDamage = WeaponFinalDamage;
+		}
+		
 		// 데미지 전달
-		UGameplayStatics::ApplyDamage(OtherActor, Damage, GetInstigatorController(), this, UDamageType::StaticClass());
+		UGameplayStatics::ApplyDamage(OtherActor, applyDamage, GetInstigatorController(), this, UDamageType::StaticClass());
 
 		// 관통 옵션이 꺼져있으면, 한 놈 맞추고 사라짐
 		if (!bPenetrate)
 		{
-			// Destroy() -> ReturnToPool()
 			if (UObjectPoolSubsystem* Pool = GetWorld()->GetSubsystem<UObjectPoolSubsystem>())
 			{
 				Pool->ReturnToPool(this);

@@ -28,6 +28,8 @@ void AProjectileWeaponBase::AttackWeapon_Implementation()
 {
 	if (!ProjectileClass) return;
 
+	UpdateWeaponStats();
+
 	// 1. 발사 위치: 플레이어 위치
 	FVector SpawnLoc = OwnerCharacter.Get()->GetActorLocation();
 	FRotator SpawnRot = OwnerCharacter.Get()->GetActorRotation(); // 기본은 플레이어가 보는 방향
@@ -76,26 +78,13 @@ void AProjectileWeaponBase::AttackWeapon_Implementation()
 		// 4. 데이터 주입
 		if (NewProj)
 		{
-			//데미지 갱신
-			if (Implements<UWeapon>()) {
-				IWeapon::Execute_GetDamageWeapon(this);
-			}
-			UpdateWeaponStats();
-
-			float FinalDmg;
-
-			if (CheckIsCritical()) {
-				FinalDmg = WeaponFinalCriticalDamage;
-			}
-			else {
-				FinalDmg = WeaponFinalDamage;
-			}
+			float totalCriticalChance = CriticalChance+OwnerStatusComp->GetResultCriticalChance();
 			
 			// ProjectileAttackSize, ProjectileSpeed 등 WeaponBase 변수 활용
 			float Duration = 5.0f; // 혹은 사거리
-			UE_LOG(LogTemp, Warning, TEXT("FinalProjectileSpeed : %.1f"), FinalProjectileSpeed);
+			//UE_LOG(LogTemp, Warning, TEXT("FinalProjectileSpeed : %.1f"), FinalProjectileSpeed);
 			NewProj->InitializeProjectile(
-				FinalDmg,
+				WeaponFinalDamage,WeaponFinalCriticalDamage, totalCriticalChance,
 				FinalProjectileSpeed,
 				5.0f /*사거리/지속시간*/,
 				KnockBack,
@@ -104,7 +93,7 @@ void AProjectileWeaponBase::AttackWeapon_Implementation()
 
 			if (FinalAttackSize > 0.0f)
 			{
-				UE_LOG(LogTemp, Warning, TEXT("FinalAttackSize : %.1f"), FinalAttackSize);
+				//UE_LOG(LogTemp, Warning, TEXT("FinalAttackSize : %.1f"), FinalAttackSize);
 				NewProj->SetActorScale3D(FVector(FinalAttackSize));
 			}
 

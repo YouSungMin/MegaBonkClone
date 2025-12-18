@@ -33,24 +33,10 @@ void AAuraWeaponBase::AttackWeapon_Implementation()
 {
 	Super::AttackWeapon_Implementation();
 
-	// 이 함수는 타이머에 의해 '공격 속도' 주기로 계속 불립니다.
-	// 즉, 0.5초마다 불리면 0.5초마다 범위 내 적에게 데미지를 줍니다.
-	if (Implements<UWeapon>()) {
-		IWeapon::Execute_GetDamageWeapon(this);
-	}
 	UpdateAuraScale();
 
 	TArray<AActor*> OverlappingActors;
 	Collision->GetOverlappingActors(OverlappingActors);
-	float DamageToApply;
-	if (CheckIsCritical()) {
-		DamageToApply = WeaponFinalCriticalDamage;
-	}
-	else {
-		DamageToApply= WeaponFinalDamage;
-	}
-
-	
 
 	// 3. 반복문으로 데미지 적용
 	bool bHitAny = false;
@@ -59,6 +45,13 @@ void AAuraWeaponBase::AttackWeapon_Implementation()
 		// 유효한 타겟인지 확인 (WeaponBase에 있는 함수 활용)
 		if (IsValidTarget(Actor))
 		{
+			float DamageToApply;
+			if (CheckIsCritical()) {
+				DamageToApply = WeaponFinalCriticalDamage;
+			}
+			else {
+				DamageToApply = WeaponFinalDamage;
+			}
 			// 데미지 전달
 			UGameplayStatics::ApplyDamage(
 				Actor,
@@ -83,17 +76,15 @@ void AAuraWeaponBase::AttackWeapon_Implementation()
 
 void AAuraWeaponBase::UpdateAuraScale()
 {
-	// 플레이어의 범위 증가 스탯(AttackSize) 반영
-	float BaseScale = 5.0f;
-	float PlayerBonus = 1.0f;
-	if (OwnerStatusComp.IsValid())
-	{// StatusComponent의 공격 범위 스탯
-		PlayerBonus = OwnerStatusComp->GetResultAttackSize(); 
-	}
+	float auraBaseSize = 5.0f;
+	SetActorScale3D(FVector(FinalAttackSize * auraBaseSize));
+}
 
-	// 최종 크기 적용
-	float FinalScale = PlayerBonus * BaseScale;
-	SetActorScale3D(FVector(FinalScale));
+void AAuraWeaponBase::UpdateWeaponStats()
+{
+	Super::UpdateWeaponStats();
+
+	//UpdateAuraScale();
 }
 
 

@@ -17,7 +17,7 @@ public:
 	AProjectileWeaponActor();
 
 	//투사체 스탯 초기화 함수 (데미지 , 발사체속도, 범위(필요한가),넉백 ,관통형인가 아닌가)
-	void InitializeProjectile(float InDamage, float InSpeed, float InRange, float InKnockback, bool bIsPenetrate = false);
+	void InitializeProjectile(float InDamage, float InCritDmg, float InCritChance, float InSpeed, float InRange, float InKnockback, bool bIsPenetrate = false);
 
 
 	//ObjectPool 인터페이스 구현부
@@ -53,7 +53,15 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	TObjectPtr<class URotatingMovementComponent> RotatingComp =nullptr;
 
-	float Damage = 0.0f;
+	UPROPERTY()
+	float WeaponFinalDamage = 0.0f;
+
+	UPROPERTY()
+	float WeaponFinalCriticalDamage = 0.0f;
+
+	UPROPERTY()
+	float WeaponFinalCriticalChance = 0.0f;
+
 	float Knockback = 0.0f;
 	bool bPenetrate = true; // 관통 여부
 

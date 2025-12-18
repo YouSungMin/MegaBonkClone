@@ -38,6 +38,8 @@ public:
     UFUNCTION()
     void InitializeWeaponStatus(const FWeaponData& InWeaponData);
 
+    
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -54,11 +56,12 @@ protected:
     void InvokeAttack();
 
     // 크리티컬 발동 여부를 체크하는 헬퍼 함수
-    UFUNCTION()
-    bool CheckIsCritical();
 
     UFUNCTION()
     virtual void UpdateWeaponStats();
+
+    UFUNCTION()
+    bool CheckIsCritical();
 
 
 public:
@@ -111,6 +114,8 @@ public:
 
     UPROPERTY()
     float WeaponFinalCriticalDamage = 0.0f;
+
+    float CurrentAttackInterval = 0.0f;
 
     float FinalProjectileCount = 1.0f;
     float FinalProjectileSpeed = 1.0f;

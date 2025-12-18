@@ -35,8 +35,7 @@ void ABouncingProjectileWeaponActor::OnProjectileHit(UPrimitiveComponent* Overla
 	// 중복 피격 방지 (이미 맞은 놈이면 패스)
 	if (HitHistory.Contains(OtherActor)) return;
 
-	// 2. 데미지 주기 (부모 로직 호출을 안 하고 직접 구현, Destroy 방지 위함)
-	UGameplayStatics::ApplyDamage(OtherActor, 10.0f /*Damage 변수 사용*/, GetInstigatorController(), this, UDamageType::StaticClass());
+	Super::OnProjectileHit(OverlappedComp, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
 
 	// 맞은 놈 기록
 	HitHistory.Add(OtherActor);
