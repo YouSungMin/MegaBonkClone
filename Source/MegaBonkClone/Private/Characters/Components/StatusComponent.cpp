@@ -7,6 +7,8 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h" 
+#include "TimerManager.h"
+
 // Sets default values for this component's properties
 UStatusComponent::UStatusComponent()
 {
@@ -576,6 +578,102 @@ void UStatusComponent::Debug_TestAllStats()
 //	GEngine->AddOnScreenDebugMessage(-1, LogTime, FColor::Green, TEXT(">>> 테스트 완료! 로그 창을 확인하세요."));
 }
 
+int32 UStatusComponent::CalculateChestCost(int32 BaseCost) const
+{
+	// 무료 상자면 0원
+	if (BaseCost <= 0) return 0;
+
+	// 커브가 없으면 그냥 기본 가격 리턴
+	if (!ChestCostCurve) return BaseCost;
+
+	// 커브에서 로그값 가져오기 (예: 3.724)
+	float LogValue = ChestCostCurve->GetFloatValue((float)ChestOpenCount);
+
+	// 10의 거듭제곱으로 복구 (10^3.724 = 5301)
+	float RealCost = FMath::Pow(10.0f, LogValue);
+
+	
+	UE_LOG(LogTemp, Log, TEXT("상자 가격: %d"), FMath::RoundToInt(RealCost));
+
+	// 반올림해서 리턴
+	return FMath::RoundToInt(RealCost);
+}
+
+void UStatusComponent::IncreaseChestOpenCount()
+{
+	ChestOpenCount++;
+	UE_LOG(LogTemp, Log, TEXT("상자 오픈 횟수 증가: %d"), ChestOpenCount);
+}
+
+bool UStatusComponent::SpendGold(float Amount)
+{
+	if (CurrentGold >= Amount)
+	{
+		CurrentGold -= Amount;
+		return true;
+	}
+	return false;
+}
+
+void UStatusComponent::ApplyBuff(EBuffType BuffType, float Duration)
+{
+	// 각 버프 타입에 맞는 수치 가져오기 (예: 스피드는 100, 공격력은 10...)
+	float Amount = GetBuffAmount(BuffType);
+
+	// A. 즉시 적용 (+Amount)
+	ProcessStatChange(BuffType, Amount);
+
+	// B. 타이머 설정 (시간이 지나면 -Amount 적용)
+	FTimerHandle BuffTimerHandle;
+
+	FTimerDelegate TimerDel;
+
+	TimerDel.BindUFunction(this, FName("ProcessStatChange"), BuffType, -Amount);
+
+	// 타이머 실행
+	GetWorld()->GetTimerManager().SetTimer(BuffTimerHandle, TimerDel, Duration, false);
+}
+
+void UStatusComponent::ProcessStatChange(EBuffType BuffType, float Amount)
+{
+	float CurrentTime = GetWorld()->GetTimeSeconds();
+	// Amount가 음수면 '해제'되는 순간입니다.
+	if (Amount < 0)
+	{
+		UE_LOG(LogTemp, Error, TEXT("[Time: %f] 버프 해제됨!"), CurrentTime);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("[Time: %f] 스탯 적용: %f"), CurrentTime, Amount);
+	}
+	// Amount가 양수면 버프, 음수면 버프 해제가 자동으로 됨
+	switch (BuffType)
+	{
+	case EBuffType::SpeedUp:
+		Movement->MaxWalkSpeed = Movement->GetMaxSpeed() + Amount;
+		break;
+	case EBuffType::AttackSpeed:
+		ResultAttackSpeed += Amount;
+		break;
+	case EBuffType::GoldBoost:
+		ResultGoldGain += Amount;
+		break;
+	default:
+		break;
+	}
+	//UE_LOG(LogTemp, Log, TEXT("버프 적용됨: %s (+%f)"), *UEnum::GetValueAsString(BuffType), Amount);
+}
+
+float UStatusComponent::GetBuffAmount(EBuffType BuffType)
+{
+	switch (BuffType)
+	{
+	case EBuffType::SpeedUp:     return 1.0f; 
+	case EBuffType::AttackSpeed: return 0.5f;   
+	case EBuffType::GoldBoost:   return 2.0f;
+	default: return 0.0f;
+	}
+}
 
 
 // -----------------------------------------------------------------

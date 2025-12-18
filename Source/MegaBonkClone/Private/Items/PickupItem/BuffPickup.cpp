@@ -2,13 +2,15 @@
 
 
 #include "Items/PickupItem/BuffPickup.h"
-#include <Characters/PlayAbleCharacter/PlayerCharacter.h>
+#include "Characters/Components/StatusComponent.h"
 
 void ABuffPickup::OnPickupComplete_Implementation()
 {
-	if (auto* Player = Cast<APlayerCharacter>(PickupOwner))
+	UStatusComponent* statusComponent = PickupOwner->FindComponentByClass<UStatusComponent>();
+
+	if(statusComponent)
 	{
-		//Player->ApplyBuff(BuffType, Duration);
+		statusComponent->ApplyBuff(BuffType, BuffDuration);
 	}
 	Super::OnPickupComplete_Implementation();
 }

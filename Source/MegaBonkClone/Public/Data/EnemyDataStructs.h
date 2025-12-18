@@ -51,7 +51,7 @@ public:
 	float AttackPower = 10.0f;
 
 	// 이동 속도
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (DisplayName = "아이템 이동속도"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (DisplayName = "몬스터 이동속도"))
 	float MoveSpeed = 10.0f;
 
 	// -- 보상 --

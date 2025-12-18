@@ -10,6 +10,8 @@ enum class ESpecialActionType : uint8
 {
 	Nuke,       // 화면 전체 적 제거
 	Magnet,     // 모든 경험치/골드 흡수
+	Stopwatch,       // 일정 시간 적 정지
+	Invincible,     // 일정시간 무적 
 };
 /**
  * 
@@ -24,9 +26,14 @@ protected:
 private:
 	void ExecuteNuke();
 	void ExecuteMagnet();
+	void ExecuteStopwatch();
+	void ExecuteInvincible();
 public:
 	// 에디터에서 무슨 아이템인지 선택
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Special Action")
 	ESpecialActionType ActionType;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Duration")
+	float BuffDuration = 5.0f;
 
 };

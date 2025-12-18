@@ -35,7 +35,7 @@ bool UInventoryComponent::AddSecretBook(FName BookID)
     }
 
 
-    // 1. 이미 보유 중이면 레벨업
+    //이미 보유 중이면 레벨업
     for (FInventorySlot& Slot : SecretBookSlots)
     {
         if (Slot.ItemID == BookID)
@@ -47,14 +47,14 @@ bool UInventoryComponent::AddSecretBook(FName BookID)
         }
     }
 
-    // 2. 슬롯 제한 확인
+    // 슬롯 제한 확인
     if (SecretBookSlots.Num() >= MaxSecretBookCount)
     {
         UE_LOG(LogTemp, Warning, TEXT("AddSecretBook Failed: Slots Full"));
         return false;
     }
 
-    // 3. 신규 추가
+    // 신규 추가
     FInventorySlot NewSlot;
     NewSlot.ItemID = BookID;
     NewSlot.Level = 1;
