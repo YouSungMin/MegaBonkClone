@@ -17,6 +17,12 @@ void ASpecialActionPickup::OnPickupComplete_Implementation()
 	case ESpecialActionType::Magnet:
 		ExecuteMagnet();
 		break;
+	case ESpecialActionType::Stopwatch:
+		ExecuteStopwatch();
+		break;
+	case ESpecialActionType::Invincible:
+		ExecuteInvincible();
+		break;
 	default:
 		break;
 	}
@@ -33,5 +39,21 @@ void ASpecialActionPickup::ExecuteMagnet()
 	if (auto* player = Cast<APlayerCharacter>(PickupOwner.Get()))
 	{
 		player->ActivateMagnetEffect();
+	}
+}
+
+void ASpecialActionPickup::ExecuteStopwatch()
+{
+	if (auto* player = Cast<APlayerCharacter>(PickupOwner.Get()))
+	{
+		player->ActivateStopwatch(BuffDuration);
+	}
+}
+
+void ASpecialActionPickup::ExecuteInvincible()
+{
+	if (auto* player = Cast<APlayerCharacter>(PickupOwner.Get()))
+	{
+		player->ActivateInvincibility(BuffDuration);
 	}
 }

@@ -5,4 +5,5 @@
 
 void AChallengeSanctuary::ApplyEffect_Implementation(AActor* Player)
 {
+	// 무작위 적(엘리트) 소환
 }

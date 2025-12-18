@@ -107,9 +107,6 @@ void APlayerCharacter::OnJumpInput(const FInputActionValue& InValue)
 	Jump();
 }
 
-
-
-
 // Called to bind functionality to input
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -218,6 +215,53 @@ void APlayerCharacter::ActivateMagnetEffect()
 	}
 }
 
+void APlayerCharacter::ActivateInvincibility(float Duration)
+{
+	if (bIsInvincible)
+	{
+		GetWorldTimerManager().ClearTimer(InvincibleTimerHandle);
+	}
+	bIsInvincible = true;
+
+	UE_LOG(LogTemp, Log, TEXT("무적 상태 시작"));
+
+	GetWorldTimerManager().SetTimer(InvincibleTimerHandle, this, &APlayerCharacter::OnInvincibleEnd, Duration, false);
+}
+
+void APlayerCharacter::OnInvincibleEnd()
+{
+	bIsInvincible = false;
+	// TODO: 무적 이펙트 끄기
+	UE_LOG(LogTemp, Log, TEXT("무적 상태 종료."));
+}
+
+void APlayerCharacter::ActivateStopwatch(float Duration)
+{
+	// 이미 시간 정지 중이면 타이머만 연장하고 리턴
+	if (GetWorldTimerManager().IsTimerActive(StopwatchTimerHandle))
+	{
+		GetWorldTimerManager().SetTimer(StopwatchTimerHandle, this, &APlayerCharacter::OnStopwatchEnd, Duration, false);
+		return;
+	}
+
+	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.05f);
+
+	this->CustomTimeDilation = 20.0f;
+
+	UE_LOG(LogTemp, Log, TEXT("시간 정지 시작"));
+
+	GetWorldTimerManager().SetTimer(StopwatchTimerHandle, this, &APlayerCharacter::OnStopwatchEnd, Duration * 0.05f, false);
+}
+
+void APlayerCharacter::OnStopwatchEnd()
+{
+	// 원래대로 복구
+	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.0f);
+	this->CustomTimeDilation = 1.0f;
+
+	UE_LOG(LogTemp, Log, TEXT("시간 정지 종료."));
+}
+
 void APlayerCharacter::OnPickupOverlap(AActor* OverlappedActor, AActor* OtherActor)
 {
 	//인터페이스 구현부 체크
@@ -244,6 +288,10 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 	
 	float finalTakeDamage = DamageAmount* resultarmor;
 
+	if (bIsInvincible)
+	{
+		finalTakeDamage = 0.0f;
+	}
 	StatusComponent2->AddCurrentHP(-finalTakeDamage);
 	UE_LOG(LogTemp, Warning, TEXT("%.1f / %.1f"), StatusComponent2->GetCurrentHP(), StatusComponent2->GetResultMaxHP());
 

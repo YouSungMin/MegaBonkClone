@@ -39,7 +39,17 @@ public:
 	// 상자를 연 횟수를 증가시키는 함수
 	virtual void NotifyChestOpened_Implementation() override;
 
+	// 자석 아이템 효과 적용
+	UFUNCTION(BlueprintCallable)
 	void ActivateMagnetEffect();
+
+	// 무적 발동 (지속시간)
+	UFUNCTION(BlueprintCallable)
+	void ActivateInvincibility(float Duration);
+
+	// 시간 정지 발동 (지속시간)
+	UFUNCTION(BlueprintCallable)
+	void ActivateStopwatch(float Duration);
 
 	//스테이터스 GETTER 함수
 	UFUNCTION(BlueprintCallable, Category = "Player|Components")
@@ -83,7 +93,11 @@ protected:
 	/*UFUNCTION()
 	void */
 private:
+	// 시간정지 타이머 종료 시 실행
+	void OnStopwatchEnd(); 
 
+	// 무적 타이머 종료 시 실행
+	void OnInvincibleEnd();
 public:
 	
 	//캐릭터 데이터 테이블에서 Row 선택 변수
@@ -119,8 +133,13 @@ protected:
 	UPROPERTY(VisibleAnywhere,BlueprintReadWrite, Category = "Player|Components")
 	TObjectPtr<class UInventoryComponent> InventoryComponent = nullptr;
 
-
 private:
+	// 캐릭터가 무적 상태 변수
+	bool bIsInvincible = false;
 
+	// 무적 타이머 핸들러
+	FTimerHandle InvincibleTimerHandle;
 
+	// 시간 정지 타이머핸들러
+	FTimerHandle StopwatchTimerHandle;
 };

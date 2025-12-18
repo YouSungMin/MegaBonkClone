@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Data/TypeEnums.h"
 #include "StatusComponent.generated.h"
 
 struct FCharacterData;
@@ -227,6 +228,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool SpendGold(float Amount);
 
+	void ApplyBuff(EBuffType BuffType, float Duration);
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -234,7 +236,12 @@ protected:
    
 
 private:
+	// 실제 스탯을 올리고 내리는 내부 함수 
+	UFUNCTION()
+	void ProcessStatChange(EBuffType BuffType, float Amount);
 
+	// 버프 값을 정의하는 헬퍼 함수
+	float GetBuffAmount(EBuffType BuffType);
 public:
 
 protected:
