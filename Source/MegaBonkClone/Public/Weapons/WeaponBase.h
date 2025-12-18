@@ -38,6 +38,8 @@ public:
     UFUNCTION()
     void InitializeWeaponStatus(const FWeaponData& InWeaponData);
 
+    
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -53,6 +55,15 @@ protected:
     UFUNCTION()
     void InvokeAttack();
 
+    // 크리티컬 발동 여부를 체크하는 헬퍼 함수
+
+    UFUNCTION()
+    virtual void UpdateWeaponStats();
+
+    UFUNCTION()
+    bool CheckIsCritical();
+
+
 public:
     // ==========================================
     // 무기 기본 스탯 (테이블에서 가져올예정)
@@ -67,7 +78,7 @@ public:
     float ProjectileSpeed = 1.0f; // 발사체 속도
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Stats")
-    float ProjectileAttackSize = 1.0f; // 발사체 크기
+    float AttackSize = 1.0f; //크기
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Stats")
     float ProjectileReflectCount = 1.0f; // 발사체 반사
@@ -104,5 +115,12 @@ public:
     UPROPERTY()
     float WeaponFinalCriticalDamage = 0.0f;
 
+    float CurrentAttackInterval = 0.0f;
+
+    float FinalProjectileCount = 1.0f;
+    float FinalProjectileSpeed = 1.0f;
+    float FinalAttackSize = 1.0f;
+    float FinalReflectCount = 0.0f;
+    float FinalDuration = 1.0f;
 
 };

@@ -30,6 +30,7 @@ void ATrailWeaponBase::AttackWeapon_Implementation()
 	if (!TrailClass) return;
 	if (!OwnerCharacter.IsValid()) return;
 
+	Super::AttackWeapon_Implementation();
 	FVector spawnLoction = OwnerCharacter->GetActorLocation();
 	spawnLoction.Z = 0.0f; // 바닥 높이 고정 (필요 시 수정)
 
@@ -50,13 +51,10 @@ void ATrailWeaponBase::AttackWeapon_Implementation()
 
 	if (NewTrail)
 	{
-		// 4. 데이터 주입
-		float FinalDamage = WeaponFinalDamage;
-		float Size = ProjectileAttackSize > 0.0f ? ProjectileAttackSize : 1.0f;
-		float Duration = OwnerStatusComp.Get()->GetResultAttackDuration()+1.0f; 
-		float attackSpeed = OwnerStatusComp.Get()->GetResultAttackSpeed() / 100.0f;
+		float totalCriticalChance = CriticalChance + OwnerStatusComp->GetResultCriticalChance();
 		// (데미지, 지속시간, 크기, 공격속도)
-		NewTrail->InitializeTrail(FinalDamage, Duration, Size, attackSpeed);
+		UE_LOG(LogTemp, Warning, TEXT("%.1f"), FinalDuration);
+		NewTrail->InitializeTrail(WeaponFinalDamage,WeaponFinalCriticalDamage, totalCriticalChance, FinalDuration, AttackSize, CurrentAttackInterval);
 	}
 }
 

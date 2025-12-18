@@ -123,7 +123,7 @@ void UStatusComponent::UpdateCharacterStatus()
 	
 
 	// [치명타 확률] (단순 합산)
-	ResultCriticalChance = (PlayerCriticalChance + VisionCriticalChance + ShrineCriticalChance)*100.0f;
+	ResultCriticalChance = (PlayerCriticalChance + VisionCriticalChance + ShrineCriticalChance);
 
 	// [치명타 대미지 배율 (Crit Dmg Rate)]
 	// 공식 n: (0.01 * Player) * (1 + (0.001 * Shrine))
@@ -135,7 +135,7 @@ void UStatusComponent::UpdateCharacterStatus()
 
 
 	// [공격 속도] (단순 합산)
-	ResultAttackSpeed = (PlayerAttackSpeed + VisionAttackSpeed + ShrineAttackSpeed)*100.0f;
+	ResultAttackSpeed = (PlayerAttackSpeed + VisionAttackSpeed + ShrineAttackSpeed);
 
 
 	// [엘리트 대미지]
@@ -192,10 +192,10 @@ void UStatusComponent::UpdateCharacterStatus()
 	if (Movement)
 	{
 		// [이동 속도]
-		// 공식: PlayerInitial + n  (PlayerInitial을 기본 배율 1로 보거나, 기본 속도에 곱함)
+		// 공식: PlayerInitial + n  (PlayerInitial에곱함)
 		// n = (0.01 * Player) + (0.001 * Vision) + (0.01 * Shrine) -> 예시: 0.01*15 -> 0.15
-		// * PlayerMoveSpeed가 100(기본)이라면 0.01*100 = 1.0. 
-		// * Result는 실제 언리얼 유닛 속도로 변환하여 적용합니다.
+	
+
 	
 
 		float MoveN = ((0.01f * PlayerMoveSpeed) + (0.001f * VisionMoveSpeed) + (0.01f * ShrineMoveSpeed))*100.0f;
@@ -203,7 +203,7 @@ void UStatusComponent::UpdateCharacterStatus()
 		// 기본 걷기 속도 (예: 400)
 		float DefaultWalkSpeed = 400.0f;
 
-		// 공식 해석: n이 배율이므로 기본 속도 * n (예: 1.45배)
+		//n이 배율이므로 기본 속도 * n (예: 1.45배)
 		ResultMoveSpeed = DefaultWalkSpeed * MoveN;
 		Movement->MaxWalkSpeed = ResultMoveSpeed;
 		//UE_LOG(LogTemp, Warning, TEXT("%.1f"), PlayerMoveSpeed);
@@ -250,6 +250,7 @@ void UStatusComponent::UpdateCharacterStatus()
 	{
 		// 기본 10이 너무 작으므로, 언리얼 단위 보정(예: *10.0f)이 필요할 수 있으나 
 		// 여기선 계산된 Result 값을 그대로 적용합니다.
+		UE_LOG(LogTemp, Warning, TEXT("ResultPickUpRange : %.1f"), ResultPickUpRange);
 		PickupComp->SetCapsuleRadius(ResultPickUpRange);
 	}
 	
@@ -318,9 +319,9 @@ void UStatusComponent::UpdateCharacterStatus()
 
 			// [Offense]
 			ResultDamage,
-			ResultCriticalChance,
+			ResultCriticalChance * 100.0f,
 			ResultCritDmgRate,
-			ResultAttackSpeed,
+			ResultAttackSpeed * 100.0f,
 			ResultEliteDamage,
 			ResultKnockBack,
 
@@ -436,7 +437,7 @@ void UStatusComponent::InitializeStatsFromDataTable(const FDataTableRowHandle& I
         PlayerPowerUPRate = RowData->PowerUPRate;
         PlayerPowerUPDropRate = RowData->PowerUPDropRate;
 
-        // 2. 값 설정이 끝났으니, 실제 게임 로직(무브먼트 속도 등)에 적용
+        //게임에 적용
         UpdateCharacterStatus();
     }
     else
@@ -451,9 +452,9 @@ void UStatusComponent::Debug_TestAllStats()
 
 	float LogTime = 15.0f; // 로그 표시 시간 15초
 
-	UE_LOG(LogTemp, Warning, TEXT("========================================="));
+	/*UE_LOG(LogTemp, Warning, TEXT("========================================="));
 	UE_LOG(LogTemp, Warning, TEXT("       [StatusComponent] FULL TEST       "));
-	UE_LOG(LogTemp, Warning, TEXT("========================================="));
+	UE_LOG(LogTemp, Warning, TEXT("========================================="));*/
 	GEngine->AddOnScreenDebugMessage(-1, LogTime, FColor::Cyan, TEXT(">>> 모든 스탯 테스트 시작..."));
 
 	// 1. 변경 전 값 기록 (Snapshot)
@@ -533,46 +534,46 @@ void UStatusComponent::Debug_TestAllStats()
 
 	// 3. 결과 로그 출력 (Old -> New)
 	// ---------------------------------------------------
-	auto LogStat = [&](const FString& Name, float Old, float New) {
-		float Diff = New - Old;
-		FString Sign = (Diff >= 0) ? TEXT("+") : TEXT("");
-		UE_LOG(LogTemp, Log, TEXT("%-15s : %6.1f -> %6.1f (%s%.1f)"), *Name, Old, New, *Sign, Diff);
-		};
-
-	UE_LOG(LogTemp, Warning, TEXT("----- [1. 생존 결과] -----"));
-	LogStat("MaxHP", OldHP, GetResultMaxHP());
-	LogStat("HPRegen", OldRegen, GetResultHPRegen());
-	LogStat("Shield", OldShield, GetResultShield());
-	LogStat("Armor(%)", OldArmor * 100.f, GetResultArmor() * 100.f);
-	LogStat("Evasion(%)", OldEvasion * 100.f, GetResultEvasionChance() * 100.f);
-	LogStat("LifeDrain", OldDrain, GetResultLifeDrain());
-	LogStat("Thorn", OldThorn, GetResultThorn());
-
-	UE_LOG(LogTemp, Warning, TEXT("----- [2. 공격 결과] -----"));
-	LogStat("Damage", OldDmg, GetResultDamage()/100.0f);
-	LogStat("CritChance(%)", OldCrit, GetResultCriticalChance()); // 코드상 이미 *100 되어있음
-	LogStat("CritDmg", OldCritDmg, GetResultCritDmgRate());
-	LogStat("AtkSpeed(%)", OldAtkSpd, GetResultAttackSpeed());
-	LogStat("EliteDmg", OldElite, GetResultEliteDamage());
-	LogStat("KnockBack", OldKnock, GetResultKnockBack());
-
-	UE_LOG(LogTemp, Warning, TEXT("----- [3. 발사체 결과] -----"));
-	LogStat("ProjCount", OldProjCnt, GetResultProjectileCount());
-	LogStat("Reflect", OldReflect, GetResultProjectileReflectCount());
-	LogStat("Size", OldSize, GetResultAttackSize());
-	LogStat("ProjSpeed", OldProjSpd, GetResultProjectileSpeed());
-	LogStat("Duration", OldDur, GetResultAttackDuration());
-
-	UE_LOG(LogTemp, Warning, TEXT("----- [4. 이동/유틸 결과] -----"));
-	LogStat("MoveSpeed", OldMove, GetResultMoveSpeed());
-	LogStat("JumpPower", OldJump, GetResultJumpPower());
-	LogStat("ExtraJump", OldExtraJump, GetResultExtraJump());
-	LogStat("Luck", OldLuck, GetResultLuck());
-	LogStat("PickRange", OldPick, GetResultPickUpRange());
-	LogStat("ExpGain", OldExpG, GetResultExpGain());
-
-	// 화면 메시지
-	GEngine->AddOnScreenDebugMessage(-1, LogTime, FColor::Green, TEXT(">>> 테스트 완료! 로그 창을 확인하세요."));
+//	auto LogStat = [&](const FString& Name, float Old, float New) {
+//		float Diff = New - Old;
+//		FString Sign = (Diff >= 0) ? TEXT("+") : TEXT("");
+//		UE_LOG(LogTemp, Log, TEXT("%-15s : %6.1f -> %6.1f (%s%.1f)"), *Name, Old, New, *Sign, Diff);
+//		};
+//
+//	UE_LOG(LogTemp, Warning, TEXT("----- [1. 생존 결과] -----"));
+//	LogStat("MaxHP", OldHP, GetResultMaxHP());
+//	LogStat("HPRegen", OldRegen, GetResultHPRegen());
+//	LogStat("Shield", OldShield, GetResultShield());
+//	LogStat("Armor(%)", OldArmor * 100.f, GetResultArmor() * 100.f);
+//	LogStat("Evasion(%)", OldEvasion * 100.f, GetResultEvasionChance() * 100.f);
+//	LogStat("LifeDrain", OldDrain, GetResultLifeDrain());
+//	LogStat("Thorn", OldThorn, GetResultThorn());
+//
+//	UE_LOG(LogTemp, Warning, TEXT("----- [2. 공격 결과] -----"));
+//	LogStat("Damage", OldDmg, GetResultDamage());
+//	LogStat("CritChance(%)", OldCrit, GetResultCriticalChance()); // 코드상 이미 *100 되어있음
+//	LogStat("CritDmg", OldCritDmg, GetResultCritDmgRate());
+//	LogStat("AtkSpeed(%)", OldAtkSpd, GetResultAttackSpeed());
+//	LogStat("EliteDmg", OldElite, GetResultEliteDamage());
+//	LogStat("KnockBack", OldKnock, GetResultKnockBack());
+//
+//	UE_LOG(LogTemp, Warning, TEXT("----- [3. 발사체 결과] -----"));
+//	LogStat("ProjCount", OldProjCnt, GetResultProjectileCount());
+//	LogStat("Reflect", OldReflect, GetResultProjectileReflectCount());
+//	LogStat("Size", OldSize, GetResultAttackSize());
+//	LogStat("ProjSpeed", OldProjSpd, GetResultProjectileSpeed());
+//	LogStat("Duration", OldDur, GetResultAttackDuration());
+//
+//	UE_LOG(LogTemp, Warning, TEXT("----- [4. 이동/유틸 결과] -----"));
+//	LogStat("MoveSpeed", OldMove, GetResultMoveSpeed());
+//	LogStat("JumpPower", OldJump, GetResultJumpPower());
+//	LogStat("ExtraJump", OldExtraJump, GetResultExtraJump());
+//	LogStat("Luck", OldLuck, GetResultLuck());
+//	LogStat("PickRange", OldPick, GetResultPickUpRange());
+//	LogStat("ExpGain", OldExpG, GetResultExpGain());
+//
+//	// 화면 메시지
+//	GEngine->AddOnScreenDebugMessage(-1, LogTime, FColor::Green, TEXT(">>> 테스트 완료! 로그 창을 확인하세요."));
 }
 
 

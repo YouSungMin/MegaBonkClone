@@ -23,6 +23,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Aura")
 	void UpdateAuraScale();
 
+	virtual void UpdateWeaponStats() override; 
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

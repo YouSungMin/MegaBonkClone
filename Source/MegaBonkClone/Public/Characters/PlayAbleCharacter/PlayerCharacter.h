@@ -30,8 +30,7 @@ public:
 	virtual void ReceiveItem_Implementation(FName ItemID, int32 Count) override;
 
 	//스테이터스 GETTER 함수
-	UFUNCTION(BlueprintCallable, Category = "Player|Components")
-	inline UStatusComponent* GetStatusComponent() { return StatusComponent2; }
+	inline UStatusComponent* GetStatusComponent() { return StatusComponent; }
 
 	//오브젝트에 오버랩 되었을때 실행할 함수
 	UFUNCTION()
@@ -99,7 +98,7 @@ protected:
 	TObjectPtr<class UCapsuleComponent> PickupCollision = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Player|Components")
-	TObjectPtr<UStatusComponent> StatusComponent2 = nullptr;
+	TObjectPtr<UStatusComponent> StatusComponent = nullptr;
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadWrite, Category = "Player|Components")
 	TObjectPtr<class UWeaponSystemComponent> WeaponComponent = nullptr;
