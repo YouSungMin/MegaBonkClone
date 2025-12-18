@@ -4,7 +4,43 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Engine/DataTable.h"
 #include "PlayerStatsPanelWidget.generated.h"
+
+class UVerticalBox;
+class UStatusComponent;
+class UPlayerStatWidget;
+
+UENUM(BlueprintType)
+enum class EStatDisplayFormat : uint8
+{
+	Number,
+	Percent01,     // 0~1 ê°’ì„ 0~100%ë¡œ (Armor/Evasion ê°™ì€ ê±°)
+	Percent100,    // ì´ë¯¸ 0~100ì¸ ê°’ì— % ë¶™ì´ê¸° (CritChance ê°™ì€ ê±°)
+	MultiplierX,   // 1.23x í˜•íƒœ (Damage ê°™ì€ ê±°)
+	Integer
+};
+
+USTRUCT(BlueprintType)
+struct FStatUIRow : public FTableRowBase
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FName PropertyName; // ì˜ˆ: "ResultMaxHP"
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FText DisplayName;  // ì˜ˆ: "ìµœëŒ€ HP"
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	EStatDisplayFormat Format = EStatDisplayFormat::Number;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int32 Decimals = 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int32 Order = 0;
+};
 
 /**
  * 
@@ -14,34 +50,35 @@ class MEGABONKCLONE_API UPlayerStatsPanelWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	
+protected:
+	UFUNCTION(BlueprintCallable)
+void BindToStatus(UStatusComponent* InStatus);
 
 protected:
-	//virtual void NativeConstruct() override; 
-	//virtual void NativeDestruct() override;
-	//virtual void NativeOnVisibilityChanged(ESlateVisibility, InVisibility) override;
+	virtual void NativeConstruct() override; 
+	virtual void NativeDestruct() override;
 
-	//UFUNCTION()
-	//void OnStatsUpdated();	//µ¨¸®°ÔÀÌÆ® Äİ¹é
-
-	//void RefreshUI();	//Getter ÀüÃ¼ È£ÃâÇØ UI °»½Å
-public:
-	//UFUNCTION(BlueprintCallable, Category = "Stat")
-	//void InitWithStatus(class UStatusComponent* InStatusComp);	//StatusComponent ³Ö¾îÁÖ±â
-
-private: 
-	//void BuildRows_Auto();	//StatusComponent¾È º¯¼öµé Row¿¡ »ı¼ºÇØ È­¸é¿¡ ÀÚµ¿³ª¿­ 
-
-protected:
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<class UVerticalBox> StatBox;		//Rowµé¾î°¥ ¹Ú½º
+	TObjectPtr<UVerticalBox> StatsBox = nullptr;
 
-	UPROPERTY(EditAnywhere, Category = "Stat")
-	TSubclassOf<class UPlayerStatWidget> PlayerStatRowClass;	//Row Å¬·¡½º -> WBP_PlayerStat³Ö¾îÁÖ±â
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UPlayerStatWidget> StatRowClass;
 
-//private:
-//	UPROPERTY()
-//	TObjectPtr<class UStatusComponent> StatusComp;	//ÇÃ·¹ÀÌ¾î°¡ °¡Áø 
-//
-//	UPROPERTY()
-//	TMap<FName, TObjectPtr<class UPlayerStatWidget>> RowByProp;
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TObjectPtr<UDataTable> StatUITable = nullptr;
+
+
+private:
+	UFUNCTION()
+	void HandleStatusUpdated();
+
+	void BuildRows();
+	void RefreshValues();
+
+	FText FormatValue(const FStatUIRow& Def, float Raw) const;
+
+private:
+	TWeakObjectPtr<UStatusComponent> Status;
+	TArray<FStatUIRow> StatDefs;
+	TArray<TObjectPtr<UPlayerStatWidget>> RowWidgets;
 };

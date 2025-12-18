@@ -274,7 +274,7 @@ void UStatusComponent::UpdateCharacterStatus()
 
 	//UI 델리게이트 갱신용 BroadCast
 	//
-	//OnStatsUpdated.Broadcast();
+	OnStatusUpdated.Broadcast();
 
     //디버그용 프린트 
 	if (GEngine)
