@@ -3,6 +3,8 @@
 
 #include "Components/InventoryComponent.h"
 #include "Characters/Components/StatusComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "GameFramework/Character.h"
 
 // Sets default values for this component's properties
 UInventoryComponent::UInventoryComponent()
@@ -14,6 +16,52 @@ UInventoryComponent::UInventoryComponent()
 
 }
 
+
+void UInventoryComponent::ProcessProcTrigger(EProcTriggerType Trigger, AActor* TargetActor, float TriggerValue)
+{
+	// [최적화] 비전서는 특수 효과가 없으므로 제외하고, '일반 아이템'만 검사합니다.
+	for (const FInventorySlot& Slot : GeneralItems)
+	{
+		FItemData* Data = GetItemInfo(Slot.ItemID);
+		if (!Data) continue;
+
+		// 아이템에 정의된 특수 효과(Proc) 목록 순회
+		for (int32 i = 0; i < Data->ProcModifiers.Num(); ++i)
+		{
+			const FItemProcData& Proc = Data->ProcModifiers[i];
+
+			// 1. 트리거 조건 확인 (예: 맞았을 때인데, 공격 시 효과면 패스)
+			if (Proc.TriggerType != Trigger) continue;
+			// 2. 쿨타임 확인 (IsOnCooldown 함수는 아까 구현한 것 사용)
+			if (Proc.Cooldown > 0.0f && IsOnCooldown(Slot.ItemID, i)) continue;
+
+			// 3. 확률 계산
+			// 기본 확률 + (중첩당 추가 확률 * (개수 - 1))
+			float FinalChance = Proc.BaseChance + (Proc.StackChance * (Slot.Quantity - 1));
+
+			// (선택 사항) 행운 스탯 적용
+			//if (CachedStatusComponent)
+			//{
+			//	FinalChance += CachedStatusComponent->GetResultLuck();
+			//}
+
+			// 4. 확률 주사위 굴리기 (0 ~ 100)
+			if (FMath::RandRange(0.0f, 100.0f) <= FinalChance)
+			{
+				// 발동 성공! -> 효과 실행
+				ExecuteProcEffect(Proc, Slot.Quantity, TargetActor, TriggerValue);
+
+				// 쿨타임이 있는 스킬이라면 쿨타임 등록
+				if (Proc.Cooldown > 0.0f)
+				{
+					SetCooldown(Slot.ItemID, i, Proc.Cooldown);
+				}
+
+				UE_LOG(LogTemp, Log, TEXT("Proc Triggered: %s (Item: %s)"), *UEnum::GetValueAsString(Proc.ProcType), *Slot.ItemID.ToString());
+			}
+		}
+	}
+}
 
 // Called when the game starts
 void UInventoryComponent::BeginPlay()
@@ -146,7 +194,6 @@ void UInventoryComponent::ApplyPassiveStats(const FItemData& ItemData, int32 Cou
             {
                 float FinalAddValue = RawValue;
 
-                // 퍼센트 체크 로직을 여기서 한 번만 작성하면 됩니다!
                 if (Mod.bIsPercentage)
                 {
                     FinalAddValue = CurrentBaseStat * (RawValue / 100.0f);
@@ -322,5 +369,103 @@ void UInventoryComponent::ApplyPassiveStats(const FItemData& ItemData, int32 Cou
     }
 }
 
+void UInventoryComponent::ExecuteProcEffect(const FItemProcData& Proc, int32 StackCount, AActor* TargetActor, float TriggerValue)
+{
+	float TotalValue = Proc.BaseValue + (Proc.StackValue * (StackCount - 1));
+	AActor* OwnerActor = GetOwner();
+
+	switch (Proc.ProcType)
+	{
+	case EProcEffectType::SpawnActor:
+		if (!Proc.SpawnActorClass.IsNull())
+		{
+			UClass* SpawnClass = Proc.SpawnActorClass.LoadSynchronous();
+			if (SpawnClass)
+			{
+				// 소환 위치 결정 (타겟이 있으면 타겟 위치, 없으면 내 위치)
+				FVector SpawnLoc = OwnerActor->GetActorLocation();
+				// 예: 번개는 타겟 머리 위, 지뢰는 내 발밑 등 기획에 따라 분기 필요
+				UE_LOG(LogTemp, Log, TEXT("소환"));
+				GetWorld()->SpawnActor<AActor>(SpawnClass, SpawnLoc, FRotator::ZeroRotator);
+			}
+		}
+		break;
+
+	case EProcEffectType::FireProjectile:
+		// 플레이어의 무기 컴포넌트 등을 통해 발사하거나 직접 스폰
+		// (구현된 투사체 로직에 따라 다름)
+		break;
+
+	case EProcEffectType::ApplyStatus:
+		// 타겟에게 상태이상 부여
+		// TargetActor가 있고, 상태이상 인터페이스나 컴포넌트가 있는지 확인 후 적용
+		break;
+
+	case EProcEffectType::AreaExplosion:
+	{
+		FVector Center = (TargetActor) ? TargetActor->GetActorLocation() : OwnerActor->GetActorLocation();
+		// 반경 내 데미지
+		UGameplayStatics::ApplyRadialDamage(
+			this,
+			TotalValue, // 데미지
+			Center,
+			Proc.Radius, // 범위
+			UDamageType::StaticClass(),
+			TArray<AActor*>(), // 무시할 액터
+			OwnerActor // 가해자
+		);
+		// 파티클/사운드 재생 로직 추가
+	}
+	break;
+
+	case EProcEffectType::ReflectDamage:
+		// 반사: 맞았을 때(OnTakeDamage) 들어온 TriggerValue(데미지) 만큼 되돌려줌
+		if (TargetActor && TriggerValue > 0.0f)
+		{
+			// 받은 데미지의 N% 반사 or 고정값 반사 (기획에 따라 TotalValue 활용)
+			float ReflectDmg = TriggerValue * (TotalValue / 100.0f);
+			UGameplayStatics::ApplyDamage(TargetActor, ReflectDmg, OwnerActor->GetInstigatorController(), OwnerActor, UDamageType::StaticClass());
+		}
+		break;
+
+	case EProcEffectType::Execute:
+
+	case EProcEffectType::FreeInteract:
+
+
+	case EProcEffectType::TemporaryBuffStat:
+		// StatusComponent에 "일시적 버프"를 거는 함수가 필요함
+		// 예: CachedStatusComponent->AddBuff(Proc.StatType, TotalValue, Proc.Duration);
+		UE_LOG(LogTemp,Log,TEXT("일시적 버프"));
+		break;
+
+		// ... 나머지 케이스 구현 ...
+	case EProcEffectType::PermanentBuffStat:
+	default:
+		break;
+	}
+}
+
+bool UInventoryComponent::IsOnCooldown(FName ItemID, int32 ProcIndex)
+{
+	FString KeyString = FString::Printf(TEXT("%s_%d"), *ItemID.ToString(), ProcIndex);
+	FName Key = FName(*KeyString);
+
+	if (double* EndTime = ProcCooldownMap.Find(Key))
+	{
+		// 현재 시간이 만료 시간보다 작으면 아직 쿨타임 중
+		return GetWorld()->GetTimeSeconds() < *EndTime;
+	}
+	return false; // 기록 없으면 쿨타임 아님
+}
+
+void UInventoryComponent::SetCooldown(FName ItemID, int32 ProcIndex, float CooldownTime)
+{
+	FString KeyString = FString::Printf(TEXT("%s_%d"), *ItemID.ToString(), ProcIndex);
+	FName Key = FName(*KeyString);
+
+	// 언제 쿨타임이 끝나는지 저장
+	ProcCooldownMap.Add(Key, GetWorld()->GetTimeSeconds() + CooldownTime);
+}
 
 
