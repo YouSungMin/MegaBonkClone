@@ -57,6 +57,8 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnItemUpdate OnItemAdd;
+protected:
+	void ApplyPassiveStats(const FItemData& ItemData, int32 Count, bool bIsFirstGet);
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "DataTable")
@@ -71,4 +73,6 @@ protected:
 	TArray<FInventorySlot> GeneralItems;
 private:
 	const int32 MaxSecretBookCount = 3;
+
+	TObjectPtr<class UStatusComponent> CachedStatusComponent = nullptr;
 };

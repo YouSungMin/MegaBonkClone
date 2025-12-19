@@ -29,105 +29,135 @@ public:
 	// -----------------------------------------------------------------
 	// [생존 (Survival)]
 	// -----------------------------------------------------------------
+	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddPlayerMaxHP(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddVisionMaxHP(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddShrineMaxHP(float Amount);
 
+	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddPlayerHPRegen(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddVisionHPRegen(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddShrineHPRegen(float Amount);
 
+	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddPlayerOverHeal(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddVisionOverHeal(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddShrineOverHeal(float Amount);
 
+	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddPlayerShield(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddVisionShield(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddShrineShield(float Amount);
 
+	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddPlayerArmor(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddVisionArmor(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddShrineArmor(float Amount);
 
+	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddPlayerEvasionChance(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddVisionEvasionChance(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddShrineEvasionChance(float Amount);
 
+	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddPlayerLifeDrain(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddVisionLifeDrain(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddShrineLifeDrain(float Amount);
 
+	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddPlayerThorn(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddVisionThorn(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddShrineThorn(float Amount);
 
 	// -----------------------------------------------------------------
 	// [공격 (Offense)]
 	// -----------------------------------------------------------------
+	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddPlayerDamage(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddVisionDamage(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddShrineDamage(float Amount);
 
+	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddPlayerCriticalChance(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddVisionCriticalChance(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddShrineCriticalChance(float Amount);
 
+	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddPlayerCritDmgRate(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddVisionCritDmgRate(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddShrineCritDmgRate(float Amount);
 
+	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddPlayerAttackSpeed(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddVisionAttackSpeed(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddShrineAttackSpeed(float Amount);
 
+	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddPlayerEliteDamage(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddVisionEliteDamage(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddShrineEliteDamage(float Amount);
 
+	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddPlayerKnockBack(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddVisionKnockBack(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddShrineKnockBack(float Amount);
 
 	// -----------------------------------------------------------------
 	// [발사체 (Projectile)]
 	// -----------------------------------------------------------------
+	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddPlayerProjectileCount(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddVisionProjectileCount(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddShrineProjectileCount(float Amount);
 
+	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddPlayerProjectileReflectCount(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddVisionProjectileReflectCount(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddShrineProjectileReflectCount(float Amount);
 
+	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddPlayerAttackSize(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddVisionAttackSize(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddShrineAttackSize(float Amount);
 
+	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddPlayerProjectileSpeed(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddVisionProjectileSpeed(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddShrineProjectileSpeed(float Amount);
 
+	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddPlayerAttackDuration(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddVisionAttackDuration(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddShrineAttackDuration(float Amount);
 
 	// -----------------------------------------------------------------
 	// [이동 (Movement)]
 	// -----------------------------------------------------------------
+	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddPlayerMoveSpeed(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddVisionMoveSpeed(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddShrineMoveSpeed(float Amount);
 
+	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddPlayerExtraJump(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddVisionExtraJump(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddShrineExtraJump(float Amount);
 
+	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddPlayerJumpPower(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddVisionJumpPower(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddShrineJumpPower(float Amount);
 
 	// -----------------------------------------------------------------
 	// [유틸리티 (Utility)]
 	// -----------------------------------------------------------------
+	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddPlayerLuck(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddVisionLuck(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddShrineLuck(float Amount);
 
+	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddPlayerDifficulty(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddVisionDifficulty(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddShrineDifficulty(float Amount);
 
+	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddPlayerPickUpRange(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddVisionPickUpRange(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddShrinePickUpRange(float Amount);
 
+	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddPlayerExpGain(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddVisionExpGain(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddShrineExpGain(float Amount);
 
+	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddPlayerGoldGain(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddVisionGoldGain(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddShrineGoldGain(float Amount);
 
+	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddPlayerSilverGain(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddVisionSilverGain(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddShrineSilverGain(float Amount);
 
+	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddPlayerPowerUPRate(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddVisionPowerUPRate(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddShrinePowerUPRate(float Amount);
 
+	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddPlayerPowerUPDropRate(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddVisionPowerUPDropRate(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddShrinePowerUPDropRate(float Amount);
 
