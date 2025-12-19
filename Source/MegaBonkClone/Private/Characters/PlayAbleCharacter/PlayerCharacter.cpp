@@ -73,6 +73,11 @@ void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	//커스텀 뎁스 활성화 (포스트 프로세스에서 이 메시를 구별할 수 있게 함)
+	GetMesh()->SetRenderCustomDepth(true);
+
+	GetMesh()->SetCustomDepthStencilValue(1);
+
 	if (DeathCurve)
 	{
 		FOnTimelineFloat ProgressFunction;
