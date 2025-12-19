@@ -35,11 +35,6 @@ class MEGABONKCLONE_API UInventoryComponent : public UActorComponent
 public:	
 	// Sets default values for this component's properties
 	UInventoryComponent();
-
-protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
-
 public:	
 	// 비전서 획득 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
@@ -57,9 +52,19 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnItemUpdate OnItemAdd;
+	void ProcessProcTrigger(EProcTriggerType Trigger, AActor* TargetActor = nullptr, float TriggerValue = 0.0f);
 protected:
-	void ApplyPassiveStats(const FItemData& ItemData, int32 Count, bool bIsFirstGet);
+	// Called when the game starts
+	virtual void BeginPlay() override;
 
+	void ApplyPassiveStats(const FItemData& ItemData, int32 Count, bool bIsFirstGet);
+private:
+	// 내부적으로 효과를 실행하는 분기 함수
+	void ExecuteProcEffect(const FItemProcData& Proc, int32 StackCount, AActor* TargetActor, float TriggerValue);
+
+	// 쿨타임 체크 헬퍼
+	bool IsOnCooldown(FName ItemID, int32 ProcIndex);
+	void SetCooldown(FName ItemID, int32 ProcIndex, float CooldownTime);
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "DataTable")
 	TObjectPtr<UDataTable> ItemDataTable = nullptr;
@@ -71,6 +76,10 @@ protected:
 	// 3. 일반 아이템 (무한)
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory|Items")
 	TArray<FInventorySlot> GeneralItems;
+
+	// 쿨타임 관리용 맵
+	UPROPERTY()
+	TMap<FName, double> ProcCooldownMap;
 private:
 	const int32 MaxSecretBookCount = 3;
 

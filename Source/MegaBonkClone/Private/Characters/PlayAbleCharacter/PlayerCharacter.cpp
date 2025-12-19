@@ -309,6 +309,12 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 	{
 		finalTakeDamage = 0.0f;
 	}
+	if (InventoryComponent)
+	{
+		UE_LOG(LogTemp, Warning,TEXT("피격시 트리거 함수 실행"));
+		InventoryComponent->ProcessProcTrigger(EProcTriggerType::OnTakeDamage, DamageCauser, finalTakeDamage);
+	}
+
 	StatusComponent2->AddCurrentHP(-finalTakeDamage);
 	UE_LOG(LogTemp, Warning, TEXT("%.1f / %.1f"), StatusComponent2->GetCurrentHP(), StatusComponent2->GetResultMaxHP());
 
