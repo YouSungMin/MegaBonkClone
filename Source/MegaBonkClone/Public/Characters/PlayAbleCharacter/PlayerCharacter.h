@@ -55,7 +55,7 @@ public:
 
 	//스테이터스 GETTER 함수
 	UFUNCTION(BlueprintCallable)
-	inline UStatusComponent* GetStatusComponent() { return StatusComponent; }
+	inline UStatusComponent* GetStatusComponent() { return StatusComponent2; }
 
 	//오브젝트에 오버랩 되었을때 실행할 함수
 	UFUNCTION()
@@ -91,6 +91,8 @@ protected:
 	//점프 입력 받으면 실행할 함수
 	UFUNCTION()
 	void OnJumpInput(const FInputActionValue& InValue);
+	UFUNCTION()
+	void HandleDeathProgress(float Value);
 	
 	/*UFUNCTION()
 	void */
@@ -107,6 +109,13 @@ public:
 	FDataTableRowHandle CharacterDataHandle;
 
 protected:
+	//사망 연출용 타임라인 컴포넌트
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player|Components")
+	TObjectPtr<class UTimelineComponent> DeathTimelineComp = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Player|Combat")
+	TObjectPtr<class UCurveFloat> DeathCurve;
+
 
 	//입력 액션
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player|Input")
@@ -131,7 +140,7 @@ protected:
 	TObjectPtr<class UCapsuleComponent> PickupCollision = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Player|Components")
-	TObjectPtr<UStatusComponent> StatusComponent = nullptr;
+	TObjectPtr<UStatusComponent> StatusComponent2 = nullptr;
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadWrite, Category = "Player|Components")
 	TObjectPtr<class UWeaponSystemComponent> WeaponComponent = nullptr;
@@ -148,4 +157,7 @@ private:
 
 	// 시간 정지 타이머핸들러
 	FTimerHandle StopwatchTimerHandle;
+
+	FRotator DeathStartRot;
+	FRotator DeathEndRot;
 };
