@@ -54,7 +54,8 @@ public:
 	void ActivateStopwatch(float Duration);
 
 	//스테이터스 GETTER 함수
-	inline UStatusComponent* GetStatusComponent() { return StatusComponent2; }
+	UFUNCTION(BlueprintCallable)
+	inline UStatusComponent* GetStatusComponent() { return StatusComponent; }
 
 	//오브젝트에 오버랩 되었을때 실행할 함수
 	UFUNCTION()
@@ -115,6 +116,10 @@ protected:
 	TObjectPtr<class UInputAction> IA_Jump = nullptr;
 
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player|Input")
+	TObjectPtr<class UInputAction> IA_Interact = nullptr;
+
+
 	//컴포넌트들 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player|Components")
 	TObjectPtr<class USpringArmComponent> SpringArm = nullptr;
@@ -126,7 +131,7 @@ protected:
 	TObjectPtr<class UCapsuleComponent> PickupCollision = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Player|Components")
-	TObjectPtr<UStatusComponent> StatusComponent2 = nullptr;
+	TObjectPtr<UStatusComponent> StatusComponent = nullptr;
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadWrite, Category = "Player|Components")
 	TObjectPtr<class UWeaponSystemComponent> WeaponComponent = nullptr;
