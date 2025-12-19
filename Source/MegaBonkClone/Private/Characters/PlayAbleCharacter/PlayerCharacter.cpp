@@ -45,7 +45,7 @@ void APlayerCharacter::InitializeCharacterComponents()
 	PickupCollision->SetCapsuleSize(100.0f, 100.0f);
 
 
-	StatusComponent2 = CreateDefaultSubobject<UStatusComponent>(TEXT("Status"));
+	StatusComponent = CreateDefaultSubobject<UStatusComponent>(TEXT("Status"));
 	WeaponComponent = CreateDefaultSubobject<UWeaponSystemComponent>(TEXT("WeaponSystem"));
 	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("Inventory"));
 	
@@ -72,11 +72,11 @@ void APlayerCharacter::BeginPlay()
 
 
 
-	if (StatusComponent2)
+	if (StatusComponent)
 	{
 		// CharacterDataHandle 안에 테이블과 RowName이 다 들어있으므로 이것만 넘기면 끝!
-		StatusComponent2->InitializeStatsFromDataTable(CharacterDataHandle);
-		StatusComponent2->OnPlayerDied.AddDynamic(this, &APlayerCharacter::OnCharacterDie);
+		StatusComponent->InitializeStatsFromDataTable(CharacterDataHandle);
+		StatusComponent->OnPlayerDied.AddDynamic(this, &APlayerCharacter::OnCharacterDie);
 	}
 
 	if (WeaponComponent) {
@@ -119,10 +119,15 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 	//입력 액션 바인드 함수
 	if (enhanced) {
-		enhanced->BindAction(IA_Move, ETriggerEvent::Triggered, this, &APlayerCharacter::OnMoveInput);
-
-		enhanced->BindAction(IA_Jump, ETriggerEvent::Started, this, &APlayerCharacter::OnJumpInput);
-
+		if (IA_Move) {
+			enhanced->BindAction(IA_Move, ETriggerEvent::Triggered, this, &APlayerCharacter::OnMoveInput);
+		}
+		if (IA_Jump) {
+			enhanced->BindAction(IA_Jump, ETriggerEvent::Started, this, &APlayerCharacter::OnJumpInput);
+		}
+		if (IA_Interact) {
+			enhanced->BindAction(IA_Interact, ETriggerEvent::Started, this, &APlayerCharacter::TryInteract);
+		}
 	}
 
 }
@@ -192,24 +197,24 @@ void APlayerCharacter::ReceiveItem_Implementation(FName ItemID, int32 Count)
 
 float APlayerCharacter::GetAdjustedCost_Implementation(float BaseCost)
 {
-	if (StatusComponent2)
+	if (StatusComponent)
 	{
-		return StatusComponent2->CalculateChestCost(BaseCost);
+		return StatusComponent->CalculateChestCost(BaseCost);
 	}
 	return BaseCost;
 }
 
 bool APlayerCharacter::UseGold_Implementation(float Amount)
 {
-	if (StatusComponent2) return StatusComponent2->SpendGold(Amount);
+	if (StatusComponent) return StatusComponent->SpendGold(Amount);
 	return 0;
 }
 
 void APlayerCharacter::NotifyChestOpened_Implementation()
 {
-	if (StatusComponent2)
+	if (StatusComponent)
 	{
-		StatusComponent2->IncreaseChestOpenCount();
+		StatusComponent->IncreaseChestOpenCount();
 	}
 }
 
@@ -301,7 +306,7 @@ void APlayerCharacter::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPr
 
 float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	float resultarmor = 1.0f - StatusComponent2->GetResultArmor();
+	float resultarmor = 1.0f - StatusComponent->GetResultArmor();
 	
 	float finalTakeDamage = DamageAmount* resultarmor;
 
@@ -309,8 +314,8 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 	{
 		finalTakeDamage = 0.0f;
 	}
-	StatusComponent2->AddCurrentHP(-finalTakeDamage);
-	UE_LOG(LogTemp, Warning, TEXT("%.1f / %.1f"), StatusComponent2->GetCurrentHP(), StatusComponent2->GetResultMaxHP());
+	StatusComponent->AddCurrentHP(-finalTakeDamage);
+	UE_LOG(LogTemp, Warning, TEXT("%.1f / %.1f"), StatusComponent->GetCurrentHP(), StatusComponent->GetResultMaxHP());
 
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	return finalTakeDamage;
