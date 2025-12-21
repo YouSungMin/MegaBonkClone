@@ -3,3 +3,7 @@
 
 #include "UI/PlayerStats/PlayerStatsWidget.h"
 
+void UPlayerStatsWidget::NativeConstruct()
+{
+	Super::NativeConstruct();
+}

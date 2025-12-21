@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "UI/Inventory/InventoryWidget.h"
+#include "UI/PlayerStats/PlayerStatsWidget.h"
 #include "MainHudWidget.generated.h"
 
 UENUM(BlueprintType)
@@ -43,10 +45,10 @@ protected:
 	TObjectPtr<class UResourceBarWidget> HealthBar = nullptr; //플레이어 HP바
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory", meta = (BindWidget))
-	TObjectPtr<class UInventoryWidget> InventoryPanel = nullptr; //인벤토리 위젯
+	TObjectPtr<UInventoryWidget> InventoryPanel = nullptr; //인벤토리 위젯
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "PlayerStat", meta = (BindWidget))
-	TObjectPtr<class UPlayerStatsWidget> PlayerStatsPanel = nullptr; //플레이어스탯 위젯
+	TObjectPtr<UPlayerStatsWidget> PlayerStatsPanel = nullptr; //플레이어스탯 위젯
 
 
 private:

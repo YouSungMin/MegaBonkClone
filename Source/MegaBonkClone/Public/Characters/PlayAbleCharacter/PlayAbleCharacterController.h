@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "UI/MainHudWidget.h"
 #include "PlayAbleCharacterController.generated.h"
 
 struct FInputActionValue;
@@ -24,14 +25,34 @@ protected:
 	void OnCameraLookInput(const FInputActionValue& InValue);
 
 	virtual void SetupInputComponent() override;
+
+public:
+	void OpenPanels();
+	UFUNCTION()
+	void ClosePanels();
+
+	//메인 HUD 위젯 세터
+	inline void InitializeMainHudWidget(UMainHudWidget* Widget) { MainHudWidget = Widget; }
+
+
+private:
+	//패널들 온오프 입력 받으면 실행할 함수(인벤토리, 플레이어스탯)
+	void OnPanelOnOff();
+
 protected:
 
 	//입력 액션
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "PlayerController|Input")
 	TObjectPtr<class UInputAction> IA_CameraLook = nullptr;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "PlayerController|Input")
+	TObjectPtr<class UInputAction> IA_PanelOnOff= nullptr;
+
 	//입력 매핑 컨텍스트
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "PlayerController|Input")
 	TObjectPtr<class UInputMappingContext> DefaultInputMappingContext = nullptr;
+
+private:
+	TWeakObjectPtr<UMainHudWidget> MainHudWidget = nullptr;
 
 };

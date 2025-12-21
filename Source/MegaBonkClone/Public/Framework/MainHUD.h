@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
+#include "UI/MainHudWidget.h"
 #include "MainHUD.generated.h"
 
 /**
@@ -17,7 +18,14 @@ class MEGABONKCLONE_API AMainHUD : public AHUD
 protected:
 	virtual void BeginPlay() override;
 
+public:
+	inline UMainHudWidget* GetMainWidget() const { return MainWidgetInstance; }
+
 protected:
+	//mainwidgetclass는 Umainhudwidget를 상속받은 블루프린트 위젯 클래스
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TSubclassOf<UUserWidget> MainWidgetClass = nullptr;
+	TSubclassOf<UMainHudWidget> MainWidgetClass = nullptr;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI")
+	TObjectPtr<UMainHudWidget> MainWidgetInstance = nullptr;	
 };

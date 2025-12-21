@@ -38,6 +38,59 @@ void APlayAbleCharacterController::SetupInputComponent()
 	//입력 액션 바인드 함수 
 	if (enhanced) {
 		enhanced->BindAction(IA_CameraLook, ETriggerEvent::Triggered, this, &APlayAbleCharacterController::OnCameraLookInput);
+		enhanced->BindAction(IA_PanelOnOff, ETriggerEvent::Started, this, &APlayAbleCharacterController::OnPanelOnOff);
 	}
 
+}
+
+
+void APlayAbleCharacterController::OpenPanels()
+{
+	if (MainHudWidget.IsValid())
+	{
+		UE_LOG(LogTemp, Log, TEXT("OpenPanels 실행"));
+		MainHudWidget->OpenPanels();
+
+		FInputModeGameAndUI inputMode;
+		//inputMode.SetWidgetToFocus(MainHudWidget->TakeWidget()); //포커스 설정(선택사항)
+		inputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock); //마우스 잠금 설정
+		inputMode.SetHideCursorDuringCapture(false); //마우스 캡처시 커서 숨기지 않음
+		SetInputMode(inputMode); //입력 모드를 컨트롤러에 적용
+
+		bShowMouseCursor = true; //마우스 커서 보이기
+
+		SetPause(true); //게임 일시정지
+	}
+}
+
+void APlayAbleCharacterController::ClosePanels()
+{
+	if(MainHudWidget.IsValid())
+	{
+		UE_LOG(LogTemp, Log, TEXT("ClosePanels 실행"));
+
+		SetPause(false); //게임 일시정지 해제
+
+		FInputModeGameOnly inputMode;
+		SetInputMode(inputMode); //입력 모드를 컨트롤러에 적용
+
+		bShowMouseCursor = false; //마우스 커서 보이기
+
+		MainHudWidget->ClosePanels();
+	}
+}
+
+void APlayAbleCharacterController::OnPanelOnOff()
+{
+	if(MainHudWidget.IsValid())
+	{
+		if (MainHudWidget->GetOpenState() == EOpenState::Open)
+		{
+			ClosePanels();
+		}
+		else
+		{
+			OpenPanels();
+		}
+	}
 }
