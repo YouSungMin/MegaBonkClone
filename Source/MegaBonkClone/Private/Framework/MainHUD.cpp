@@ -3,18 +3,25 @@
 
 #include "Framework/MainHUD.h"
 #include "Blueprint/UserWidget.h"
+#include "Characters/PlayAbleCharacter/PlayAbleCharacterController.h"
 
 void AMainHUD::BeginPlay()
 {
 	Super::BeginPlay();
 	if (MainWidgetClass)
 	{
-		UUserWidget* widget = CreateWidget<UUserWidget>(GetWorld(), MainWidgetClass);
+		MainWidgetInstance = CreateWidget<UMainHudWidget>(GetWorld(), MainWidgetClass);
 
-			if (widget)
+		if (MainWidgetInstance)
+		{
+			MainWidgetInstance->AddToViewport();
+
+			//HUD는 컨트롤러가 소유하므로, 컨트롤러에 메인위젯을 설정
+			APlayAbleCharacterController* pc = Cast<APlayAbleCharacterController>(GetOwningPlayerController());
+			if (pc)
 			{
-				widget->AddToViewport();
+				pc->InitializeMainHudWidget(MainWidgetInstance);
 			}
+		}
 	}
-
 }
