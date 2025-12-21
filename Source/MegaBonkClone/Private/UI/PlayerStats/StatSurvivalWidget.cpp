@@ -1,19 +1,19 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "UI/ManagementPanel/PlayerStatSurvivalWidget.h"
+#include "UI/PlayerStats/StatSurvivalWidget.h"
 
 #include "Components/TextBlock.h"
 #include "Characters/PlayAbleCharacter/PlayerCharacter.h"
 #include "Characters/Components/StatusComponent.h"
 
-void UPlayerStatSurvivalWidget::NativeConstruct()
+void UStatSurvivalWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
 	//if (MaxHP_TitleText)
 	//{
-	//	MaxHP_TitleText->SetText(FText::FromString(TEXT("√÷¥Î HP"))); // ¡¶∏Ò¿∫ ∞Ì¡§
+	//	MaxHP_TitleText->SetText(FText::FromString(TEXT("ÏµúÎåÄ HP"))); // Ï†úÎ™©ÏùÄ Í≥†Ï†ï
 	//}
 	APawn* pawn = GetOwningPlayerPawn();	//getplayerpawn
 	if (!pawn) return;
@@ -22,15 +22,15 @@ void UPlayerStatSurvivalWidget::NativeConstruct()
 	UStatusComponent* status = player->GetStatusComponent();	//getstatusComponent
 	if (!status) return;
 
-	//µ®∏Æ∞‘¿Ã∆Æ πŸ¿Œµ˘
-	status->OnStatusUpdated.AddDynamic(this, &UPlayerStatSurvivalWidget::HandleStatusUpdated);
-	UE_LOG(LogTemp, Warning, TEXT("µ®∏Æ∞‘¿Ã∆Æ πŸ¿Œµ˘"));
+	//Îç∏Î¶¨Í≤åÏù¥Ìä∏ Î∞îÏù∏Îî©
+	status->OnStatusUpdated.AddDynamic(this, &UStatSurvivalWidget::HandleStatusUpdated);
+	UE_LOG(LogTemp, Warning, TEXT("Îç∏Î¶¨Í≤åÏù¥Ìä∏ Î∞îÏù∏Îî©"));
 
 
 	RefreshSurvival();
 }
 
-void UPlayerStatSurvivalWidget::NativeDestruct()
+void UStatSurvivalWidget::NativeDestruct()
 {
 	APawn* pawn = GetOwningPlayerPawn();
 	if (pawn)
@@ -39,9 +39,9 @@ void UPlayerStatSurvivalWidget::NativeDestruct()
 		{
 			if (UStatusComponent* status = player->GetStatusComponent())
 			{
-				//πŸ¿Œµ˘ «ÿ¡¶
-				status->OnStatusUpdated.RemoveDynamic(this, &UPlayerStatSurvivalWidget::HandleStatusUpdated);
-				UE_LOG(LogTemp, Warning, TEXT("πŸ¿Œµ˘ «ÿ¡¶"));
+				//Î∞îÏù∏Îî© Ìï¥Ï†ú
+				status->OnStatusUpdated.RemoveDynamic(this, &UStatSurvivalWidget::HandleStatusUpdated);
+				UE_LOG(LogTemp, Warning, TEXT("Î∞îÏù∏Îî© Ìï¥Ï†ú"));
 			}
 		}
 	}
@@ -49,12 +49,12 @@ void UPlayerStatSurvivalWidget::NativeDestruct()
 	Super::NativeDestruct();
 }
 
-void UPlayerStatSurvivalWidget::HandleStatusUpdated()
+void UStatSurvivalWidget::HandleStatusUpdated()
 {
 	RefreshSurvival();
 }
 
-void UPlayerStatSurvivalWidget::RefreshSurvival()
+void UStatSurvivalWidget::RefreshSurvival()
 {
 	APawn* pawn = GetOwningPlayerPawn();	//getplayerpawn
 	if (!pawn) return;

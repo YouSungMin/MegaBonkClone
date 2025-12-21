@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "InventoryWidget.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventoryCloseRequested);
 /**
  * 
  */
@@ -14,4 +15,18 @@ class MEGABONKCLONE_API UInventoryWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	
+public:
+	virtual void NativeConstruct() override;
+
+	UPROPERTY(BlueprintAssignable, Category = "UI|Inventory")
+	FOnInventoryCloseRequested OnInventoryCloseRequested;
+
+private:
+	UFUNCTION()
+	void OnCloseInventoryClicked();
+
+protected:
+	//UPROPERTY(meta = (BindWIdget))
+	//TObjectPtr<class UButton> CloseButton = nullptr;
+
 };
