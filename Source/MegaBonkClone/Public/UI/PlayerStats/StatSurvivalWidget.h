@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "PlayerStatSurvivalWidget.generated.h"
+#include "StatSurvivalWidget.generated.h"
 
 class UTextBlock; 
 
@@ -12,7 +12,7 @@ class UTextBlock;
  * 
  */
 UCLASS()
-class MEGABONKCLONE_API UPlayerStatSurvivalWidget : public UUserWidget
+class MEGABONKCLONE_API UStatSurvivalWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	
@@ -21,19 +21,19 @@ protected:
 	virtual void NativeConstruct() override;	
 	virtual void NativeDestruct() override;
 
-	//µ¨¸®°ÔÀÌÆ® ¹ÙÀÎµùµÉÇÔ¼ö
+	//ë¸ë¦¬ê²Œì´íŠ¸ ë°”ì¸ë”©ë í•¨ìˆ˜
 	UFUNCTION()
 	void HandleStatusUpdated();
 
-	//ÀÌº¥Æ®¸¸µé±â
+	//ì´ë²¤íŠ¸ë§Œë“¤ê¸°
 	UFUNCTION(BlueprintCallable)
 	void RefreshSurvival();
 
 protected:
 	UPROPERTY(meta = (BindWidgetOptional))
-	TObjectPtr<UTextBlock> Label1 = nullptr;	//Á¦¸ñ
+	TObjectPtr<UTextBlock> Label1 = nullptr;	//ì œëª©
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UTextBlock> MaxHPValue = nullptr;		//°ª 
+	TObjectPtr<UTextBlock> MaxHPValue = nullptr;		//ê°’ 
 
 	UPROPERTY(meta = (BindWidgetOptional))
 	TObjectPtr<UTextBlock> Label2 = nullptr;
