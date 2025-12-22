@@ -111,3 +111,10 @@ enum class EProcTriggerType : uint8
 	OnHeal			UMETA(DisplayName = "체력 회복 시"),
 	OnLowHP			UMETA(DisplayName = "체력이 50% 이하일때")
 };
+
+enum class EAltarState : uint8
+{
+	ReadyToSummon, // 처음 상태
+	BossesAlive,   // 보스 잡는 중 (상호작용 불가)
+	StageClear     // 다 잡음 (다음 스테이지 이동)
+};
