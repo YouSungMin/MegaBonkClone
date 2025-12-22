@@ -12,6 +12,8 @@ class UResourceBarWidget; //HP,Shield바
 
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStatusUpdated);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStatFloatChanged, float, NewValue);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnStatExpChanged, float, InCurrentExp,float,InMaxExp);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPlayerDied);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -129,6 +131,11 @@ public:
 	// -----------------------------------------------------------------
 	// [유틸리티 (Utility)]
 	// -----------------------------------------------------------------
+
+	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddSilver(float Amount);
+	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddKillCount(float Amount);
+
+
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddPlayerLuck(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddVisionLuck(float Amount);
 	UFUNCTION(BlueprintCallable, Category = "Status|Modify") void AddShrineLuck(float Amount);
@@ -232,6 +239,8 @@ public:
 	// [유틸리티 (Utility)]
 	// =================================================================
 
+	UFUNCTION(BlueprintCallable) inline float GetCurrentSilver() const { return CurrentSilver; }
+	UFUNCTION(BlueprintCallable) inline float GetKillCount() const { return KillCount; }
 	UFUNCTION(BlueprintCallable) inline float GetResultLuck() const { return ResultLuck; }
 	UFUNCTION(BlueprintCallable) inline float GetResultDifficulty() const { return ResultDifficulty; }
 	UFUNCTION(BlueprintCallable) inline float GetResultPickUpRange() const { return ResultPickUpRange; }
@@ -279,9 +288,25 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Status|Event")
 	FOnStatusUpdated OnStatusUpdated;
 
+	UPROPERTY(BlueprintAssignable, Category = "Status|Event")
+	FOnStatFloatChanged OnGoldChanged;
+
+	UPROPERTY(BlueprintAssignable, Category = "Status|Event")
+	FOnStatFloatChanged OnSilverChanged;     
+
+	UPROPERTY(BlueprintAssignable, Category = "Status|Event")
+	FOnStatFloatChanged OnKillCountChanged;   
+
+	UPROPERTY(BlueprintAssignable, Category = "Status|Event")
+	FOnStatFloatChanged OnLevelChanged;
+
+	UPROPERTY(BlueprintAssignable, Category = "Status|Event")
+	FOnStatExpChanged OnStatExpChanged;
+
 	//플레이어 die 델리게이트
 	UPROPERTY(BlueprintAssignable, Category = "Player|Die")
 	FOnPlayerDied OnPlayerDied;
+	
 
 protected:
 	// =================================================================
@@ -303,6 +328,12 @@ protected:
 	//현재 LV
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Growth")
 	int32 CurrentLevel = 1;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character|State")
+	float CurrentSilver = 0.0f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character|State")
+	float KillCount = 0.0f;
 
 	//경험치 통 크기
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Growth")
