@@ -13,6 +13,7 @@ AChestActor::AChestActor()
 	ChestMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	SetRootComponent(ChestMesh);
 	ChestMesh->SetCollisionProfileName(TEXT("BlockAllDynamic"));
+	ChestMesh->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 }
 
 // Called when the game starts or when spawned
