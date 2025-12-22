@@ -20,10 +20,10 @@ public:
 	//위젯데이터 세팅
 	void InitializeItemSlot(FName InItemID, int32 InQuantity, UInventoryComponent* InInventory);
 	//설정된 데이터 기반으로 위젯내용 갱신
-	void RefreshItemSlot() const;
+	void RefreshItemSlot();
 
 protected:
-	void ClearItemSlot() const;
+	void ClearItemSlot();
 
 protected:
 	UPROPERTY(BlueprintReadOnly, Category = "UI|Inventory", meta = (BindWidget))
@@ -33,6 +33,11 @@ protected:
 	TObjectPtr<class UTextBlock> CountText;
 
 private:
-	int32 Index = -1;
+
+	FName ItemID = NAME_None;
+	int32 Quantity = 0;
+
+	UPROPERTY()
+	TWeakObjectPtr<UInventoryComponent> TargetItemInventory;
 
 };

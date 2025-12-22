@@ -4,14 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "InventoryWidget.generated.h"
+#include "InGameItemBarWidget.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventoryCloseRequested);
 /**
  * 
  */
 UCLASS()
-class MEGABONKCLONE_API UInventoryWidget : public UUserWidget
+class MEGABONKCLONE_API UInGameItemBarWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	
@@ -20,32 +19,24 @@ public:
 
 	//외부 인벤토리 컴포넌트 주입
 	void InitializeInventoryWidget(class UInventoryComponent* InventoryComponent);
-	
+
 	//현재 인벤토리로 UI채우기
 	UFUNCTION()
 	void RefreshInventoryWidget();
 
+
 	UFUNCTION()
 	void ClearInventoryWidget();
-
-	UPROPERTY(BlueprintAssignable, Category = "UI|Inventory")
-	FOnInventoryCloseRequested OnInventoryCloseRequested;
 
 private:
 	//아이템 추가시 이벤트 전체 리프레시
 	UFUNCTION()
 	void HandleItemAdded(FName ItemID, const FItemData& ItemData);
 
-	//닫기버튼사용시
-	/*UFUNCTION()
-	void OnCloseInventoryClicked();*/
 
 protected:
-	//UPROPERTY(meta = (BindWIdget))
-	//TObjectPtr<class UButton> CloseButton = nullptr;
-
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget), Category = "UI|Inventory|Items")
-	TObjectPtr<class UUniformGridPanel> ItemSlotGridPanel = nullptr;
+	TObjectPtr<class UWrapBox> ItemWrapBox = nullptr;
 
 private:
 	UPROPERTY()
