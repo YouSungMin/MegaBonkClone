@@ -4,18 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "Interactables/SanctuaryBase.h"
-#include "GreedSanctuary.generated.h"
+#include "CursedSanctuary.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class MEGABONKCLONE_API AGreedSanctuary : public ASanctuaryBase
+class MEGABONKCLONE_API ACursedSanctuary : public ASanctuaryBase
 {
 	GENERATED_BODY()
 protected:
 	virtual void ApplyEffect_Implementation(AActor* Player)override;
-protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Difficulty")
-	float DifficultyAmount = 0.05f;
 };
