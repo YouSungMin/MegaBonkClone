@@ -2,31 +2,53 @@
 
 
 #include "UI/Inventory/WeaponSlotWidget.h"
-
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
-#include "Characters/PlayAbleCharacter/PlayerCharacter.h"
 
-void UWeaponSlotWidget::InitializeSlot(int32 InIndex, FInvenSlot* InSlotData)
+#include "Characters/Components/WeaponSystemComponent.h"
+
+void UWeaponSlotWidget::InitializeWeaponSlot(FName InWeaponID, int32 InLevel, UWeaponSystemComponent* InWeapon)
 {
-	Index = InIndex;
-	SlotData = InSlotData;
+    WeaponID = InWeaponID;
+    Level = InLevel;
+    TargetWeaponInventory = InWeapon;
 
-	RefreshWeaponSlot();
+    RefreshWeaponSlot();
 }
 
-void UWeaponSlotWidget::RefreshWeaponSlot() const
+void UWeaponSlotWidget::RefreshWeaponSlot()
 {
-	//if (SlotData && !SlotData->IsEmpty())
-	//{
-	//	WeaponIconImage->SetBrushFromTexture(SlotData->ItemData->ItemIcon);
-	//	
-	//	LevelText->SetText(FText::AsNumber(SlotData->GetCount()));
+    if (!TargetWeaponInventory.IsValid() || WeaponID.IsNone() || Level <= 0)
+    {
+        ClearWeaponSlot();
+        return;
+    }
 
-	//}
+    FWeaponData* WeaponInfo = TargetWeaponInventory->GetWeaponInfo(WeaponID);
+    if (!WeaponInfo)
+    {
+        ClearWeaponSlot();
+        return;
+    }
 
+    UTexture2D* Tex = WeaponInfo->Icon.LoadSynchronous();
+    WeaponIconImage->SetBrushFromTexture(Tex);
+    WeaponIconImage->SetBrushTintColor(FLinearColor::White);
+
+    LevelText->SetText(FText::AsNumber(Level));
+    LevelText->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 }
 
-void UWeaponSlotWidget::ClearWeaponSlotWidget() const
+void UWeaponSlotWidget::ClearWeaponSlot()
 {
+    if (WeaponIconImage)
+    {
+        WeaponIconImage->SetBrushFromTexture(nullptr);
+        WeaponIconImage->SetBrushTintColor(FLinearColor::Transparent);
+    }
+
+    if (LevelText)
+    {
+        LevelText->SetVisibility(ESlateVisibility::Hidden);
+    }
 }

@@ -4,9 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Data/WeaponDataStructs.h"
 #include "WeaponSlotWidget.generated.h"
 
-struct FInvenSlot;
+class UWeaponSystemComponent;
 /**
  * 
  */
@@ -17,13 +18,13 @@ class MEGABONKCLONE_API UWeaponSlotWidget : public UUserWidget
 
 public:
 	//이 위젯이 보여줄 데이터 세팅
-	void InitializeSlot(int32 InIndex, FInvenSlot* InSlotData);
+	void InitializeWeaponSlot(FName InWeaponID, int32 InLevel, UWeaponSystemComponent* InWeapon);
 
 	//설정된 데이터 기반해 위젯에 표시하는 내용 갱신
-	void RefreshWeaponSlot() const;
+	void RefreshWeaponSlot();
 
 protected:
-	void ClearWeaponSlotWidget() const;
+	void ClearWeaponSlot();
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI|WeaponSlot", meta = (BindWidget))
@@ -33,7 +34,9 @@ protected:
 	TObjectPtr<class UTextBlock> LevelText = nullptr;
 
 private:
-	int32 Index = -1;
-	FInvenSlot* SlotData = nullptr;
+	FName WeaponID = NAME_None;
+	int32 Level = 1;
 
+	UPROPERTY()
+	TWeakObjectPtr<UWeaponSystemComponent> TargetWeaponInventory;
 };
