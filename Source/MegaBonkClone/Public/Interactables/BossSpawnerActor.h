@@ -21,22 +21,28 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	// 상호작용 인터페이스 구현
 	virtual void Interact_Implementation(AActor* PlayerActor) override;
 
-	UFUNCTION(BlueprintCallable)
-	void OnBossClear();
 private:
+	// 보스가 다처치되었을 실행될 함수
+	UFUNCTION()
+	void OnBossClear();
+
+	// 보스를 파라미터의 값만큼 소환하는 함수
 	void SpawnBosses(int32 Amount);
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	USceneComponent* Root;
 
-	// 전자레인지 외형
+	// 보스 스포너 외형
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UStaticMeshComponent> BossSpawnerMesh;
 
+	// 게임 스테이트 베이스 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<class AMegaBonkGameState> GameState = nullptr;
 private:
+	// 현재 보스 스포너의 상태 
 	EAltarState CurrentState = EAltarState::ReadyToSummon;
 };
