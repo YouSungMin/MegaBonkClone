@@ -4,8 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Data/ItemDataStructs.h"
 #include "ItemSlotWidget.generated.h"
 
+class UInventoryComponent;
 /**
  * 
  */
@@ -16,16 +18,21 @@ class MEGABONKCLONE_API UItemSlotWidget : public UUserWidget
 
 public:
 	//위젯데이터 세팅
-	//void InitializeItemSlot(int32 Int32 , struct int32 InSlotData);
-
+	void InitializeItemSlot(FName InItemID, int32 InQuantity, UInventoryComponent* InInventory);
 	//설정된 데이터 기반으로 위젯내용 갱신
-	void RefreshItemSlotWidget();
+	void RefreshItemSlot() const;
+
+protected:
+	void ClearItemSlot() const;
 
 protected:
 	UPROPERTY(BlueprintReadOnly, Category = "UI|Inventory", meta = (BindWidget))
 	TObjectPtr<class UImage> ItemIconImage;
 
 	UPROPERTY(BlueprintReadOnly, Category = "UI|Inventory", meta = (BindWidget))
-	TObjectPtr<class UTextBlock> LevelText;
+	TObjectPtr<class UTextBlock> CountText;
+
+private:
+	int32 Index = -1;
 
 };

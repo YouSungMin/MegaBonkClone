@@ -19,6 +19,7 @@ public:
 	virtual void NativeConstruct() override;
 
 	void InitializeInventoryWidget(class UInventoryComponent* InventoryComponent);
+	void RefreshInventoryWidget();
 	void ClearInventoryWidget();
 
 	UPROPERTY(BlueprintAssignable, Category = "UI|Inventory")
@@ -32,10 +33,17 @@ protected:
 	//UPROPERTY(meta = (BindWIdget))
 	//TObjectPtr<class UButton> CloseButton = nullptr;
 
-	UPROPERTY(meta = (BindWIdget))
+	UPROPERTY(BlueprintReadOnly,meta = (BindWidget))
 	TObjectPtr<class UUniformGridPanel> ItemSlotGridPanel = nullptr;
+
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
+	TObjectPtr<class UItemSlotWidget> DetailInfoPanel = nullptr;
+
 private:
 	UPROPERTY()
 	TWeakObjectPtr<UInventoryComponent> TargetInventory = nullptr;
+
+
+	TArray<TObjectPtr<class UItemSlotWidget>> ItemSlotWidgets;
 
 };

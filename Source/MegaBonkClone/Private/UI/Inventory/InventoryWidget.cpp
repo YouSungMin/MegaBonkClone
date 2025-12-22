@@ -45,6 +45,14 @@ void UInventoryWidget::InitializeInventoryWidget(UInventoryComponent* InventoryC
 	}
 }
 
+void UInventoryWidget::RefreshInventoryWidget()
+{
+	//for (const UItemSlotWidget* slot : ItemsSlotWidgets)
+	//{
+	//	slot->RefreshSlot();
+	//}
+}
+
 void UInventoryWidget::ClearInventoryWidget()
 {
 	TargetInventory = nullptr;

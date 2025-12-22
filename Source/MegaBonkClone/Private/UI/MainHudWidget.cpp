@@ -38,6 +38,8 @@ void UMainHudWidget::NativeConstruct()
 
 void UMainHudWidget::OpenPanels()
 {
+	InventoryPanel->RefreshInventoryWidget();
+
 	InventoryPanel->SetVisibility(ESlateVisibility::Visible);	//인벤토리 패널 보이기
 	PlayerStatsPanel->SetVisibility(ESlateVisibility::Visible);	//플레이어스탯 패널 보이기
 
