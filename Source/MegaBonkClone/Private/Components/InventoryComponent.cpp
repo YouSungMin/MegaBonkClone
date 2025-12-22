@@ -383,7 +383,7 @@ void UInventoryComponent::ExecuteProcEffect(const FItemProcData& Proc, int32 Sta
 			if (SpawnClass)
 			{
 				// 소환 위치 결정 (타겟이 있으면 타겟 위치, 없으면 내 위치)
-				FVector SpawnLoc = OwnerActor->GetActorLocation();
+				FVector SpawnLoc = OwnerActor->GetActorLocation() - FVector(0.0f, 0.0f, 75.0f);
 				// 예: 번개는 타겟 머리 위, 지뢰는 내 발밑 등 기획에 따라 분기 필요
 				UE_LOG(LogTemp, Log, TEXT("소환"));
 				GetWorld()->SpawnActor<AActor>(SpawnClass, SpawnLoc, FRotator::ZeroRotator);
@@ -412,7 +412,7 @@ void UInventoryComponent::ExecuteProcEffect(const FItemProcData& Proc, int32 Sta
 			Proc.Radius, // 범위
 			UDamageType::StaticClass(),
 			TArray<AActor*>(), // 무시할 액터
-			OwnerActor // 가해자
+			OwnerActor 
 		);
 		// 파티클/사운드 재생 로직 추가
 	}
@@ -422,7 +422,7 @@ void UInventoryComponent::ExecuteProcEffect(const FItemProcData& Proc, int32 Sta
 		// 반사: 맞았을 때(OnTakeDamage) 들어온 TriggerValue(데미지) 만큼 되돌려줌
 		if (TargetActor && TriggerValue > 0.0f)
 		{
-			// 받은 데미지의 N% 반사 or 고정값 반사 (기획에 따라 TotalValue 활용)
+			// 받은 데미지의 N% 반사 or 고정값 반사
 			float ReflectDmg = TriggerValue * (TotalValue / 100.0f);
 			UGameplayStatics::ApplyDamage(TargetActor, ReflectDmg, OwnerActor->GetInstigatorController(), OwnerActor, UDamageType::StaticClass());
 		}
