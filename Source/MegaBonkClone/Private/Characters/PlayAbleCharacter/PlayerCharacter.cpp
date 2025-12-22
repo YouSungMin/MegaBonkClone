@@ -87,6 +87,10 @@ void APlayerCharacter::BeginPlay()
 		DeathTimelineComp->AddInterpFloat(DeathCurve, ProgressFunction);    // 커브 연결
 		DeathTimelineComp->SetLooping(false);
 		DeathTimelineComp->SetIgnoreTimeDilation(true); // 시간 정지(Stopwatch) 스킬 써도 죽는 건 정상 속도로
+
+		FOnTimelineEvent TimelineFinished;
+		TimelineFinished.BindUFunction(this, FName("OnDeathTimelineFinished"));
+		DeathTimelineComp->SetTimelineFinishedFunc(TimelineFinished);
 	}
 	
 	OnActorBeginOverlap.AddDynamic(this, &APlayerCharacter::OnPickupOverlap);
@@ -139,8 +143,16 @@ void APlayerCharacter::HandleDeathProgress(float Value)
 	if (GlobalEffectMPC)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("SetScalarParameterValue : %f"), UKismetMaterialLibrary::GetScalarParameterValue(GetWorld(), GlobalEffectMPC,FName("FadeAlpha")));
-		UKismetMaterialLibrary::SetScalarParameterValue(GetWorld(), GlobalEffectMPC, FName("FadeAlpha"), Value);
+
+		float Radius = FMath::Lerp(0.0f, 1.0f, Value);
+		UKismetMaterialLibrary::SetScalarParameterValue(GetWorld(), GlobalEffectMPC, FName("FadeAlpha"), Radius);
 	}
+
+}
+
+void APlayerCharacter::OnDeathTimelineFinished()
+{
+	UE_LOG(LogTemp, Warning, TEXT("죽음 UI 실행"));
 }
 
 // Called to bind functionality to input

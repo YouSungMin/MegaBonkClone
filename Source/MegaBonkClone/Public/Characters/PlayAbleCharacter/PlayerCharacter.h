@@ -93,9 +93,10 @@ protected:
 	void OnJumpInput(const FInputActionValue& InValue);
 	UFUNCTION()
 	void HandleDeathProgress(float Value);
-	
-	/*UFUNCTION()
-	void */
+
+	UFUNCTION()
+	void OnDeathTimelineFinished();
+
 private:
 	// 시간정지 타이머 종료 시 실행
 	void OnStopwatchEnd(); 
