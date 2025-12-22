@@ -67,17 +67,6 @@ public:
 	UFUNCTION()
 	void OnPickupOverlap(AActor* OverlappedActor, AActor* OtherActor);
 
-	UFUNCTION()
-	virtual void NotifyHit(
-		class UPrimitiveComponent* MyComp,
-		AActor* Other,
-		class UPrimitiveComponent* OtherComp,
-		bool bSelfMoved,
-		FVector HitLocation,
-		FVector HitNormal,
-		FVector NormalImpulse,
-		const FHitResult& Hit
-	) override;
 	//데미지 처리 함수
 	UFUNCTION()
 	virtual float TakeDamage(
@@ -99,9 +88,13 @@ protected:
 	void OnJumpInput(const FInputActionValue& InValue);
 	UFUNCTION()
 	void HandleDeathProgress(float Value);
-	
-	/*UFUNCTION()
-	void */
+
+	UFUNCTION()
+	void OnDeathTimelineFinished();
+
+	UFUNCTION()
+	void ResetHitFlash();
+
 private:
 	// 시간정지 타이머 종료 시 실행
 	void OnStopwatchEnd(); 
@@ -122,6 +115,10 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Player|Combat")
 	TObjectPtr<class UCurveFloat> DeathCurve;
 
+	//다이나믹 마테리얼 (피격용)
+	UPROPERTY()
+	TArray<class UMaterialInstanceDynamic*> MeshDMIs;
+
 
 	//입력 액션
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player|Input")
@@ -133,6 +130,10 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player|Input")
 	TObjectPtr<class UInputAction> IA_Interact = nullptr;
+
+	//화면 연출 MPC
+	UPROPERTY(EditDefaultsOnly, Category = "Effects")
+	TObjectPtr<class UMaterialParameterCollection> GlobalEffectMPC;
 
 
 	//컴포넌트들 
@@ -163,6 +164,10 @@ private:
 
 	// 시간 정지 타이머핸들러
 	FTimerHandle StopwatchTimerHandle;
+
+
+	//타이머 관리용 핸들
+	FTimerHandle HitFlashTimerHandle;
 
 	FRotator DeathStartRot;
 	FRotator DeathEndRot;

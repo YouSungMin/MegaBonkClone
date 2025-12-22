@@ -18,6 +18,9 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "InputActionValue.h"
 #include "Items/PickupItem/ResourcePickup.h"
+#include "Kismet/KismetMaterialLibrary.h"
+#include "Materials/MaterialParameterCollection.h"
+#include "Materials/MaterialInstanceDynamic.h"
 #include <Kismet/GameplayStatics.h>
 
 // Sets default values
@@ -63,8 +66,8 @@ void APlayerCharacter::InitializeCharacterComponents()
 	GetCharacterMovement()->SetWalkableFloorAngle(46.0f);
 
 	DeathTimelineComp = CreateDefaultSubobject<UTimelineComponent>(TEXT("DeathTimelineComp"));
-	//점프횟수 조절가능
-	//JumpMaxCount = 2;
+	
+	
 }
 
 
@@ -85,6 +88,10 @@ void APlayerCharacter::BeginPlay()
 		DeathTimelineComp->AddInterpFloat(DeathCurve, ProgressFunction);    // 커브 연결
 		DeathTimelineComp->SetLooping(false);
 		DeathTimelineComp->SetIgnoreTimeDilation(true); // 시간 정지(Stopwatch) 스킬 써도 죽는 건 정상 속도로
+
+		FOnTimelineEvent TimelineFinished;
+		TimelineFinished.BindUFunction(this, FName("OnDeathTimelineFinished"));
+		DeathTimelineComp->SetTimelineFinishedFunc(TimelineFinished);
 	}
 	
 	OnActorBeginOverlap.AddDynamic(this, &APlayerCharacter::OnPickupOverlap);
@@ -106,6 +113,18 @@ void APlayerCharacter::BeginPlay()
 			WeaponComponent->AddWeapon(rowData->BaseWeapon.LoadSynchronous());
 		}
 		
+	}
+	if (GetMesh())
+	{
+		int32 MaterialCount = GetMesh()->GetNumMaterials();
+		for (int32 i = 0; i < MaterialCount; i++)
+		{
+			UMaterialInstanceDynamic* DMI = GetMesh()->CreateDynamicMaterialInstance(i);
+			if (DMI)
+			{
+				MeshDMIs.Add(DMI);
+			}
+		}
 	}
 
 }
@@ -132,8 +151,33 @@ void APlayerCharacter::OnJumpInput(const FInputActionValue& InValue)
 void APlayerCharacter::HandleDeathProgress(float Value)
 {
 	FRotator NewRot = FMath::Lerp(DeathStartRot, DeathEndRot, Value);
-	UE_LOG(LogTemp, Warning, TEXT("NewRot : %s"), *NewRot.ToString());
 	SetActorRotation(NewRot);
+
+	if (GlobalEffectMPC)
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("SetScalarParameterValue : %f"), UKismetMaterialLibrary::GetScalarParameterValue(GetWorld(), GlobalEffectMPC,FName("FadeAlpha")));
+
+		float Radius = FMath::Lerp(0.0f, 1.0f, Value);
+		UKismetMaterialLibrary::SetScalarParameterValue(GetWorld(), GlobalEffectMPC, FName("FadeAlpha"), Radius);
+	}
+
+}
+
+void APlayerCharacter::OnDeathTimelineFinished()
+{
+	UE_LOG(LogTemp, Warning, TEXT("죽음 UI 실행"));
+}
+
+void APlayerCharacter::ResetHitFlash()
+{
+	for (auto* DMI : MeshDMIs)
+	{
+		if (DMI)
+		{
+			// 밝기를 0으로 돌려놓음
+			DMI->SetScalarParameterValue(FName("HitAlpha"), 0.0f);
+		}
+	}
 }
 
 // Called to bind functionality to input
@@ -348,14 +392,6 @@ void APlayerCharacter::OnPickupOverlap(AActor* OverlappedActor, AActor* OtherAct
 	
 }
 
-void APlayerCharacter::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit)
-{
-	if (Other && Other->ActorHasTag("Enemy")) {
-		//충돌 데미지 처리
-		//UE_LOG(LogTemp, Warning, TEXT("히트 성공 : %s"), *Other->GetName());
-	}
-	
-}
 
 float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
@@ -373,8 +409,31 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 		InventoryComponent->ProcessProcTrigger(EProcTriggerType::OnTakeDamage, DamageCauser, finalTakeDamage);
 	}
 
-	StatusComponent2->AddCurrentHP(-finalTakeDamage);
-	UE_LOG(LogTemp, Warning, TEXT("%.1f / %.1f"), StatusComponent2->GetCurrentHP(), StatusComponent2->GetResultMaxHP());
+
+	if (finalTakeDamage > 0.0f) {
+		StatusComponent2->AddCurrentHP(-finalTakeDamage);
+
+		for (auto* DMI : MeshDMIs)
+		{
+			if (DMI)
+			{
+				//UE_LOG(LogTemp, Warning, TEXT("DMI"));
+				// 색상을 빨간색으로 설정 (Red)
+				DMI->SetVectorParameterValue(FName("HitColor"), FLinearColor::Red);
+				// 밝기를 1로 설정
+				DMI->SetScalarParameterValue(FName("HitAlpha"), 1.0f);
+			}
+		}
+
+		//기존 타이머 초기화 (연타 맞았을 때 깜빡임 끊기지 않게)
+		GetWorldTimerManager().ClearTimer(HitFlashTimerHandle);
+
+		//ResetHitFlash 함수 (다시 돌리기)
+		GetWorldTimerManager().SetTimer(HitFlashTimerHandle, this, &APlayerCharacter::ResetHitFlash, 0.2f, false);
+
+		UE_LOG(LogTemp, Warning, TEXT("%.1f / %.1f"), StatusComponent2->GetCurrentHP(), StatusComponent2->GetResultMaxHP());
+	}
+	
 
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	return finalTakeDamage;
