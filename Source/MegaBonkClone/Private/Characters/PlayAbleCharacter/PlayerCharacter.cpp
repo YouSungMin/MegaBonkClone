@@ -18,6 +18,8 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "InputActionValue.h"
 #include "Items/PickupItem/ResourcePickup.h"
+#include "Kismet/KismetMaterialLibrary.h"
+#include "Materials/MaterialParameterCollection.h"
 #include <Kismet/GameplayStatics.h>
 
 // Sets default values
@@ -132,8 +134,13 @@ void APlayerCharacter::OnJumpInput(const FInputActionValue& InValue)
 void APlayerCharacter::HandleDeathProgress(float Value)
 {
 	FRotator NewRot = FMath::Lerp(DeathStartRot, DeathEndRot, Value);
-	UE_LOG(LogTemp, Warning, TEXT("NewRot : %s"), *NewRot.ToString());
 	SetActorRotation(NewRot);
+
+	if (GlobalEffectMPC)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("SetScalarParameterValue : %f"), UKismetMaterialLibrary::GetScalarParameterValue(GetWorld(), GlobalEffectMPC,FName("FadeAlpha")));
+		UKismetMaterialLibrary::SetScalarParameterValue(GetWorld(), GlobalEffectMPC, FName("FadeAlpha"), Value);
+	}
 }
 
 // Called to bind functionality to input

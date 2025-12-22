@@ -128,6 +128,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player|Input")
 	TObjectPtr<class UInputAction> IA_Interact = nullptr;
 
+	//화면 연출 MPC
+	UPROPERTY(EditDefaultsOnly, Category = "Effects")
+	TObjectPtr<class UMaterialParameterCollection> GlobalEffectMPC;
+
 
 	//컴포넌트들 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player|Components")
