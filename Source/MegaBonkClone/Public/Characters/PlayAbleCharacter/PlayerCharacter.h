@@ -56,6 +56,12 @@ public:
 	//스테이터스 GETTER 함수
 	UFUNCTION(BlueprintCallable)
 	inline UStatusComponent* GetStatusComponent() { return StatusComponent2; }
+	//무기 시스템 컴포넌트 GETTER 함수
+	UFUNCTION(BlueprintCallable)
+	inline UWeaponSystemComponent* GetWeaponComponent() { return WeaponComponent; }
+	//인벤토리 컴포넌트 GETTER 함수
+	UFUNCTION(BlueprintCallable)
+	inline UInventoryComponent* GetInventoryComponent() { return InventoryComponent; }
 
 	//오브젝트에 오버랩 되었을때 실행할 함수
 	UFUNCTION()

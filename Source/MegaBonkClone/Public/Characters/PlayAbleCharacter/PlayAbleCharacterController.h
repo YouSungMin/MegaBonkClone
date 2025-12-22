@@ -19,6 +19,9 @@ class MEGABONKCLONE_API APlayAbleCharacterController : public APlayerController
 protected:
 
 	virtual void BeginPlay() override;
+	//포세스 될 때 실행할 함수
+	virtual void OnPossess(APawn* InPawn) override;
+	virtual void OnUnPossess() override;	
 
 	//카메라 이동 입력 받으면 실행할 함수
 	UFUNCTION()
@@ -32,7 +35,7 @@ public:
 	void ClosePanels();
 
 	//메인 HUD 위젯 세터
-	inline void InitializeMainHudWidget(UMainHudWidget* Widget) { MainHudWidget = Widget; }
+	inline void InitializeMainHudWidget(UMainHudWidget* InWidget);
 
 
 private:
@@ -54,5 +57,7 @@ protected:
 
 private:
 	TWeakObjectPtr<UMainHudWidget> MainHudWidget = nullptr;
+	TWeakObjectPtr<UInventoryWidget> InventoryWidget = nullptr;
+	TWeakObjectPtr<class UInventoryComponent> InventoryComponent = nullptr;
 
 };
