@@ -53,6 +53,11 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnItemUpdate OnItemAdd;
 	void ProcessProcTrigger(EProcTriggerType Trigger, AActor* TargetActor = nullptr, float TriggerValue = 0.0f);
+
+	// 일반 아이템 슬롯 정보 반환
+	UFUNCTION(BlueprintPure, Category = "Inventory|Items")
+	const TArray<FInventorySlot>& GetGeneralItemSlots() const { return GeneralItems; }
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -84,4 +89,5 @@ private:
 	const int32 MaxSecretBookCount = 3;
 
 	TObjectPtr<class UStatusComponent> CachedStatusComponent = nullptr;
+
 };

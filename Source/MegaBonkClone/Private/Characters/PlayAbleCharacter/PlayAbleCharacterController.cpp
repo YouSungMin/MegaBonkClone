@@ -5,6 +5,8 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
+#include "Components/InventoryComponent.h"
+#include "Characters/PlayAbleCharacter/PlayerCharacter.h"
 
 void APlayAbleCharacterController::BeginPlay()
 {
@@ -16,6 +18,31 @@ void APlayAbleCharacterController::BeginPlay()
 		subsystem->AddMappingContext(DefaultInputMappingContext, 0);
 		//UE_LOG(LogTemp, Warning, TEXT("AddMappingContext 완료"));
 	}
+}
+
+void APlayAbleCharacterController::OnPossess(APawn* InPawn)
+{
+	Super::OnPossess(InPawn);	//폰에서 인벤토리 가져오기
+
+	APlayerCharacter* player = Cast<APlayerCharacter>(InPawn);
+	if (player)
+	{
+		InventoryComponent = player->GetInventoryComponent();
+		if (InventoryWidget.IsValid())
+		{
+		InventoryWidget->InitializeInventoryWidget(InventoryComponent.Get());
+		}
+	}
+}
+
+void APlayAbleCharacterController::OnUnPossess()
+{
+	if (InventoryWidget.IsValid())
+	{
+	InventoryWidget->ClearInventoryWidget();
+	}
+	InventoryComponent = nullptr;
+	Super::OnUnPossess();
 }
 
 void APlayAbleCharacterController::OnCameraLookInput(const FInputActionValue& InValue)
@@ -77,6 +104,22 @@ void APlayAbleCharacterController::ClosePanels()
 		bShowMouseCursor = false; //마우스 커서 보이기
 
 		MainHudWidget->ClosePanels();
+	}
+}
+
+inline void APlayAbleCharacterController::InitializeMainHudWidget(UMainHudWidget* InWidget)
+{
+	if (InWidget)
+	{
+		MainHudWidget = InWidget;
+
+		InventoryWidget = MainHudWidget->GetInventoryWidget();
+		if (InventoryWidget.IsValid())	//Possess보다 타이밍이 늦다.
+		{
+		InventoryWidget->InitializeInventoryWidget(InventoryComponent.Get());
+
+		}
+
 	}
 }
 

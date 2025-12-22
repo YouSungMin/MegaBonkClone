@@ -18,6 +18,9 @@ class MEGABONKCLONE_API UInventoryWidget : public UUserWidget
 public:
 	virtual void NativeConstruct() override;
 
+	void InitializeInventoryWidget(class UInventoryComponent* InventoryComponent);
+	void ClearInventoryWidget();
+
 	UPROPERTY(BlueprintAssignable, Category = "UI|Inventory")
 	FOnInventoryCloseRequested OnInventoryCloseRequested;
 
@@ -28,5 +31,11 @@ private:
 protected:
 	//UPROPERTY(meta = (BindWIdget))
 	//TObjectPtr<class UButton> CloseButton = nullptr;
+
+	UPROPERTY(meta = (BindWIdget))
+	TObjectPtr<class UUniformGridPanel> ItemSlotGridPanel = nullptr;
+private:
+	UPROPERTY()
+	TWeakObjectPtr<UInventoryComponent> TargetInventory = nullptr;
 
 };

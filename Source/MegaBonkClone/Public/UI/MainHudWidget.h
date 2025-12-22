@@ -35,6 +35,7 @@ public:
 
 	//인벤토리 열림 상태 GETTER
 	inline EOpenState GetOpenState() const { return OpenState; }
+	inline UInventoryWidget* GetInventoryWidget() const { return InventoryPanel; }
 	
 
 protected:
