@@ -20,7 +20,7 @@ public:
 	FName WeaponID;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 Level = 1;
+	int32 Level = 0;
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -65,10 +65,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon|Slots")
 	TArray<FWeaponSlot> WeaponSlots;
 
-	// 무기 클래스 -> DT RowName 매핑
-	UPROPERTY(EditDefaultsOnly, Category = "Weapon|Data")
-	TMap<TSubclassOf<AActor>, FName> WeaponClassToID;
-
+	//BP_무기클래스 이름 -> DTRow로 변환함 
 	FName ResolveWeaponIDFromClass(TSubclassOf<AActor> InWeapon) const;
 
 private:

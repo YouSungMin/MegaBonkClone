@@ -58,11 +58,21 @@ void UInGameWeaponBarWidget::InitializeInventoryWidget(UWeaponSystemComponent* W
 	TargetWeaponInventory->OnWeaponChanged.AddDynamic(this, &UInGameWeaponBarWidget::HandleWeaponChanged);
 
 	RefreshInventoryWidget();
+
+
+	UE_LOG(LogTemp, Warning, TEXT("[WeaponBar] Grid=%s CachedWidgets=%d"),
+		WeaponSlotGridPanel ? TEXT("OK") : TEXT("NULL"),
+		WeaponSlotWidgets.Num());
+
 }
 
 
 void UInGameWeaponBarWidget::RefreshInventoryWidget()
 {
+
+	UE_LOG(LogTemp, Warning, TEXT("[WeaponBar] Refresh called"));
+
+
 	if (!TargetWeaponInventory.IsValid())
 		return;
 
@@ -86,6 +96,10 @@ void UInGameWeaponBarWidget::RefreshInventoryWidget()
 			continue;
 
 		WeaponSlotWidgets[i]->InitializeWeaponSlot(S.WeaponID, S.Level, TargetWeaponInventory.Get());
+	
+		UE_LOG(LogTemp, Warning, TEXT("[WeaponBar] Slot[%d] ID=%s Lv=%d"),
+			i, *Slots[i].WeaponID.ToString(), Slots[i].Level);
+
 	}
 }
 
@@ -100,6 +114,8 @@ void UInGameWeaponBarWidget::ClearInventoryWidget()
 
 void UInGameWeaponBarWidget::HandleWeaponChanged()
 {
+	UE_LOG(LogTemp, Warning, TEXT("[WeaponBar] HandleWeaponChanged() CALLED"));
+
 	//전체리프레시
 	RefreshInventoryWidget();
 	UE_LOG(LogTemp, Warning, TEXT("델리게이트 발생"));
