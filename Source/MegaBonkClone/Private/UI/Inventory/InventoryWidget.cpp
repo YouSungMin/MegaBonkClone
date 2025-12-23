@@ -3,8 +3,15 @@
 
 #include "UI/Inventory/InventoryWidget.h"
 #include "UI/Inventory/ItemSlotWidget.h"
+#include "UI/Inventory/SecretBookSlotWidget.h"
+
+#include "UI/InGameWeaponBarWidget.h"              
+#include "Characters/Components/WeaponSystemComponent.h" 
+
 #include "Components/Button.h"
 #include "Components/UniformGridPanel.h"
+#include "Characters/PlayAbleCharacter/PlayerCharacter.h"
+
 
 #include "Components/InventoryComponent.h"
 
@@ -13,6 +20,7 @@ void UInventoryWidget::NativeConstruct()
 	Super::NativeConstruct();
 
 	ItemSlotWidgets.Reset();
+	SecretSlotWidgets.Reset();
 
 	const int32 ChildCount = ItemSlotGridPanel->GetChildrenCount();
 	for (int32 i = 0; i < ChildCount; ++i)
@@ -51,10 +59,29 @@ void UInventoryWidget::InitializeInventoryWidget(UInventoryComponent* InventoryC
 				ItemSlotWidgets.Add(SlotWidget);
 			}
 		}
+
 	}
+
 		//아이템 추가되면 갱신
+		TargetInventory->OnItemAdd.RemoveDynamic(this, &UInventoryWidget::HandleItemAdded);
 		TargetInventory->OnItemAdd.AddDynamic(this, &UInventoryWidget::HandleItemAdded);
 
+	if (WeaponBarWidget)
+	{
+		APlayerCharacter* player = Cast<APlayerCharacter>(GetOwningPlayerPawn());
+		if (player)
+		{
+			UWeaponSystemComponent* weaponSystemComponent = player->FindComponentByClass<UWeaponSystemComponent>();
+			if (weaponSystemComponent)
+			{
+				WeaponBarWidget->InitializeInventoryWidget(weaponSystemComponent);
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("InventoryWidget: WeaponSystemComponent not found on player"));
+			}
+		}
+	}
 		RefreshInventoryWidget();
 	}
 
@@ -104,4 +131,8 @@ void UInventoryWidget::HandleItemAdded(FName ItemID, const FItemData& ItemData)
 	//전체리프레시
 	RefreshInventoryWidget();
 	UE_LOG(LogTemp, Warning, TEXT("델리게이트 발생"));
+}
+
+void UInventoryWidget::HandleSecretAdded(FName ItemID, const FItemData& ItemData)
+{
 }

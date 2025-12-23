@@ -18,7 +18,9 @@ UWeaponSystemComponent::UWeaponSystemComponent()
 	PlayerWeapons.Empty();
 	PlayerWeapons.SetNum(MaxWeaponNum);
 
-	
+	//UI용
+	WeaponSlots.Empty();
+	WeaponSlots.SetNum(MaxWeaponNum);
 
 }
 
@@ -37,12 +39,20 @@ void UWeaponSystemComponent::AddWeapon(TSubclassOf<AActor> InWeapon)
 {
 	if (!InWeapon) return;
 
+	const FName WeaponID = ResolveWeaponIDFromClass(InWeapon);
+
 	for (int32 i = 0; i < PlayerWeapons.Num(); i++)
 	{
 		// 현재 슬롯이 비어있다면?
 		if (PlayerWeapons[i] == nullptr)
 		{
 			PlayerWeapons[i] = InWeapon;
+
+			WeaponSlots[i].WeaponID = ResolveWeaponIDFromClass(InWeapon); 
+			WeaponSlots[i].Level = 1;
+
+			OnWeaponChanged.Broadcast();
+
 			UE_LOG(LogWeapon, Log, TEXT("무기 장착 성공: 슬롯 %d"), i);
 			EquipWeapon();
 			return;
@@ -50,7 +60,6 @@ void UWeaponSystemComponent::AddWeapon(TSubclassOf<AActor> InWeapon)
 	}
 
 	UE_LOG(LogWeapon, Warning, TEXT("무기 슬롯이 가득 찼습니다! (추가 실패)"));
-	OnWeaponChanged.Broadcast();
 }
 
 FWeaponData* UWeaponSystemComponent::GetWeaponInfo(FName WeaponID) const
@@ -74,6 +83,18 @@ void UWeaponSystemComponent::BeginPlay()
 
 	// ...
 
+}
+
+FName UWeaponSystemComponent::ResolveWeaponIDFromClass(TSubclassOf<AActor> InWeapon) const
+{
+	if (!InWeapon) return NAME_None;
+
+	if (const FName* FoundID = WeaponClassToID.Find(InWeapon))
+	{
+		return *FoundID;
+	}
+
+	return NAME_None;
 }
 
 

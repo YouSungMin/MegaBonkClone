@@ -36,6 +36,11 @@ private:
 	UFUNCTION()
 	void HandleItemAdded(FName ItemID, const FItemData& ItemData);
 
+	UFUNCTION()
+	void HandleSecretAdded(FName ItemID, const FItemData& ItemData);
+
+
+	//�ݱ��ư����
 	//�ݱ��ư����
 	/*UFUNCTION()
 	void OnCloseInventoryClicked();*/
@@ -47,6 +52,13 @@ protected:
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget), Category = "UI|Inventory|Items")
 	TObjectPtr<class UUniformGridPanel> ItemSlotGridPanel = nullptr;
 
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidget), Category = "UI|Inventory|Items")
+	TObjectPtr<class UUniformGridPanel> SecretSlotGridPanel = nullptr;
+
+
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidget), Category = "UI|Inventory|Weapon")
+	TObjectPtr<class UInGameWeaponBarWidget> WeaponBarWidget = nullptr;
+
 private:
 	UPROPERTY()
 	TWeakObjectPtr<UInventoryComponent> TargetInventory = nullptr;
@@ -54,5 +66,10 @@ private:
 	//NativeConstruct���� �׸����г� 8�� ���� ĳ��
 	UPROPERTY()
 	TArray<TObjectPtr<class UItemSlotWidget>> ItemSlotWidgets;
+
+
+	//NativeConstruct���� �������г� ĳ��
+	UPROPERTY()
+	TArray<TObjectPtr<class UItemSlotWidget>> SecretSlotWidgets;
 
 };

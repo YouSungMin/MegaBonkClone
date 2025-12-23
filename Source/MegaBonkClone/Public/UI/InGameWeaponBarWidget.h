@@ -19,7 +19,7 @@ public:
 	virtual void NativeConstruct() override;
 
 	//외부 인벤토리 컴포넌트 주입
-	void InitializeInventoryWidget(UWeaponSystemComponent* WepaonSystemComponent);
+	void InitializeInventoryWidget(UWeaponSystemComponent* WeaponSystemComponent);
 
 	//현재 인벤토리로 UI채우기
 	UFUNCTION()
@@ -32,7 +32,7 @@ public:
 private:
 	//아이템 추가시 이벤트 전체 리프레시
 	UFUNCTION()
-	void HandleItemAdded(FName WeaponID, const FWeaponData& WeaponData);
+	void HandleWeaponChanged();
 
 protected:
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget), Category = "UI|Inventory|Weapon")

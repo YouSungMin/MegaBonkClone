@@ -5,6 +5,7 @@
 #include "Characters/PlayAbleCharacter/PlayerCharacter.h"
 #include "Characters/Components/StatusComponent.h"
 #include "Components/InventoryComponent.h"
+#include "Characters/Components/WeaponSystemComponent.h"
 #include "UI/ResourceBarWidget.h"
 
 
@@ -41,6 +42,13 @@ void UMainHudWidget::NativeConstruct()
 				UE_LOG(LogTemp, Warning, TEXT("아이템바 확인"));
 			}
 
+		}
+		if(UWeaponSystemComponent* weaponSystemComponent = player->FindComponentByClass<UWeaponSystemComponent>())
+		{
+			if (WeaponBar)
+			{
+				WeaponBar->InitializeInventoryWidget(weaponSystemComponent);
+			}
 		}
 	}
 }
