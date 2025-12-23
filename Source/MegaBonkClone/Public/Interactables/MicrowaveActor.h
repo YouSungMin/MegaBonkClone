@@ -31,6 +31,22 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UStaticMeshComponent> MicrowaveMesh;
 
+	// 전자레인지 등급 텍스처들
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Textures")
+	UTexture2D* CommonTexture;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Textures")
+	UTexture2D* UncommonTexture;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Textures")
+	UTexture2D* RareTexture;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Textures")
+	UTexture2D* LegendaryTexture;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item Properties")
 	EItemGrade CurrentRarity;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Config")
+	TMap<EItemGrade, float> RarityDropRates;
 };

@@ -25,60 +25,81 @@ void AMicrowaveActor::BeginPlay()
 
 	if (MicrowaveMesh)
 	{
-		// 1. 다이내믹 머티리얼 인스턴스(DMI) 생성
+		// 다이내믹 머티리얼 인스턴스(DMI) 생성
 		UMaterialInstanceDynamic* DMI = MicrowaveMesh->CreateAndSetMaterialInstanceDynamic(0);
 
 		if (DMI)
 		{
-			// 1. 확률 계산 (총합 110)
-			int32 RandomChance = FMath::RandRange(1, 110);
-
-			// 2. 확률에 따라 등급(Rarity) 설정 (멤버 변수에 저장)
-			if (RandomChance <= 50)
+			// TMap 이 비어있으면 방어코드 실행
+			if (RarityDropRates.Num() == 0)
 			{
-				CurrentRarity = EItemGrade::Common; // 50 (1~50)
-			}
-			else if (RandomChance <= 80)
-			{
-				CurrentRarity = EItemGrade::UnCommon; // 30 (51~80)
-			}
-			else if (RandomChance <= 100)
-			{
-				CurrentRarity = EItemGrade::Rare; // 20 (81~100)
-			}
-			else
-			{
-				CurrentRarity = EItemGrade::Legendary; // 10 (101~110)
+				RarityDropRates.Add(EItemGrade::Common, 60.0f);
+				RarityDropRates.Add(EItemGrade::UnCommon, 30.0f);
+				RarityDropRates.Add(EItemGrade::Rare, 10.0f);
+				RarityDropRates.Add(EItemGrade::Legendary, 5.0f);
 			}
 
-			// 3. 결정된 등급에 따라 색상 적용
-			FLinearColor SelectedColor;
+			if (DMI)
+			{
+				// 전체 가중치 합계 계산
+				float TotalWeight = 0.0f;
+				for (const auto& Entry : RarityDropRates)
+				{
+					TotalWeight += Entry.Value;
+				}
+
+				// 0 ~ TotalWeight 사이의 랜덤 값 뽑기
+				float RandomValue = FMath::RandRange(0.0f, TotalWeight);
+
+				// 누적 가중치로 등급 결정
+				float CurrentWeightSum = 0.0f;
+
+				// 기본값 설정
+				CurrentRarity = EItemGrade::Common;
+
+				for (const auto& Entry : RarityDropRates)
+				{
+					CurrentWeightSum += Entry.Value;
+
+					// 랜덤 값이 현재 누적 범위 안에 들어오면 당첨
+					if (RandomValue <= CurrentWeightSum)
+					{
+						CurrentRarity = Entry.Key;
+						break; // 결정되었으므로 반복문 탈출
+					}
+				}
+
+			// 결정된 등급에 따라 색상 적용
+			UTexture2D* SelectedTexture = nullptr;
 
 			switch (CurrentRarity)
 			{
 			case EItemGrade::UnCommon:
-				SelectedColor = FLinearColor(0.0f, 0.2f, 1.0f); // 파랑
+				SelectedTexture = UncommonTexture;
 				break;
 
 			case EItemGrade::Rare:
-				SelectedColor = FLinearColor(1.0f, 0.0f, 0.6f);
+				SelectedTexture = RareTexture;
 				break;
 
 			case EItemGrade::Legendary:
-				SelectedColor = FLinearColor(1.0f, 0.9f, 0.1f); // 노랑
+				SelectedTexture = LegendaryTexture;
 				break;
 
 			case EItemGrade::Common:
 			default:
-				SelectedColor = FLinearColor(1.0f, 1.0f, 1.0f); // 기본(흰색)
+				SelectedTexture = CommonTexture;
 				break;
 			}
 
-			// 머티리얼 파라미터 변경
-			DMI->SetVectorParameterValue(FName("PaintColor"), SelectedColor);
-
+			// 텍스처가 유효하다면 머티리얼 파라미터 변경
+			if (SelectedTexture != nullptr)
+			{
+				DMI->SetTextureParameterValue(FName("DiffuseColorMap"), SelectedTexture);
+			}
 			// (디버깅용) 로그 출력
 			UE_LOG(LogTemp, Warning, TEXT("Item Rarity: %d"), (int32)CurrentRarity);
+			}
 		}
 	}
 }
