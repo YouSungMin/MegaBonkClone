@@ -5,6 +5,7 @@
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 
+#include "Data/WeaponDataStructs.h"
 #include "Characters/Components/WeaponSystemComponent.h"
 
 void UWeaponSlotWidget::InitializeWeaponSlot(FName InWeaponID, int32 InLevel, UWeaponSystemComponent* InWeapon)

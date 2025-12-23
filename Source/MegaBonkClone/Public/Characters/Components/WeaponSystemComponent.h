@@ -44,7 +44,7 @@ public:
 
 	//UI가 슬롯정보 접근할수있게 
 	UFUNCTION(BlueprintPure, Category = "Weapon")
-	const TArray<TSubclassOf<AActor>>& GetWeaponSlots() const { return PlayerWeapons; }
+	const TArray<FWeaponSlot>& GetWeaponSlots() const { return WeaponSlots; }
 
 	//바인딩
 	UPROPERTY(BlueprintAssignable)
@@ -60,6 +60,16 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "WeaponComponent|Weapons")
 	TArray<TSubclassOf<AActor>> PlayerWeapons;
+
+	//UI용 슬롯 배열 추가
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon|Slots")
+	TArray<FWeaponSlot> WeaponSlots;
+
+	// 무기 클래스 -> DT RowName 매핑
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon|Data")
+	TMap<TSubclassOf<AActor>, FName> WeaponClassToID;
+
+	FName ResolveWeaponIDFromClass(TSubclassOf<AActor> InWeapon) const;
 
 private:
 	//무기 슬롯 크기

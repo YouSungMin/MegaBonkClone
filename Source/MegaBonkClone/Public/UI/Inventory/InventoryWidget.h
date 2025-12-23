@@ -36,6 +36,10 @@ private:
 	UFUNCTION()
 	void HandleItemAdded(FName ItemID, const FItemData& ItemData);
 
+	UFUNCTION()
+	void HandleSecretAdded(FName ItemID, const FItemData& ItemData);
+
+
 	//닫기버튼사용시
 	/*UFUNCTION()
 	void OnCloseInventoryClicked();*/
@@ -47,6 +51,13 @@ protected:
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget), Category = "UI|Inventory|Items")
 	TObjectPtr<class UUniformGridPanel> ItemSlotGridPanel = nullptr;
 
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidget), Category = "UI|Inventory|Items")
+	TObjectPtr<class UUniformGridPanel> SecretSlotGridPanel = nullptr;
+
+
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidget), Category = "UI|Inventory|Weapon")
+	TObjectPtr<class UInGameWeaponBarWidget> WeaponBarWidget = nullptr;
+
 private:
 	UPROPERTY()
 	TWeakObjectPtr<UInventoryComponent> TargetInventory = nullptr;
@@ -54,5 +65,10 @@ private:
 	//NativeConstruct에서 그리드패널 8개 슬롯 캐싱
 	UPROPERTY()
 	TArray<TObjectPtr<class UItemSlotWidget>> ItemSlotWidgets;
+
+
+	//NativeConstruct에서 비전시패널 캐싱
+	UPROPERTY()
+	TArray<TObjectPtr<class UItemSlotWidget>> SecretSlotWidgets;
 
 };

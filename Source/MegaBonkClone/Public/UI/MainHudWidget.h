@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "UI/Inventory/InventoryWidget.h"
 #include "UI/InGameItemBarWidget.h"
+#include "UI/InGameWeaponBarWidget.h"
 #include "UI/PlayerStats/PlayerStatsWidget.h"
 #include "MainHudWidget.generated.h"
 
@@ -37,7 +38,8 @@ public:
 	//인벤토리 열림 상태 GETTER
 	inline EOpenState GetOpenState() const { return OpenState; }
 	inline UInventoryWidget* GetInventoryWidget() const { return InventoryPanel; }
-	inline UInGameItemBarWidget* GetItemBarWidget() const { return ItemBar;}
+	inline UInGameItemBarWidget* GetItemBarWidget() const { return ItemBar; }
+	inline UInGameWeaponBarWidget* GetWeaponBarWidget() const { return WeaponBar;}
 	
 
 protected:
@@ -55,6 +57,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item", meta = (BindWidget))
 	TObjectPtr<UInGameItemBarWidget> ItemBar = nullptr; //플레이어스탯 위젯
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon", meta = (BindWidget))
+	TObjectPtr<UInGameWeaponBarWidget> WeaponBar = nullptr; //플레이어스탯 위젯
 
 
 private:
