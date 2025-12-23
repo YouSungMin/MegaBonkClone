@@ -7,27 +7,48 @@
 
 #include "Components/InventoryComponent.h"
 
-//void UItemSlotWidget::InitializeItemSlot(int32 Int32 InIndex, struct int32 InSlotData)
-//{
-//	Index = InIndex;
-//	SlotData = InSlotData;
-//
-//	RefreshItemSlotWidget();
-//}
-
-//void UItemSlotWidget::InitializeItemSlot(int32 InIndex, int32 InSlotData)
-//{
-//    ItemID = InItemID;
-//    Quantity = InQuantity;
-//    TargetInventory = InInventory;
-//    RefreshItemSlot();
-//}
-
-void UItemSlotWidget::RefreshItemSlot() const
+void UItemSlotWidget::InitializeItemSlot(FName InItemID, int32 InQuantity, UInventoryComponent* InInventory)
 {
+    ItemID = InItemID;
+    Quantity = InQuantity;
+    TargetItemInventory = InInventory;
 
+    RefreshItemSlot();
 }
 
-void UItemSlotWidget::ClearItemSlot() const
+void UItemSlotWidget::RefreshItemSlot()
 {
+    if (!TargetItemInventory.IsValid() || ItemID.IsNone() || Quantity <= 0)
+    {
+        ClearItemSlot();
+        return;
+    }
+
+    FItemData* ItemInfo = TargetItemInventory->GetItemInfo(ItemID);
+    if (!ItemInfo)
+    {
+        ClearItemSlot();
+        return;
+    }
+
+    UTexture2D* Tex = ItemInfo->Icon.LoadSynchronous();
+    ItemIconImage->SetBrushFromTexture(Tex);
+    ItemIconImage->SetBrushTintColor(FLinearColor::White);
+
+    CountText->SetText(FText::AsNumber(Quantity));
+    CountText->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+}
+
+void UItemSlotWidget::ClearItemSlot()
+{
+    if (ItemIconImage)
+    {
+        ItemIconImage->SetBrushFromTexture(nullptr);
+        ItemIconImage->SetBrushTintColor(FLinearColor::Transparent);
+    }
+
+    if (CountText)
+    {
+        CountText->SetVisibility(ESlateVisibility::Hidden);
+    }
 }

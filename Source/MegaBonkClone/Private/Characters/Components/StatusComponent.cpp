@@ -725,6 +725,11 @@ void UStatusComponent::AddGold(float Amount)
 	CurrentGold += Amount * ResultGoldGain;
 	// (선택) 돈이 0보다 작아지지 않게 하려면: FMath::Max(0.0f, CurrentGold + Amount);
 	UE_LOG(LogTemp, Log, TEXT("골드 변경: %.0f -> 현재: %.0f"), Amount, CurrentGold);
+
+	if (OnGoldChanged.IsBound())
+	{
+		OnGoldChanged.Broadcast(CurrentGold);
+	}
 }
 
 void UStatusComponent::AddExp(float Amount)
@@ -753,6 +758,11 @@ void UStatusComponent::AddExp(float Amount)
 		UE_LOG(LogTemp, Warning, TEXT("★★★ [Exp] LEVEL UP! Lv.%d (Next Exp: %.1f) ★★★"), CurrentLevel, MaxExp);
 	}
 
+	if (OnStatExpChanged.IsBound())
+	{
+		OnStatExpChanged.Broadcast(CurrentExp,MaxExp); 
+	}
+
 	// 3. [Exp 관련] 레벨업 후처리
 	if (bLeveledUp)
 	{
@@ -761,12 +771,29 @@ void UStatusComponent::AddExp(float Amount)
 
 		//스탯 재계산 (레벨 비례 스탯이 있다면 필수)
 		UpdateCharacterStatus();
-
-		//레벨업 델리게이트 호출 (UI, 효과음 등)
-		// OnLevelUp.Broadcast(CurrentLevel);
+		if (OnLevelChanged.IsBound())
+		{
+			OnLevelChanged.Broadcast((float)CurrentLevel); // float로 변환해서 전달
+		}
+	}
+}
+void UStatusComponent::AddSilver(float Amount)
+{
+	CurrentSilver += Amount * ResultSilverGain;
+	if (OnSilverChanged.IsBound())
+	{
+		OnSilverChanged.Broadcast(CurrentSilver);
 	}
 }
 
+void UStatusComponent::AddKillCount(float Amount)
+{
+	KillCount += Amount;
+	if (OnKillCountChanged.IsBound())
+	{
+		OnKillCountChanged.Broadcast(KillCount);
+	}
+}
 
 
 
@@ -863,6 +890,7 @@ void UStatusComponent::AddShrineExtraJump(float Amount) { ShrineExtraJump += Amo
 void UStatusComponent::AddPlayerJumpPower(float Amount) { PlayerJumpPower += Amount; UpdateCharacterStatus(); }
 void UStatusComponent::AddVisionJumpPower(float Amount) { VisionJumpPower += Amount; UpdateCharacterStatus(); }
 void UStatusComponent::AddShrineJumpPower(float Amount) { ShrineJumpPower += Amount; UpdateCharacterStatus(); }
+
 
 // -----------------------------------------------------------------
 // [유틸리티 (Utility)]

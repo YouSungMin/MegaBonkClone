@@ -37,7 +37,6 @@ void UWeaponSystemComponent::AddWeapon(TSubclassOf<AActor> InWeapon)
 {
 	if (!InWeapon) return;
 
-
 	for (int32 i = 0; i < PlayerWeapons.Num(); i++)
 	{
 		// 현재 슬롯이 비어있다면?
@@ -50,9 +49,21 @@ void UWeaponSystemComponent::AddWeapon(TSubclassOf<AActor> InWeapon)
 		}
 	}
 
-
 	UE_LOG(LogWeapon, Warning, TEXT("무기 슬롯이 가득 찼습니다! (추가 실패)"));
+	OnWeaponChanged.Broadcast();
+}
+
+FWeaponData* UWeaponSystemComponent::GetWeaponInfo(FName WeaponID) const
+{
+	if (!WeaponDataTable)
+	{
+		UE_LOG(LogTemp, Error, TEXT("WeaponDataTable is not set in InventoryComponent!"));
+		return nullptr;
+	}
+	static const FString ContextString(TEXT("GetWeaponInfo"));
 	
+	return WeaponDataTable->FindRow<FWeaponData>(WeaponID, ContextString);
+
 }
 
 

@@ -26,12 +26,22 @@ void UMainHudWidget::NativeConstruct()
 			//ShieldBar->RefreshWidget(resource->)
 		}
 
-		//if (UInventoryComponent* inventoryComponent = player->GetInventoryComponent())
-		//{
-		//	Inventory->OnInventoryCloseRequested.AddDynamic(this, &UMainHudWidget::CloseInventory);
-
+		if (UInventoryComponent* inventoryComponent = player->GetInventoryComponent())
+		{
 			// 인벤토리컴포넌트의 내용을 바탕으로 InventoryWidget 채우기
-		//}
+			
+
+			//항상 떠있는 하단 아이템바
+			if (ItemBar)
+			{
+				ItemBar->InitializeInventoryWidget(inventoryComponent);  // 너가 만든 함수명 그대로
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("아이템바 확인"));
+			}
+
+		}
 	}
 }
 

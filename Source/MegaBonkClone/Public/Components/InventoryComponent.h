@@ -7,7 +7,9 @@
 #include "Data/WeaponDataStructs.h"
 #include "Data/ItemDataStructs.h"
 #include "InventoryComponent.generated.h"
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnItemUpdate, FName, ItemID, const FItemData&, ItemData);
+
 USTRUCT(BlueprintType)
 struct FInventorySlot
 {
@@ -52,6 +54,7 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnItemUpdate OnItemAdd;
+
 	void ProcessProcTrigger(EProcTriggerType Trigger, AActor* TargetActor = nullptr, float TriggerValue = 0.0f);
 
 	// 일반 아이템 슬롯 정보 반환
