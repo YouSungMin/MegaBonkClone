@@ -34,10 +34,10 @@ void AMainHUD::BeginPlay()
 	for (AActor* Actor : FoundActors)
 	{
 		// 이름으로 찾기 (혹은 태그로 찾는 게 더 안전합니다)
-		if (Actor && Actor->ActorHasTag("ChestStudio"))
+		if (Actor && Actor->ActorHasTag(TEXT("ChestStudio")))
 		{
 			CachedStudioActor = Actor;
-			UE_LOG(LogTemp, Log, TEXT("촬영용 스튜디오 액터 찾음: %s"), *Actor->GetName());
+			//UE_LOG(LogTemp, Warning, TEXT("촬영용 스튜디오 액터 찾음: %s"), *Actor->GetName());
 			break; 
 		}
 	}
