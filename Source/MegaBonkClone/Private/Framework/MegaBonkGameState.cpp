@@ -19,14 +19,43 @@ void AMegaBonkGameState::Tick(float DeltaTime)
 	// 1. 스테이지 타이머 진행
 	StageTimer += DeltaTime;
 
-	// 2. 웨이브 체크 및 스폰
-	CheckWaveLogic();
+	if (IsOvertime())
+	{
+		// 제한 시간 초과: 오버타임 로직 (다른 몬스터만 소환)
+		CheckOvertimeLogic();
+	}
+	else
+	{
+		// 제한 시간 이내: 기존 웨이브 로직 (데이터 테이블)
+		CheckWaveLogic();
+	}
+}
+
+bool AMegaBonkGameState::IsOvertime() const
+{
+	return StageTimer >= StageTimeLimit;
 }
 
 void AMegaBonkGameState::BeginPlay()
 {
 	Super::BeginPlay();
 	SpawnProps();
+}
+
+float AMegaBonkGameState::GetDisplayGameTime() const
+{
+	if (IsOvertime())
+	{
+		// 제한 시간 후: 0초부터 다시 증가 (누적 시간)
+		// 예: 현재 305초, 제한 300초 -> 5초 반환
+		return StageTimer - StageTimeLimit;
+	}
+	else
+	{
+		// 제한 시간 전: 남은 시간 카운트다운
+		// 예: 현재 10초, 제한 300초 -> 290초 반환
+		return StageTimeLimit - StageTimer;
+	}
 }
 
 void AMegaBonkGameState::OnBossDied()
@@ -53,18 +82,16 @@ void AMegaBonkGameState::CheckWaveLogic()
 {
 	if (!WaveDataTable) return;
 
-	// 데이터 테이블에서 현재 시간에 맞는 웨이브 정보 가져오기
+	// ... (기존 데이터 테이블 조회 코드 유지) ...
 	static const FString ContextString(TEXT("WaveContext"));
 	TArray<FStageWaveInfo*> AllRows;
 	WaveDataTable->GetAllRows<FStageWaveInfo>(ContextString, AllRows);
 
-	// 현재 활성화되어야 할 웨이브 찾기
 	for (FStageWaveInfo* Row : AllRows)
 	{
+		// [중요] 데이터 테이블의 시간과 현재 절대 시간 비교
 		if (StageTimer >= Row->StartTime && StageTimer < (Row->StartTime + Row->Duration))
 		{
-			// 스폰 간격 체크
-			// (실제 구현 시에는 각 웨이브별 쿨타임을 따로 관리해야 완벽하지만, 간단한 예시로 글로벌 쿨타임 사용)
 			if (GetWorld()->GetTimeSeconds() - LastSpawnTime >= Row->SpawnInterval)
 			{
 				for (int32 i = 0; i < Row->SpawnAmountPerInterval; i++)
@@ -74,6 +101,23 @@ void AMegaBonkGameState::CheckWaveLogic()
 				LastSpawnTime = GetWorld()->GetTimeSeconds();
 			}
 		}
+	}
+}
+
+void AMegaBonkGameState::CheckOvertimeLogic()
+{
+	// 오버타임 전용 몬스터가 설정되어 있지 않으면 리턴
+	if (!OvertimeEnemyClass) return;
+
+	// 오버타임 전용 쿨타임 체크
+	if (GetWorld()->GetTimeSeconds() - LastSpawnTime >= OvertimeSpawnInterval)
+	{
+		// 지정된 마릿수만큼 강력한 몬스터 소환
+		for (int32 i = 0; i < OvertimeSpawnAmount; i++)
+		{
+			SpawnEnemy(OvertimeEnemyClass);
+		}
+		LastSpawnTime = GetWorld()->GetTimeSeconds();
 	}
 }
 

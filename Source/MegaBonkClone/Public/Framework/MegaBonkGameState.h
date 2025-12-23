@@ -50,11 +50,20 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Boss Mechanics")
 	void OnBossDied();
 
+	// 제한 시간이 지났는지 확인하는 함수
+	UFUNCTION(BlueprintCallable, Category = "Stage")
+	bool IsOvertime() const;
+
+	// UI에 표시할 시간을 반환하는 함수 (자동으로 카운트다운/업 전환)
+	UFUNCTION(BlueprintCallable, Category = "Stage")
+	float GetDisplayGameTime() const;
+
 	UPROPERTY(BlueprintAssignable, Category = "Boss Mechanics")
 	FOnAllBossesDead OnAllBossesDead;
 
 private:
 	void CheckWaveLogic();
+	void CheckOvertimeLogic();  // 오버타임 웨이브 (고정 몹)
 	void SpawnEnemy(TSubclassOf<AActor> EnemyClass);
 
 	// 랜덤 위치 찾기 (NavMesh 사용)
@@ -88,10 +97,21 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Spawning")
 	int32 SanctuaryCount = 5; // 맵에 뿌릴 제단 개수
 
+	UPROPERTY(EditDefaultsOnly, Category = "Overtime")
+	TSubclassOf<AActor> OvertimeEnemyClass; // 예: 강력한 엘리트 몹
+
+	UPROPERTY(EditDefaultsOnly, Category = "Overtime")
+	float OvertimeSpawnInterval = 1.0f; // 소환 간격
+
+	UPROPERTY(EditDefaultsOnly, Category = "Overtime")
+	int32 OvertimeSpawnAmount = 5;
+
 	// [현재 상태]
 	UPROPERTY(BlueprintReadOnly, Category = "Stage")
 	float StageTimer = 0.0f;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Stage")
+	float StageTimeLimit = 600.0f;
 private:
 	
 

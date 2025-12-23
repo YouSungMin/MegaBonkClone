@@ -31,7 +31,7 @@ public:
 	void RefreshKillCountText(float InKillCount);
 
 	UFUNCTION()
-	void RefreshGameTimeText(float InMin, float InSec);
+	void RefreshGameTimeText(float InMin, float InSec, bool bIsOvertime = false);
 
 	UFUNCTION()
 	void RefreshLevelText(float InLevel);
@@ -76,5 +76,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Top|Detail", meta = (BindWidget))
 	TObjectPtr<class UProgressBar> ExpProgressbar = nullptr;
 	
-
+private:
+	UPROPERTY()
+	TObjectPtr<class AMegaBonkGameState> GameStateRef;
 };
