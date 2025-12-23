@@ -27,5 +27,8 @@ protected:
 	TSubclassOf<UMainHudWidget> MainWidgetClass = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI")
-	TObjectPtr<UMainHudWidget> MainWidgetInstance = nullptr;	
+	TObjectPtr<UMainHudWidget> MainWidgetInstance = nullptr;
+
+	UPROPERTY()
+	TObjectPtr<AActor> CachedStudioActor = nullptr;
 };

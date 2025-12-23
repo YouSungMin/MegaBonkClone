@@ -1,10 +1,12 @@
 #include "UI/ChestOpen.h"
 #include "Components/Image.h"
 #include "Components/Button.h"
+#include "Components/TextBlock.h"
 #include "TimerManager.h"
 #include "Kismet/GameplayStatics.h"
+#include "Data/ItemDataStructs.h"
 #include "Misc/OutputDeviceNull.h"
-// 1. 초기화
+//초기화
 void UChestOpen::NativeConstruct()
 {
 	Super::NativeConstruct();
@@ -13,58 +15,103 @@ void UChestOpen::NativeConstruct()
 	if (Btn_Claim)
 	{
 		Btn_Claim->OnClicked.AddDynamic(this, &UChestOpen::OnClaimClicked);
-
-		// 처음엔 버튼 숨기기 (연출 끝나고 보여주기 위해)
-		Btn_Claim->SetVisibility(ESlateVisibility::Hidden);
 	}
 
 	if (Btn_Decline)
 	{
 		Btn_Decline->OnClicked.AddDynamic(this, &UChestOpen::OnDeclineClicked);
-
-		// 처음엔 버튼 숨기기 (연출 끝나고 보여주기 위해)
-		Btn_Decline->SetVisibility(ESlateVisibility::Hidden);
 	}
 
 	if (Btn_OpenChest)
 	{
-		Btn_OpenChest->OnClicked.AddDynamic(this, &UChestOpen::OnOpenChestClicked);
-
-		// 처음엔 버튼 숨기기 (연출 끝나고 보여주기 위해)
-		Btn_OpenChest->SetVisibility(ESlateVisibility::Hidden);
+		Btn_OpenChest->OnClicked.AddDynamic(this, &UChestOpen::OnOpenChestClicked);;
 	}
 
-	// 아이템 아이콘도 처음엔 숨김
-	if (ItemIcon)
-	{
-		ItemIcon->SetVisibility(ESlateVisibility::Hidden);
-	}
+
 }
 
-// 2. 외부 호출: 연출 시작
-void UChestOpen::PlayLootSequence(UTexture2D* NewItemIcon)
+//외부 호출: 연출 시작
+void UChestOpen::PlayLootSequence(const FItemData& InRowData)
 {
-	// 1) 아이콘 이미지 세팅
-	if (ItemIcon && NewItemIcon)
+	//열기 버튼만 보이기
+	if (Btn_OpenChest) Btn_OpenChest->SetVisibility(ESlateVisibility::Visible); 
+	//이아래는 숨기기
+	if (Btn_Claim) Btn_Claim->SetVisibility(ESlateVisibility::Hidden);         
+	if (Btn_Decline) Btn_Decline->SetVisibility(ESlateVisibility::Hidden);      
+	if (ItemIcon) ItemIcon->SetVisibility(ESlateVisibility::Hidden);
+	if (ItemName) ItemName->SetVisibility(ESlateVisibility::Hidden);
+	if (ItemDescription) ItemDescription->SetVisibility(ESlateVisibility::Hidden);
+	if (ItemGrade) ItemGrade->SetVisibility(ESlateVisibility::Hidden);
+
+	//아이템 정보 세팅
+	//아이템 이름
+	if (ItemName)
 	{
-		ItemIcon->SetBrushFromTexture(NewItemIcon);
+		ItemName->SetText(InRowData.Name);
 	}
 
-	// 2) 촬영용 액터에게 "상자 열어" 명령 (3D 애니메이션)
+	//아이템 설명
+	if (ItemDescription)
+	{
+		ItemDescription->SetText(InRowData.Description);
+	}
+
+	//아이템 등급 (텍스트 + 색상 처리)
+	if (ItemGrade)
+	{
+		FText GradeText;
+		FSlateColor GradeColor = FSlateColor(FLinearColor::White); // 기본 흰색
+
+		// 등급에 따라 텍스트와 색상을 다르게 설정 (스위치문 활용)
+		switch (InRowData.Grade)
+		{
+		case EItemGrade::Common:
+			GradeText = FText::FromString(TEXT("Common"));
+			GradeColor = FSlateColor(FLinearColor(0.8f, 0.8f, 0.8f, 1.0f)); // 회색
+			break;
+		case EItemGrade::UnCommon:
+			GradeText = FText::FromString(TEXT("UnCommon"));
+			GradeColor = FSlateColor(FLinearColor(0.1f, 1.0f, 0.1f, 1.0f));
+			break;
+		case EItemGrade::Rare:
+			GradeText = FText::FromString(TEXT("Rare"));
+			GradeColor = FSlateColor(FLinearColor(0.0f, 0.5f, 1.0f, 1.0f)); // 파랑
+			break;
+		case EItemGrade::Epic:
+			GradeText = FText::FromString(TEXT("Epic"));
+			GradeColor = FSlateColor(FLinearColor(0.6f, 0.0f, 1.0f, 1.0f)); // 보라
+			break;
+		case EItemGrade::Legendary:
+			GradeText = FText::FromString(TEXT("Legendary"));
+			GradeColor = FSlateColor(FLinearColor(1.0f, 0.5f, 0.0f, 1.0f)); // 주황
+			break;
+		default:
+			GradeText = FText::FromString(TEXT("Unknown"));
+			break;
+		}
+
+		ItemGrade->SetText(GradeText);
+		ItemGrade->SetColorAndOpacity(GradeColor);
+	}
+
+	UTexture2D* LoadedTexture = InRowData.Icon.LoadSynchronous();
+
+	if (ItemIcon && LoadedTexture)
+	{
+		// 텍스처 설정
+		ItemIcon->SetBrushFromTexture(LoadedTexture);
+	}
+
 	if (ChestStudioActor)
 	{
-		// Blueprint에서 만든 PlayOpenAnim 함수 호출
-		UE_LOG(LogTemp, Warning, TEXT("PlayOpenAnim"));
 		FOutputDeviceNull Ar;
-		ChestStudioActor->CallFunctionByNameWithArguments(TEXT("PlayOpenAnim"), Ar, NULL, true);
+		// BP에 만든 'StartIntroSequence' 이벤트 호출
+		ChestStudioActor->CallFunctionByNameWithArguments(TEXT("StartIntroSequence"), Ar, NULL, true);
 	}
 
-	// 3) 타이머 설정: 1.2초 뒤에 아이템과 버튼 등장
-	// (상자 열리는 애니메이션 시간에 맞춰 조절하세요)
-	GetWorld()->GetTimerManager().SetTimer(SequenceTimer, this, &UChestOpen::ShowItemIcon, 1.2f, false);
 }
 
-// 3. 타이머 종료: 아이템 및 버튼 표시
+//타이머 종료: 아이템 및 버튼 표시
 void UChestOpen::ShowItemIcon()
 {
 	if (ItemIcon)
@@ -89,7 +136,7 @@ void UChestOpen::ShowItemIcon()
 	}
 }
 
-// 4. 버튼 클릭: 닫기
+//버튼 클릭: 닫기
 void UChestOpen::OnClaimClicked()
 {
 	// 위젯 닫기
@@ -110,10 +157,28 @@ void UChestOpen::OnDeclineClicked()
 
 void UChestOpen::OnOpenChestClicked()
 {
-	//PlayLootSequence();
+	
+	if (Btn_OpenChest)Btn_OpenChest->SetVisibility(ESlateVisibility::Hidden);
+	if (ItemName) ItemName->SetVisibility(ESlateVisibility::Visible);
+	if (ItemDescription) ItemDescription->SetVisibility(ESlateVisibility::Visible);
+	if (ItemGrade) ItemGrade->SetVisibility(ESlateVisibility::Visible);
 
-	// 로그 출력
-	UE_LOG(LogTemp, Log, TEXT("아이템 열기!"));
+	if (ChestStudioActor)
+	{
+		FOutputDeviceNull Ar;
+		// BP에 만든 'StartOpenSequence' 이벤트 호출
+		ChestStudioActor->CallFunctionByNameWithArguments(TEXT("StartOpenSequence"), Ar, NULL, true);
+	}
+
+	
+	float OpenAnimDuration = 1.2f;
+
+	if (GetWorld())
+	{
+		GetWorld()->GetTimerManager().SetTimer(SequenceTimer, this, &UChestOpen::ShowItemIcon, OpenAnimDuration, false);
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("상자 열기 시작!"));
 }
 
 void UChestOpen::SetStudioActor(AActor* InStudioActor)
