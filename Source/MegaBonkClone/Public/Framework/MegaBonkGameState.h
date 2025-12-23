@@ -10,6 +10,18 @@
 // 보스가 다 죽었을때 보낼 델리게이트 선언
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAllBossesDead);
 
+
+USTRUCT(BlueprintType)
+struct FPropSpawnRule
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<AActor> PropClass; // 생성할 액터 (예: 항아리, 상자)
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0.0", ClampMax = "100.0"))
+	float SpawnPercentage; // 확률 (0~100%)
+};
 /**
  * 
  */
@@ -38,11 +50,20 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Boss Mechanics")
 	void OnBossDied();
 
+	// 제한 시간이 지났는지 확인하는 함수
+	UFUNCTION(BlueprintCallable, Category = "Stage")
+	bool IsOvertime() const;
+
+	// UI에 표시할 시간을 반환하는 함수 (자동으로 카운트다운/업 전환)
+	UFUNCTION(BlueprintCallable, Category = "Stage")
+	float GetDisplayGameTime() const;
+
 	UPROPERTY(BlueprintAssignable, Category = "Boss Mechanics")
 	FOnAllBossesDead OnAllBossesDead;
 
 private:
 	void CheckWaveLogic();
+	void CheckOvertimeLogic();  // 오버타임 웨이브 (고정 몹)
 	void SpawnEnemy(TSubclassOf<AActor> EnemyClass);
 
 	// 랜덤 위치 찾기 (NavMesh 사용)
@@ -63,23 +84,34 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Stage")
 	UDataTable* WaveDataTable; // 웨이브 데이터 테이블 할당
 
-	// [오브젝트 배치 설정]
+	//비율 설정을 위한 변수
 	UPROPERTY(EditDefaultsOnly, Category = "Spawning")
-	TArray<TSubclassOf<AActor>> RandomProps; // 항아리, 상자 클래스 목록
+	TArray<FPropSpawnRule> PropSpawnRules;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Spawning")
+	int32 TotalPropCount = 50; // 전체 생성 개수
 
 	UPROPERTY(EditDefaultsOnly, Category = "Spawning")
 	TArray<TSubclassOf<AActor>> Sanctuaries; // 제단 클래스 목록
 
 	UPROPERTY(EditDefaultsOnly, Category = "Spawning")
-	int32 PropCount = 50; // 맵에 뿌릴 항아리 개수
-
-	UPROPERTY(EditDefaultsOnly, Category = "Spawning")
 	int32 SanctuaryCount = 5; // 맵에 뿌릴 제단 개수
+
+	UPROPERTY(EditDefaultsOnly, Category = "Overtime")
+	TSubclassOf<AActor> OvertimeEnemyClass; // 예: 강력한 엘리트 몹
+
+	UPROPERTY(EditDefaultsOnly, Category = "Overtime")
+	float OvertimeSpawnInterval = 1.0f; // 소환 간격
+
+	UPROPERTY(EditDefaultsOnly, Category = "Overtime")
+	int32 OvertimeSpawnAmount = 5;
 
 	// [현재 상태]
 	UPROPERTY(BlueprintReadOnly, Category = "Stage")
 	float StageTimer = 0.0f;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Stage")
+	float StageTimeLimit = 600.0f;
 private:
 	
 

@@ -19,14 +19,43 @@ void AMegaBonkGameState::Tick(float DeltaTime)
 	// 1. 스테이지 타이머 진행
 	StageTimer += DeltaTime;
 
-	// 2. 웨이브 체크 및 스폰
-	CheckWaveLogic();
+	if (IsOvertime())
+	{
+		// 제한 시간 초과: 오버타임 로직 (다른 몬스터만 소환)
+		CheckOvertimeLogic();
+	}
+	else
+	{
+		// 제한 시간 이내: 기존 웨이브 로직 (데이터 테이블)
+		CheckWaveLogic();
+	}
+}
+
+bool AMegaBonkGameState::IsOvertime() const
+{
+	return StageTimer >= StageTimeLimit;
 }
 
 void AMegaBonkGameState::BeginPlay()
 {
 	Super::BeginPlay();
 	SpawnProps();
+}
+
+float AMegaBonkGameState::GetDisplayGameTime() const
+{
+	if (IsOvertime())
+	{
+		// 제한 시간 후: 0초부터 다시 증가 (누적 시간)
+		// 예: 현재 305초, 제한 300초 -> 5초 반환
+		return StageTimer - StageTimeLimit;
+	}
+	else
+	{
+		// 제한 시간 전: 남은 시간 카운트다운
+		// 예: 현재 10초, 제한 300초 -> 290초 반환
+		return StageTimeLimit - StageTimer;
+	}
 }
 
 void AMegaBonkGameState::OnBossDied()
@@ -53,18 +82,16 @@ void AMegaBonkGameState::CheckWaveLogic()
 {
 	if (!WaveDataTable) return;
 
-	// 데이터 테이블에서 현재 시간에 맞는 웨이브 정보 가져오기
+	// ... (기존 데이터 테이블 조회 코드 유지) ...
 	static const FString ContextString(TEXT("WaveContext"));
 	TArray<FStageWaveInfo*> AllRows;
 	WaveDataTable->GetAllRows<FStageWaveInfo>(ContextString, AllRows);
 
-	// 현재 활성화되어야 할 웨이브 찾기
 	for (FStageWaveInfo* Row : AllRows)
 	{
+		// [중요] 데이터 테이블의 시간과 현재 절대 시간 비교
 		if (StageTimer >= Row->StartTime && StageTimer < (Row->StartTime + Row->Duration))
 		{
-			// 스폰 간격 체크
-			// (실제 구현 시에는 각 웨이브별 쿨타임을 따로 관리해야 완벽하지만, 간단한 예시로 글로벌 쿨타임 사용)
 			if (GetWorld()->GetTimeSeconds() - LastSpawnTime >= Row->SpawnInterval)
 			{
 				for (int32 i = 0; i < Row->SpawnAmountPerInterval; i++)
@@ -74,6 +101,23 @@ void AMegaBonkGameState::CheckWaveLogic()
 				LastSpawnTime = GetWorld()->GetTimeSeconds();
 			}
 		}
+	}
+}
+
+void AMegaBonkGameState::CheckOvertimeLogic()
+{
+	// 오버타임 전용 몬스터가 설정되어 있지 않으면 리턴
+	if (!OvertimeEnemyClass) return;
+
+	// 오버타임 전용 쿨타임 체크
+	if (GetWorld()->GetTimeSeconds() - LastSpawnTime >= OvertimeSpawnInterval)
+	{
+		// 지정된 마릿수만큼 강력한 몬스터 소환
+		for (int32 i = 0; i < OvertimeSpawnAmount; i++)
+		{
+			SpawnEnemy(OvertimeEnemyClass);
+		}
+		LastSpawnTime = GetWorld()->GetTimeSeconds();
 	}
 }
 
@@ -107,20 +151,64 @@ void AMegaBonkGameState::SpawnEnemy(TSubclassOf<AActor> EnemyClass)
 
 void AMegaBonkGameState::SpawnProps()
 {
-	// 1. 항아리/상자 랜덤 배치 (PropCount 만큼)
-	for (int32 i = 0; i < PropCount; i++)
+	// 1. [생성 목록 만들기] 비율에 맞춰서 "무엇을 소환할지" 리스트를 미리 만듭니다.
+	TArray<TSubclassOf<AActor>> SpawnDeck;
+
+	int32 CurrentCount = 0;
+
+	for (const FPropSpawnRule& Rule : PropSpawnRules)
 	{
-		if (RandomProps.Num() == 0) break;
+		if (!Rule.PropClass) continue;
 
-		// 랜덤한 종류 선택
-		int32 Index = FMath::RandRange(0, RandomProps.Num() - 1);
-		TSubclassOf<AActor> PropClass = RandomProps[Index];
+		// 비율에 따른 개수 계산 (예: 50개 중 10% = 5개)
+		int32 CountForThisType = FMath::RoundToInt(TotalPropCount * (Rule.SpawnPercentage / 100.0f));
 
-		FVector SpawnLoc;
-		if (GetRandomLocationOnNavMesh(SpawnLoc)) // 맵 전체에서 랜덤
+		for (int32 i = 0; i < CountForThisType; i++)
 		{
-			// 바닥에 딱 붙이기 위해 Z축 보정 필요할 수 있음
-			GetWorld()->SpawnActor<AActor>(PropClass, SpawnLoc, FRotator::ZeroRotator);
+			SpawnDeck.Add(Rule.PropClass);
+		}
+		CurrentCount += CountForThisType;
+	}
+
+	// [보정] 반올림 오차 등으로 전체 개수가 모자라면, 첫 번째 항목(보통 가장 흔한 항아리)으로 채웁니다.
+	if (SpawnDeck.Num() < TotalPropCount && PropSpawnRules.Num() > 0)
+	{
+		int32 MissingCount = TotalPropCount - SpawnDeck.Num();
+		for (int32 i = 0; i < MissingCount; i++)
+		{
+			SpawnDeck.Add(PropSpawnRules[0].PropClass);
+		}
+	}
+
+	// 2. [셔플] 목록을 무작위로 섞습니다. (항아리, 항아리, 상자... 순서를 섞음)
+	if (SpawnDeck.Num() > 0)
+	{
+		// Fisher-Yates Shuffle 알고리즘 (언리얼 내장 기능 이용)
+		const int32 LastIndex = SpawnDeck.Num() - 1;
+		for (int32 i = 0; i <= LastIndex; ++i)
+		{
+			int32 Index = FMath::RandRange(i, LastIndex);
+			if (i != Index)
+			{
+				SpawnDeck.Swap(i, Index);
+			}
+		}
+	}
+
+	// 3. [배치] 섞인 목록을 하나씩 꺼내서 맵에 배치합니다.
+	for (TSubclassOf<AActor> PropClassToSpawn : SpawnDeck)
+	{
+		FVector SpawnLoc;
+		// 네비게이션 위 랜덤 위치 찾기
+		if (GetRandomLocationOnNavMesh(SpawnLoc))
+		{
+			// 위치 찾기에 성공하면 스폰
+			GetWorld()->SpawnActor<AActor>(PropClassToSpawn, SpawnLoc, FRotator::ZeroRotator);
+		}
+		else
+		{
+			// 위치를 못 찾았을 경우 로그 (원한다면 다시 시도하는 로직 추가 가능)
+			// UE_LOG(LogTemp, Warning, TEXT("Failed to find valid location for Prop"));
 		}
 	}
 
@@ -136,6 +224,7 @@ void AMegaBonkGameState::SpawnProps()
 			GetWorld()->SpawnActor<AActor>(Sanctuaries[Index], SpawnLoc, FRotator::ZeroRotator);
 		}
 	}
+
 }
 
 bool AMegaBonkGameState::GetRandomLocationOnNavMesh(FVector& OutLocation)
