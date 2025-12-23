@@ -17,7 +17,8 @@ UENUM(BlueprintType)
 enum class EItemType : uint8
 {
 	GeneralItem		UMETA(DisplayName = "일반 아이템"), // 갯수 제한 없이 중첩 가능
-	SecretBook		UMETA(DisplayName = "비전서") // 최대 4개까지 장착 가능
+	SecretBook		UMETA(DisplayName = "비전서"), // 최대 4개까지 장착 가능
+	Weapon			UMETA(DisplayName = "무기") // 최대 4개까지 장착 가능
 };
 
 // 아이템 등급
@@ -111,10 +112,26 @@ enum class EProcTriggerType : uint8
 	OnHeal			UMETA(DisplayName = "체력 회복 시"),
 	OnLowHP			UMETA(DisplayName = "체력이 50% 이하일때")
 };
-
+UENUM(BlueprintType)
 enum class EAltarState : uint8
 {
 	ReadyToSummon, // 처음 상태
 	BossesAlive,   // 보스 잡는 중 (상호작용 불가)
 	StageClear     // 다 잡음 (다음 스테이지 이동)
+};
+
+// 무기 강화 선택지 목록
+UENUM(BlueprintType)
+enum class EWeaponStatType : uint8
+{
+	None,
+	Damage			UMETA(DisplayName = "데미지"),
+	ProjectileCount UMETA(DisplayName = "발사체 수"),
+	ProjectileSpeed UMETA(DisplayName = "발사체 속도"),
+	ProjectileScale UMETA(DisplayName = "발사체 크기(범위)"),
+	ChainCount		UMETA(DisplayName = "반사 횟수"),
+	CritChance		UMETA(DisplayName = "치명타 확률"),
+	CritDamage		UMETA(DisplayName = "치명타 데미지"),
+	KnockBack		UMETA(DisplayName = "넉백"),
+	Cooldown		UMETA(DisplayName = "쿨타임 감소")
 };

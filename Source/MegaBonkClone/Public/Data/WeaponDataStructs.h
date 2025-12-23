@@ -4,24 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h"
+#include "Data/TypeEnums.h"
 #include "WeaponDataStructs.generated.h"
 /**
  *
  */
-UENUM(BlueprintType)
-enum class EWeaponStatType : uint8
-{
-	None,
-	Damage			UMETA(DisplayName = "데미지"),
-	ProjectileCount UMETA(DisplayName = "발사체 수"),
-	ProjectileSpeed UMETA(DisplayName = "발사체 속도"),
-	ProjectileScale UMETA(DisplayName = "발사체 크기(범위)"),
-	ChainCount		UMETA(DisplayName = "반사 횟수"),
-	CritChance		UMETA(DisplayName = "치명타 확률"),
-	CritDamage		UMETA(DisplayName = "치명타 데미지"),
-	KnockBack		UMETA(DisplayName = "넉백"),
-	Cooldown		UMETA(DisplayName = "쿨타임 감소")
-};
+
 USTRUCT(BlueprintType)
 struct FWeaponUpgradeOption
 {
@@ -92,6 +80,10 @@ public:
 	// 기본 넉백
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (DisplayName = "넉백", ClampMin = "0"))
 	float KnockBack = 0.0f;
+
+	// 쿨타임 감소
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (DisplayName = "넉백", ClampMin = "0"))
+	float Cooldown = 0.0f;
 
 	// 강화 효율 배열
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Upgrades", meta = (DisplayName = "강화 선택지 목록 (Pool)", TitleProperty = "StatType"))
