@@ -10,6 +10,18 @@
 // 보스가 다 죽었을때 보낼 델리게이트 선언
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAllBossesDead);
 
+
+USTRUCT(BlueprintType)
+struct FPropSpawnRule
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<AActor> PropClass; // 생성할 액터 (예: 항아리, 상자)
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0.0", ClampMax = "100.0"))
+	float SpawnPercentage; // 확률 (0~100%)
+};
 /**
  * 
  */
@@ -63,15 +75,15 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Stage")
 	UDataTable* WaveDataTable; // 웨이브 데이터 테이블 할당
 
-	// [오브젝트 배치 설정]
+	//비율 설정을 위한 변수
 	UPROPERTY(EditDefaultsOnly, Category = "Spawning")
-	TArray<TSubclassOf<AActor>> RandomProps; // 항아리, 상자 클래스 목록
+	TArray<FPropSpawnRule> PropSpawnRules;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Spawning")
+	int32 TotalPropCount = 50; // 전체 생성 개수
 
 	UPROPERTY(EditDefaultsOnly, Category = "Spawning")
 	TArray<TSubclassOf<AActor>> Sanctuaries; // 제단 클래스 목록
-
-	UPROPERTY(EditDefaultsOnly, Category = "Spawning")
-	int32 PropCount = 50; // 맵에 뿌릴 항아리 개수
 
 	UPROPERTY(EditDefaultsOnly, Category = "Spawning")
 	int32 SanctuaryCount = 5; // 맵에 뿌릴 제단 개수

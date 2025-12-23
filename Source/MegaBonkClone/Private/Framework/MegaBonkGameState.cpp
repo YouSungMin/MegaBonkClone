@@ -107,20 +107,64 @@ void AMegaBonkGameState::SpawnEnemy(TSubclassOf<AActor> EnemyClass)
 
 void AMegaBonkGameState::SpawnProps()
 {
-	// 1. 항아리/상자 랜덤 배치 (PropCount 만큼)
-	for (int32 i = 0; i < PropCount; i++)
+	// 1. [생성 목록 만들기] 비율에 맞춰서 "무엇을 소환할지" 리스트를 미리 만듭니다.
+	TArray<TSubclassOf<AActor>> SpawnDeck;
+
+	int32 CurrentCount = 0;
+
+	for (const FPropSpawnRule& Rule : PropSpawnRules)
 	{
-		if (RandomProps.Num() == 0) break;
+		if (!Rule.PropClass) continue;
 
-		// 랜덤한 종류 선택
-		int32 Index = FMath::RandRange(0, RandomProps.Num() - 1);
-		TSubclassOf<AActor> PropClass = RandomProps[Index];
+		// 비율에 따른 개수 계산 (예: 50개 중 10% = 5개)
+		int32 CountForThisType = FMath::RoundToInt(TotalPropCount * (Rule.SpawnPercentage / 100.0f));
 
-		FVector SpawnLoc;
-		if (GetRandomLocationOnNavMesh(SpawnLoc)) // 맵 전체에서 랜덤
+		for (int32 i = 0; i < CountForThisType; i++)
 		{
-			// 바닥에 딱 붙이기 위해 Z축 보정 필요할 수 있음
-			GetWorld()->SpawnActor<AActor>(PropClass, SpawnLoc, FRotator::ZeroRotator);
+			SpawnDeck.Add(Rule.PropClass);
+		}
+		CurrentCount += CountForThisType;
+	}
+
+	// [보정] 반올림 오차 등으로 전체 개수가 모자라면, 첫 번째 항목(보통 가장 흔한 항아리)으로 채웁니다.
+	if (SpawnDeck.Num() < TotalPropCount && PropSpawnRules.Num() > 0)
+	{
+		int32 MissingCount = TotalPropCount - SpawnDeck.Num();
+		for (int32 i = 0; i < MissingCount; i++)
+		{
+			SpawnDeck.Add(PropSpawnRules[0].PropClass);
+		}
+	}
+
+	// 2. [셔플] 목록을 무작위로 섞습니다. (항아리, 항아리, 상자... 순서를 섞음)
+	if (SpawnDeck.Num() > 0)
+	{
+		// Fisher-Yates Shuffle 알고리즘 (언리얼 내장 기능 이용)
+		const int32 LastIndex = SpawnDeck.Num() - 1;
+		for (int32 i = 0; i <= LastIndex; ++i)
+		{
+			int32 Index = FMath::RandRange(i, LastIndex);
+			if (i != Index)
+			{
+				SpawnDeck.Swap(i, Index);
+			}
+		}
+	}
+
+	// 3. [배치] 섞인 목록을 하나씩 꺼내서 맵에 배치합니다.
+	for (TSubclassOf<AActor> PropClassToSpawn : SpawnDeck)
+	{
+		FVector SpawnLoc;
+		// 네비게이션 위 랜덤 위치 찾기
+		if (GetRandomLocationOnNavMesh(SpawnLoc))
+		{
+			// 위치 찾기에 성공하면 스폰
+			GetWorld()->SpawnActor<AActor>(PropClassToSpawn, SpawnLoc, FRotator::ZeroRotator);
+		}
+		else
+		{
+			// 위치를 못 찾았을 경우 로그 (원한다면 다시 시도하는 로직 추가 가능)
+			// UE_LOG(LogTemp, Warning, TEXT("Failed to find valid location for Prop"));
 		}
 	}
 
@@ -136,6 +180,7 @@ void AMegaBonkGameState::SpawnProps()
 			GetWorld()->SpawnActor<AActor>(Sanctuaries[Index], SpawnLoc, FRotator::ZeroRotator);
 		}
 	}
+
 }
 
 bool AMegaBonkGameState::GetRandomLocationOnNavMesh(FVector& OutLocation)
