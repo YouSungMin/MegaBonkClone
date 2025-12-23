@@ -19,6 +19,10 @@ void UWeaponSlotWidget::InitializeWeaponSlot(FName InWeaponID, int32 InLevel, UW
 
 void UWeaponSlotWidget::RefreshWeaponSlot()
 {
+
+    UE_LOG(LogTemp, Warning, TEXT("[WeaponSlot] Refresh start ID=%s Lv=%d ValidInv=%d"),
+        *WeaponID.ToString(), Level, TargetWeaponInventory.IsValid());
+
     if (!TargetWeaponInventory.IsValid() || WeaponID.IsNone() || Level <= 0)
     {
         ClearWeaponSlot();
@@ -38,6 +42,7 @@ void UWeaponSlotWidget::RefreshWeaponSlot()
 
     LevelText->SetText(FText::AsNumber(Level));
     LevelText->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+    
 }
 
 void UWeaponSlotWidget::ClearWeaponSlot()
