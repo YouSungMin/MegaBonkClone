@@ -81,6 +81,7 @@ void UWeaponSystemComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+
 	// ...
 
 }
