@@ -9,6 +9,8 @@
 // 전방 선언
 class UImage;
 class UButton;
+class UTextBlock;
+struct FItemData;
 
 UCLASS()
 class MEGABONKCLONE_API UChestOpen : public UUserWidget
@@ -18,7 +20,7 @@ class MEGABONKCLONE_API UChestOpen : public UUserWidget
 public:
 	// 외부(ChestActor)에서 이 함수를 호출해서 연출을 시작합니다.
 	UFUNCTION(BlueprintCallable)
-	void PlayLootSequence(UTexture2D* NewItemIcon);
+	void PlayLootSequence(const FItemData& InRowData);
 
 	// 촬영용 스튜디오 액터를 설정하는 함수
 	UFUNCTION(BlueprintCallable)
@@ -41,12 +43,21 @@ protected:
 	void ShowItemIcon();
 
 protected:
-	// [UI 바인딩] 에디터의 위젯 디자이너에 있는 이름과 똑같아야 합니다.
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ChestOpen", meta = (BindWidget))
 	TObjectPtr<UImage> Chest3D;   // 3D 상자 화면 (Render Target)
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ChestOpen", meta = (BindWidget))
 	TObjectPtr<UImage> ItemIcon;  // 2D 아이템 아이콘
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ChestOpen", meta = (BindWidget))
+	TObjectPtr<UTextBlock> ItemDescription; //아이템 설명
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ChestOpen", meta = (BindWidget))
+	TObjectPtr<UTextBlock> ItemGrade; //아이템 등급
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ChestOpen", meta = (BindWidget))
+	TObjectPtr<UTextBlock> ItemName; //아이템 이름
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ChestOpen", meta = (BindWidget))
 	TObjectPtr<UButton> Btn_OpenChest;

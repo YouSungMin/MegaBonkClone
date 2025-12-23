@@ -18,10 +18,10 @@ class MEGABONKCLONE_API UInventoryWidget : public UUserWidget
 public:
 	virtual void NativeConstruct() override;
 
-	//¿ÜºÎ ÀÎº¥Åä¸® ÄÄÆ÷³ÍÆ® ÁÖÀÔ
+	//ï¿½Üºï¿½ ï¿½Îºï¿½ï¿½ä¸® ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½
 	void InitializeInventoryWidget(class UInventoryComponent* InventoryComponent);
 	
-	//ÇöÀç ÀÎº¥Åä¸®·Î UIÃ¤¿ì±â
+	//ï¿½ï¿½ï¿½ï¿½ ï¿½Îºï¿½ï¿½ä¸®ï¿½ï¿½ UIÃ¤ï¿½ï¿½ï¿½
 	UFUNCTION()
 	void RefreshInventoryWidget();
 
@@ -32,7 +32,7 @@ public:
 	FOnInventoryCloseRequested OnInventoryCloseRequested;
 
 private:
-	//¾ÆÀÌÅÛ Ãß°¡½Ã ÀÌº¥Æ® ÀüÃ¼ ¸®ÇÁ·¹½Ã
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ß°ï¿½ï¿½ï¿½ ï¿½Ìºï¿½Æ® ï¿½ï¿½Ã¼ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	UFUNCTION()
 	void HandleItemAdded(FName ItemID, const FItemData& ItemData);
 
@@ -40,7 +40,8 @@ private:
 	void HandleSecretAdded(FName ItemID, const FItemData& ItemData);
 
 
-	//´Ý±â¹öÆ°»ç¿ë½Ã
+	//ï¿½Ý±ï¿½ï¿½Æ°ï¿½ï¿½ï¿½ï¿½
+	//ï¿½Ý±ï¿½ï¿½Æ°ï¿½ï¿½ï¿½ï¿½
 	/*UFUNCTION()
 	void OnCloseInventoryClicked();*/
 
@@ -62,12 +63,12 @@ private:
 	UPROPERTY()
 	TWeakObjectPtr<UInventoryComponent> TargetInventory = nullptr;
 
-	//NativeConstruct¿¡¼­ ±×¸®µåÆÐ³Î 8°³ ½½·Ô Ä³½Ì
+	//NativeConstructï¿½ï¿½ï¿½ï¿½ ï¿½×¸ï¿½ï¿½ï¿½ï¿½Ð³ï¿½ 8ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Ä³ï¿½ï¿½
 	UPROPERTY()
 	TArray<TObjectPtr<class UItemSlotWidget>> ItemSlotWidgets;
 
 
-	//NativeConstruct¿¡¼­ ºñÀü½ÃÆÐ³Î Ä³½Ì
+	//NativeConstructï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð³ï¿½ Ä³ï¿½ï¿½
 	UPROPERTY()
 	TArray<TObjectPtr<class UItemSlotWidget>> SecretSlotWidgets;
 
