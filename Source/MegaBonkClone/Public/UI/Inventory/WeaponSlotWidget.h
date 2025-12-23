@@ -17,10 +17,10 @@ class MEGABONKCLONE_API UWeaponSlotWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	//ÀÌ À§Á¬ÀÌ º¸¿©ÁÙ µ¥ÀÌÅÍ ¼¼ÆÃ
+	//ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	void InitializeWeaponSlot(FName InWeaponID, int32 InLevel, UWeaponSystemComponent* InWeapon);
 
-	//¼³Á¤µÈ µ¥ÀÌÅÍ ±â¹ÝÇØ À§Á¬¿¡ Ç¥½ÃÇÏ´Â ³»¿ë °»½Å
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Ç¥ï¿½ï¿½ï¿½Ï´ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	void RefreshWeaponSlot();
 
 protected:
