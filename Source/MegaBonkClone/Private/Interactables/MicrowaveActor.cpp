@@ -34,8 +34,8 @@ void AMicrowaveActor::BeginPlay()
 			if (RarityDropRates.Num() == 0)
 			{
 				RarityDropRates.Add(EItemGrade::Common, 60.0f);
-				RarityDropRates.Add(EItemGrade::UnCommon, 30.0f);
-				RarityDropRates.Add(EItemGrade::Rare, 10.0f);
+				RarityDropRates.Add(EItemGrade::Rare, 30.0f);
+				RarityDropRates.Add(EItemGrade::Epic, 10.0f);
 				RarityDropRates.Add(EItemGrade::Legendary, 5.0f);
 			}
 
@@ -74,8 +74,8 @@ void AMicrowaveActor::BeginPlay()
 
 				switch (CurrentRarity)
 				{
-				case EItemGrade::UnCommon:
-					SelectedTexture = UncommonTexture;
+				case EItemGrade::Epic:
+					SelectedTexture = EpicTexture;
 					break;
 
 				case EItemGrade::Rare:
@@ -101,7 +101,7 @@ void AMicrowaveActor::BeginPlay()
 				}
 
 				// (디버깅용) 로그 출력
-				UE_LOG(LogTemp, Warning, TEXT("Item Rarity: %d"), (int32)CurrentRarity);
+				UE_LOG(LogTemp, Warning, TEXT("Microwave Rarity: %d"), (int32)CurrentRarity);
 			}
 		}
 	}

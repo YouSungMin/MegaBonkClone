@@ -32,22 +32,23 @@ protected:
 	TObjectPtr<UStaticMeshComponent> MicrowaveMesh;
 
 	// 에디터에서 등급별 텍스처를 지정할 변수
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Textures")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Microwave Textures")
 	UTexture2D* CommonTexture;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Textures")
-	UTexture2D* UncommonTexture;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Textures")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Microwave Textures")
 	UTexture2D* RareTexture;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Textures")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Microwave Textures")
+	UTexture2D* EpicTexture;
+
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Microwave Textures")
 	UTexture2D* LegendaryTexture;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item Properties")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Microwave Properties")
 	EItemGrade CurrentRarity;
 
 	// 에디터에서 설정할 등급 별 확률 가중치
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Config")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Microwave Config")
 	TMap<EItemGrade, float> RarityDropRates;
 };
