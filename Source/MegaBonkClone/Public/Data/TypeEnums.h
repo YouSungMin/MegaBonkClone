@@ -136,3 +136,12 @@ enum class EWeaponStatType : uint8
 	KnockBack		UMETA(DisplayName = "넉백"),
 	Cooldown		UMETA(DisplayName = "쿨타임 감소")
 };
+
+// 전자레인지 상태 열거형 정의
+UENUM(BlueprintType)
+enum class EMicrowaveState : uint8
+{
+	Ready       UMETA(DisplayName = "준비됨 (사용 가능)"),
+	Cooking     UMETA(DisplayName = "조리 중"),
+	Completed   UMETA(DisplayName = "조리 완료 (수령 대기)")
+};

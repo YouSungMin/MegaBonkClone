@@ -156,6 +156,40 @@ void UInventoryComponent::AddItem(FName ItemID, int32 Count)
     UE_LOG(LogTemp, Log, TEXT("Item 추가: %s (Qty: %d)"), *ItemID.ToString(), Count);
 }
 
+void UInventoryComponent::RemoveItem(FName ItemID, int32 Count)
+{
+	// 리스트 순회하여 아이템 찾기
+	for (int32 i = 0; i < GeneralItems.Num(); ++i)
+	{
+		if (GeneralItems[i].ItemID == ItemID)
+		{
+			if (GeneralItems[i].Quantity >= Count)
+			{
+				GeneralItems[i].Quantity -= Count;
+
+				// 수량이 0 이하가 되면 슬롯 자체를 삭제할지, 0으로 남길지 결정
+				// 보통 인벤토리에서는 0개면 목록에서 지우는 것이 깔끔합니다.
+				if (GeneralItems[i].Quantity <= 0)
+				{
+					GeneralItems.RemoveAt(i);
+				}
+
+				// UI 업데이트 델리게이트가 있다면 호출 (OnItemUpdate 등)
+				// if (OnItemUpdate.IsBound()) ...
+				return;
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("제거하려는 수량이 보유량보다 많습니다."));
+				return;
+			}
+		}
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("제거하려는 아이템이 인벤토리에 없습니다."));
+	return;
+}
+
 
 FItemData* UInventoryComponent::GetItemInfo(FName ItemID) const
 {

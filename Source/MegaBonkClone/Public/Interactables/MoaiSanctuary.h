@@ -14,5 +14,4 @@ class MEGABONKCLONE_API AMoaiSanctuary : public ASanctuaryBase
 {
 	GENERATED_BODY()
 public:
-	virtual void ApplyEffect_Implementation(AActor* Player)override;
 };

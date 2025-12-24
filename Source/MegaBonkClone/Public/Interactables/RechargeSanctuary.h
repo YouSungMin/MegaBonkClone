@@ -92,5 +92,5 @@ protected:
 
 	// 충전 중인 플레이어
 	UPROPERTY()
-	AActor* OverlappingPlayer;
+	TWeakObjectPtr<AActor> OverlappingPlayer;
 };

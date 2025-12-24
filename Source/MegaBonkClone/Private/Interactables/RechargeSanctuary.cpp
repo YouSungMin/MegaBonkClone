@@ -36,8 +36,6 @@ void ARechargeSanctuary::BeginPlay()
 
 void ARechargeSanctuary::ApplyEffect_Implementation(AActor* Player)
 {
-	// 스탯 적용 필요 
-
 }
 
 void ARechargeSanctuary::ApplySelectedReward(AActor* Player, const FSanctuaryRewardInfo& RewardInfo)
