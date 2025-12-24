@@ -55,6 +55,9 @@ void AChestActor::Interact_Implementation(AActor* PlayerActor)
 
 	UE_LOG(LogTemp, Log,TEXT("아이템 추가 %s"),*SelectedItemID.ToString());
 	IInventoryOwner::Execute_ReceiveItem(PlayerActor, SelectedItemID, 1);
+
+
+
 	// 아이템 획득 이펙트 추가
 	//Destroy();
 }
