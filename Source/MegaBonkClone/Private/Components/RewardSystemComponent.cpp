@@ -34,16 +34,17 @@ void URewardSystemComponent::GenerateLevelUpRewards()
 	{
 		WeaponComp = PlayerPawn->FindComponentByClass<UWeaponSystemComponent>();
 		InventoryComp = PlayerPawn->FindComponentByClass<UInventoryComponent>();
+		StatusComp = PlayerPawn->FindComponentByClass<UStatusComponent>();
 	}
 
-	if (!WeaponComp || !InventoryComp || !WeaponDataTable || !ItemDataTable)
+	if (!WeaponComp || !InventoryComp || !StatusComp || !WeaponDataTable || !ItemDataTable)
 	{
 		UE_LOG(LogTemp, Error, TEXT("RewardSystem: Components or DataTables are missing!"));
 		return;
 	}
 
 	// 2. 슬롯 여유 확인 (4개 제한)
-	bool bCanNewWeapon = false ; //(WeaponComp->GetCurrentWeaponCount() < 4);
+	bool bCanNewWeapon = (WeaponComp->GetCurrentWeaponCount() < 4);
 	bool bCanNewBook = (InventoryComp->GetSecretBookSlots().Num() < 4);
 
 	TArray<FRewardOption> Pool;
@@ -56,7 +57,7 @@ void URewardSystemComponent::GenerateLevelUpRewards()
 		FWeaponData* Row = WeaponDataTable->FindRow<FWeaponData>(RowName, TEXT("Reward_Wep"));
 		if (!Row) continue;
 
-		bool bHas = false ;//WeaponComp->HasWeapon(RowName);
+		bool bHas = WeaponComp->HasWeapon(RowName);
 
 		// [조건] 보유 중이면 무조건 후보(강화), 미보유면 슬롯이 남아야 후보(신규)
 		if (bHas || bCanNewWeapon)
@@ -67,8 +68,8 @@ void URewardSystemComponent::GenerateLevelUpRewards()
 			Opt.Icon = Row->Icon;
 			Opt.Name = Row->Name;
 			Row->UpgradeOptions;
-			int32 CurLv =  1;//WeaponComp->GetWeaponLevel(RowName);
-			//Opt.NewLevel = CurLv + 1;
+			int32 CurLv = WeaponComp->GetWeaponLevel(RowName);
+			Opt.NewLevel = CurLv + 1;
 
 			ApplyWeaponUpgradeLogic(Row, CurLv, bHas, Opt);
 			Pool.Add(Opt);
@@ -271,11 +272,17 @@ EItemGrade URewardSystemComponent::CalculateRandomRarity()
 	return EItemGrade::Common;
 }
 
+void URewardSystemComponent::OnPlayerLevelChanged(float NewLevel)
+{
+	UE_LOG(LogTemp, Log, TEXT("RewardSystem: 레벨업 감지 (Lv.%.0f) -> 보상 생성 시작"), NewLevel);
+	GenerateLevelUpRewards();
+}
+
 void URewardSystemComponent::SelectReward(const FRewardOption& SelectedOption)
 {
 	if (SelectedOption.Type == EItemType::Weapon)
 	{
-		//WeaponComp->AddOrLevelUpWeapon(SelectedOption.ItemID);
+		WeaponComp->AddWeapon(SelectedOption.ItemID);
 	}
 	else
 	{

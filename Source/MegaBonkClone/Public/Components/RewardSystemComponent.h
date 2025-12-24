@@ -52,7 +52,6 @@ public:
 	// Sets default values for this component's properties
 	URewardSystemComponent();
 
-
 	// 레벨업 시 호출: 보상 생성 -> UI 오픈 -> 일시정지
 	UFUNCTION(BlueprintCallable)
 	void GenerateLevelUpRewards();
@@ -75,6 +74,9 @@ private:
 	// 랜덤 등급 계산
 	EItemGrade CalculateRandomRarity();
 
+	// 델리게이트 시그니처(float)와 맞추기 위한 래퍼 함수
+	UFUNCTION()
+	void OnPlayerLevelChanged(float NewLevel);
 protected:
 	// 무기데이터 테이블
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Data")
@@ -90,10 +92,15 @@ protected:
 	UPROPERTY()
 	TObjectPtr<class UWeaponSystemComponent> WeaponComp;
 
+	UPROPERTY()
+	TObjectPtr<class UInventoryComponent> InventoryComp;
+
+	UPROPERTY()
+	TObjectPtr<class UStatusComponent> StatusComp;
+
+
 	// 등급별 스탯 증가 배율
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")
 	TMap<EItemGrade, float> GradeMultipliers;
-	UPROPERTY()
-	TObjectPtr<class UInventoryComponent> InventoryComp;
 		
 };
