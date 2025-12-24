@@ -19,14 +19,6 @@ void UMainHudWidget::NativeConstruct()
 	APlayerCharacter* player = Cast<APlayerCharacter>(GetOwningPlayerPawn());
 	if (player)
 	{
-		if (UStatusComponent* status = player->GetStatusComponent())
-		{
-			//if (HealthBar.IsValid())
-			//{
-			//	HealthBar->RefreshWidget(resource->GetCurrentHP(), resource->GetResultMaxHP());
-			//}
-			//ShieldBar->RefreshWidget(resource->)
-		}
 
 		if (UInventoryComponent* inventoryComponent = player->GetInventoryComponent())
 		{
@@ -51,6 +43,19 @@ void UMainHudWidget::NativeConstruct()
 				WeaponBar->InitializeInventoryWidget(weaponSystemComponent);
 			}
 		}
+
+		if (UStatusComponent* status = player->GetStatusComponent())
+		{
+			//[바인딩] 값이 변하면 이 함수들을 실행해라!
+			status->OnHPChanged.AddDynamic(this, &UMainHudWidget::HandleHPChanged);
+			status->OnShieldChanged.AddDynamic(this, &UMainHudWidget::HandleShieldChanged);
+
+			//[초기값 강제 실행] 바인딩 직후, 현재 상태로 한 번 그려줌 (타이밍 문제 해결)
+			HandleHPChanged(status->GetCurrentHP(), status->GetResultMaxHP());
+			HandleShieldChanged(status->GetResultShield(), status->GetResultShield());
+		}
+
+		
 	}
 }
 
@@ -95,3 +100,19 @@ void UMainHudWidget::ClearCenterContent()
 	}
 }
 
+void UMainHudWidget::HandleHPChanged(float CurrentHP, float MaxHP)
+{
+	if (HealthBar)
+	{
+		HealthBar->RefreshWidget(CurrentHP, MaxHP);
+	}
+}
+
+void UMainHudWidget::HandleShieldChanged(float CurrentShield, float MaxShield)
+{
+	if (ShieldBar)
+	{
+		// 쉴드는 Max를 MaxShield로 쓸지, MaxHP로 쓸지 기획에 따라 결정 (여기선 MaxHP 기준)
+		ShieldBar->RefreshWidget(CurrentShield, MaxShield);
+	}
+}

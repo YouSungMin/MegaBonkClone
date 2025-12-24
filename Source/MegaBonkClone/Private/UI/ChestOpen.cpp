@@ -21,12 +21,15 @@ void UChestOpen::NativeConstruct()
 	if (Btn_Decline)
 	{
 		Btn_Decline->OnClicked.AddDynamic(this, &UChestOpen::OnDeclineClicked);
+		Btn_Decline->bIsEnabled = false;
 	}
 
 	if (Btn_OpenChest)
 	{
 		Btn_OpenChest->OnClicked.AddDynamic(this, &UChestOpen::OnOpenChestClicked);;
 	}
+
+
 
 
 }

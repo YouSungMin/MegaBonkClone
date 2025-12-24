@@ -43,6 +43,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "UI")
 	void ClearCenterContent();
 
+	UFUNCTION()
+	void HandleHPChanged(float CurrentHP, float MaxHP);
+
+	UFUNCTION()
+	void HandleShieldChanged(float CurrentShield, float MaxShield);
+
 	//인벤토리 열림 상태 GETTER
 	inline EOpenState GetOpenState() const { return OpenState; }
 	inline UInventoryWidget* GetInventoryWidget() const { return InventoryPanel; }

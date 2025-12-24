@@ -14,6 +14,8 @@ class UResourceBarWidget; //HP,Shield바
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStatusUpdated);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStatFloatChanged, float, NewValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnStatExpChanged, float, InCurrentExp,float,InMaxExp);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnHPChanged, float, CurrentHP, float, MaxHP);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnShieldChanged, float, CurrentShield, float, MaxShield);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPlayerDied);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -307,6 +309,11 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Player|Die")
 	FOnPlayerDied OnPlayerDied;
 	
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+	FOnHPChanged OnHPChanged;
+
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+	FOnShieldChanged OnShieldChanged;
 
 protected:
 	// =================================================================
