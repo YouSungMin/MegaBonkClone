@@ -33,6 +33,34 @@ APlayerCharacter::APlayerCharacter()
 	
 }
 
+void APlayerCharacter::DefaultWeaponEquip()
+{
+	if (WeaponComponent2)
+	{
+		// 1. 캐릭터 데이터 테이블에서 Row 정보 가져오기
+		FCharacterData* RowData = CharacterDataHandle.GetRow<FCharacterData>(TEXT("InitWeapon"));
+
+		// 2. 데이터가 유효하고, 설정된 기본 무기(BaseWeapon)가 있는지 확인
+		if (RowData && !RowData->BaseWeapon.IsNull())
+		{
+			// 3. 무기 클래스 동기 로드 (SoftClassPtr -> UClass*)
+			UClass* WeaponClass = RowData->BaseWeapon.LoadSynchronous();
+
+			if (WeaponClass)
+			{
+				// 4. 해당 클래스와 일치하는 무기 ID(RowName) 검색
+				FName WeaponID = WeaponComponent2->ResolveWeaponIDFromClass(WeaponClass);
+
+				// 5. ID가 유효하면 무기 시스템에 최종 추가
+				if (!WeaponID.IsNone())
+				{
+					WeaponComponent2->AddWeapon(WeaponID);
+				}
+			}
+		}
+	}
+}
+
 void APlayerCharacter::InitializeCharacterComponents()
 {
 	//컴포넌트 생성 Attach 및 위치 , 회전 조정
@@ -52,7 +80,7 @@ void APlayerCharacter::InitializeCharacterComponents()
 
 
 	StatusComponent2 = CreateDefaultSubobject<UStatusComponent>(TEXT("Status"));
-	WeaponComponent = CreateDefaultSubobject<UWeaponSystemComponent>(TEXT("WeaponSystem"));
+	WeaponComponent2 = CreateDefaultSubobject<UWeaponSystemComponent>(TEXT("WeaponSystem"));
 	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("Inventory"));
 	
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -70.0f), FRotator(0.0f, -90.0f, 0.0f));
@@ -105,15 +133,29 @@ void APlayerCharacter::BeginPlay()
 		StatusComponent2->OnPlayerDied.AddDynamic(this, &APlayerCharacter::OnCharacterDie);
 	}
 
-	if (WeaponComponent) {
+	if (WeaponComponent2) {
 		FCharacterData* rowData = CharacterDataHandle.GetRow<FCharacterData>(TEXT("Get Weapon"));
-		if (rowData) {
-			
-			//UE_LOG(LogTemp, Warning, TEXT("AddWeapon : %s"), *rowData->BaseWeapon->GetName());
-			WeaponComponent->AddWeapon(rowData->BaseWeapon.LoadSynchronous());
+		if (rowData)
+		{
+			// 2. SoftClassPtr 로드 (비동기 로드면 로직이 다르지만, 여기선 동기 로드 사용)
+			UClass* WeaponClass = rowData->BaseWeapon.LoadSynchronous();
+
+			if (WeaponClass)
+			{
+				// 3. [핵심] 클래스 정보 -> 무기 ID(FName)로 변환
+				FName WeaponID = WeaponComponent2->ResolveWeaponIDFromClass(WeaponClass);
+
+				// 4. ID가 유효하면 무기 추가
+				if (!WeaponID.IsNone())
+				{
+					// UE_LOG(LogTemp, Warning, TEXT("AddWeapon ID : %s"), *WeaponID.ToString());
+					WeaponComponent2->AddWeapon(WeaponID);
+				}
+			}
 		}
 		
 	}
+	//피격시 효과 설정 위한 마테리얼 생성
 	if (GetMesh())
 	{
 		int32 MaterialCount = GetMesh()->GetNumMaterials();
@@ -126,6 +168,8 @@ void APlayerCharacter::BeginPlay()
 			}
 		}
 	}
+
+	DefaultWeaponEquip();
 
 }
 

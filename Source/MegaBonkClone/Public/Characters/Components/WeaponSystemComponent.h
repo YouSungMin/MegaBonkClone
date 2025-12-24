@@ -21,6 +21,13 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Level = 1;
+
+	// 실제 스폰된 무기 액터 (직접 접근 가능!)
+	UPROPERTY(BlueprintReadOnly)
+	TObjectPtr<class AWeaponBase> WeaponInstance = nullptr;
+
+	// 슬롯이 비었는지 확인하는 헬퍼
+	bool IsEmpty() const { return WeaponID.IsNone(); }
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -32,43 +39,61 @@ public:
 	// Sets default values for this component's properties
 	UWeaponSystemComponent();
 
-	//배열에 있는 무기 액터에 스폰후 어태치
+	// =========================================================
+	// [기능 함수]
+	// =========================================================
+
+	// 무기 신규 추가 (스폰 + 슬롯 등록)
 	UFUNCTION(BlueprintCallable)
-	void EquipWeapon();
+	void AddWeapon(FName WeaponID);
 
+	// 무기 레벨업 (기존 무기 찾아서 스탯 강화)
 	UFUNCTION(BlueprintCallable)
-	void AddWeapon(TSubclassOf<AActor> InWeapon);
+	void LevelUpWeapon(FName WeaponID, EItemStatType StatType, float IncreaseValue);
 
-	//DT에서 무기 정보 가져오기 
-	FWeaponData* GetWeaponInfo(FName WeaponID) const; 
+	// 특정 무기 보유 여부 확인 (RewardSystem 연동용)
+	UFUNCTION(BlueprintPure)
+	bool HasWeapon(FName WeaponID) const;
 
-	//UI가 슬롯정보 접근할수있게 
-	UFUNCTION(BlueprintPure, Category = "Weapon")
-	const TArray<FWeaponSlot>& GetWeaponSlots() const { return WeaponSlots; }
+	// 무기 레벨 가져오기
+	UFUNCTION(BlueprintPure)
+	int32 GetWeaponLevel(FName WeaponID) const;
 
-	//바인딩
+	// 현재 무기 개수 (빈 슬롯 제외)
+	UFUNCTION(BlueprintPure)
+	int32 GetCurrentWeaponCount() const;
+	
+	FWeaponData* GetWeaponInfo(FName WeaponID) const;
+
+	// UI에서 슬롯 정보를 가져갈 때 사용
+	UFUNCTION(BlueprintPure)
+	const TArray<FWeaponSlot>& GetWeaponSlots() const { return ActiveSlots; }
+
+	// 클래스 정보로 ID 찾기 (시작 무기 지급용)
+	FName ResolveWeaponIDFromClass(TSubclassOf<AActor> InWeaponClass) const;
+
+	UFUNCTION(BlueprintCallable, Category = "Debug")
+	void Debug_TestWeapon(FName WeaponID);
+
+public:
 	UPROPERTY(BlueprintAssignable)
 	FOnWeaponChanged OnWeaponChanged;
 
 protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
+	// =========================================================
+	// [데이터 및 설정]
+	// =========================================================
 
-	//DT지정
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon|Data")
-	TObjectPtr <class UDataTable> WeaponDataTable = nullptr;
+	// 무기 데이터 테이블
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Data")
+	TObjectPtr<UDataTable> WeaponDataTable;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "WeaponComponent|Weapons")
-	TArray<TSubclassOf<AActor>> PlayerWeapons;
-
-	//UI용 슬롯 배열 추가
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon|Slots")
-	TArray<FWeaponSlot> WeaponSlots;
-
-	//BP_무기클래스 이름 -> DTRow로 변환함 
-	FName ResolveWeaponIDFromClass(TSubclassOf<AActor> InWeapon) const;
 
 private:
-	//무기 슬롯 크기
-	int32 MaxWeaponNum = 3;
+	// [통합] 실제 관리되는 무기 슬롯 배열 (이거 하나로 끝!)
+	UPROPERTY(VisibleInstanceOnly, Category = "State")
+	TArray<FWeaponSlot> ActiveSlots;
+
+	// 최대 무기 개수
+	int32 MaxWeaponSlots = 3;
 };
