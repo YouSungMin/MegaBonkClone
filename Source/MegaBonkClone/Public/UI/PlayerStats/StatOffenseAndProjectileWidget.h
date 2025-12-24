@@ -18,18 +18,21 @@ class MEGABONKCLONE_API UStatOffenseAndProjectileWidget : public UUserWidget
 protected:
 	virtual void NativeConstruct() override;
 
-	//ÀÌº¥Æ®¸¸µé±â
+	//ï¿½Ìºï¿½Æ®ï¿½ï¿½ï¿½ï¿½ï¿½
 	UFUNCTION(BlueprintCallable)
-	void RefreshOffense();	//°ø°Ý
-	void RefreshProjectile();	//¹ß»çÃ¼
+	void RefreshOffense();	//ï¿½ï¿½ï¿½ï¿½
+	void RefreshProjectile();	//ï¿½ß»ï¿½Ã¼
+
+	UFUNCTION()
+	void HandleOffenseStatusUpdated();
 
 
 
 protected:
 	UPROPERTY(meta = (BindWidgetOptional))
-	TObjectPtr<UTextBlock> Label1 = nullptr;	//Á¦¸ñ
+	TObjectPtr<UTextBlock> Label1 = nullptr;	//ï¿½ï¿½ï¿½ï¿½
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UTextBlock> DamageValue = nullptr;		//°ª 
+	TObjectPtr<UTextBlock> DamageValue = nullptr;		//ï¿½ï¿½ 
 
 	UPROPERTY(meta = (BindWidgetOptional))
 	TObjectPtr<UTextBlock> Label2 = nullptr;

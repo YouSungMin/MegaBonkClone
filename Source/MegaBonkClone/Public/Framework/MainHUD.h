@@ -24,10 +24,12 @@ public:
 	inline UMainHudWidget* GetMainWidget() const { return MainWidgetInstance; }
 
 	//외부(상자)에서 호출할 함수
+	UFUNCTION(BlueprintCallable)
 	void ShowChestReward(const FItemData& ItemData);
 
 	void OpenCenterPanel(TSubclassOf<UUserWidget> PanelClass, TObjectPtr<UUserWidget>& WidgetInstance);
 
+	UFUNCTION(BlueprintCallable)
 	void CloseCenterUI();
 
 protected:

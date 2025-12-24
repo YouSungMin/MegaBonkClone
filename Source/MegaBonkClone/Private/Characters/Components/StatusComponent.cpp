@@ -196,9 +196,6 @@ void UStatusComponent::UpdateCharacterStatus()
 		// [이동 속도]
 		// 공식: PlayerInitial + n  (PlayerInitial에곱함)
 		// n = (0.01 * Player) + (0.001 * Vision) + (0.01 * Shrine) -> 예시: 0.01*15 -> 0.15
-	
-
-	
 
 		float MoveN = ((0.01f * PlayerMoveSpeed) + (0.001f * VisionMoveSpeed) + (0.01f * ShrineMoveSpeed))*100.0f;
 		//UE_LOG(LogTemp, Warning, TEXT("%.1f"), PlayerMoveSpeed);
