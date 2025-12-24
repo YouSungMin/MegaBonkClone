@@ -63,6 +63,7 @@ enum class EItemStatType : uint8
 	KnockBack				UMETA(DisplayName = "넉백"),
 	MoveSpeed				UMETA(DisplayName = "이동 속도"),
 	JumpPower				UMETA(DisplayName = "점프 높이"),
+	ExtraJump				UMETA(DisplayName = "점프 횟수"),
 	Luck					UMETA(DisplayName = "행운")
 };
 
