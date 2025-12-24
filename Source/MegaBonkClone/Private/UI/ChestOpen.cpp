@@ -179,7 +179,7 @@ void UChestOpen::OnOpenChestClicked()
 	}
 
 	
-	float OpenAnimDuration = 1.2f;
+	float OpenAnimDuration = 1.2f * 0.001f;
 
 	if (GetWorld())
 	{
