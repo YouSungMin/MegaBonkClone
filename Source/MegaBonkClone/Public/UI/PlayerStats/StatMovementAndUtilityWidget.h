@@ -18,18 +18,21 @@ class MEGABONKCLONE_API UStatMovementAndUtilityWidget : public UUserWidget
 protected:
 	virtual void NativeConstruct() override;
 
-	//ÀÌº¥Æ®¸¸µé±â
+	//ï¿½Ìºï¿½Æ®ï¿½ï¿½ï¿½ï¿½ï¿½
 	UFUNCTION(BlueprintCallable)
-	void RefreshMovement();		//ÀÌµ¿
-	void RefreshUtility();	//À¯Æ¿¸®Æ¼
+	void RefreshMovement();		//ï¿½Ìµï¿½
+	void RefreshUtility();	//ï¿½ï¿½Æ¿ï¿½ï¿½Æ¼
 
+
+	UFUNCTION()
+	void HandleUtilityStatusUpdated();
 
 
 protected:
 	UPROPERTY(meta = (BindWidgetOptional))
-	TObjectPtr<UTextBlock> Label1 = nullptr;	//Á¦¸ñ
+	TObjectPtr<UTextBlock> Label1 = nullptr;	//ï¿½ï¿½ï¿½ï¿½
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UTextBlock> MoveSpeedValue = nullptr;		//°ª 
+	TObjectPtr<UTextBlock> MoveSpeedValue = nullptr;		//ï¿½ï¿½ 
 
 	UPROPERTY(meta = (BindWidgetOptional))
 	TObjectPtr<UTextBlock> Label2 = nullptr;

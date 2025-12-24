@@ -23,7 +23,7 @@ void UStatSurvivalWidget::NativeConstruct()
 	if (!status) return;
 
 	//델리게이트 바인딩
-	status->OnStatusUpdated.AddDynamic(this, &UStatSurvivalWidget::HandleStatusUpdated);
+	status->OnStatusUpdated.AddDynamic(this, &UStatSurvivalWidget::HandleSurvivalStatusUpdated);
 	UE_LOG(LogTemp, Warning, TEXT("델리게이트 바인딩"));
 
 
@@ -40,7 +40,7 @@ void UStatSurvivalWidget::NativeDestruct()
 			if (UStatusComponent* status = player->GetStatusComponent())
 			{
 				//바인딩 해제
-				status->OnStatusUpdated.RemoveDynamic(this, &UStatSurvivalWidget::HandleStatusUpdated);
+				status->OnStatusUpdated.RemoveDynamic(this, &UStatSurvivalWidget::HandleSurvivalStatusUpdated);
 				UE_LOG(LogTemp, Warning, TEXT("바인딩 해제"));
 			}
 		}
@@ -49,7 +49,7 @@ void UStatSurvivalWidget::NativeDestruct()
 	Super::NativeDestruct();
 }
 
-void UStatSurvivalWidget::HandleStatusUpdated()
+void UStatSurvivalWidget::HandleSurvivalStatusUpdated()
 {
 	RefreshSurvival();
 }
@@ -64,34 +64,33 @@ void UStatSurvivalWidget::RefreshSurvival()
 	if (!status) return;
 
 	const float MaxHP = status->GetResultMaxHP();	//getresult--
-	MaxHPValue->SetText(FText::AsNumber(FMath::FloorToInt(MaxHP)));
+	MaxHPValue->SetText(FText::AsNumber(FMath::CeilToFloat(MaxHP)));
 
-	const float HPRegen = status->GetResultHPRegen();	//getresult--
-	HPRegenValue->SetText(FText::AsNumber(FMath::FloorToInt(HPRegen)));
+	const float HPRegen = status->GetResultHPRegen() * 60.0f;	//getresult--
+	HPRegenValue->SetText(FText::AsNumber(FMath::CeilToFloat(HPRegen)));
 
 	const float OverHeal = status->GetResultOverHeal();	//getresult--
-	OverHealValue->SetText(FText::AsNumber(FMath::FloorToInt(OverHeal)));
+	OverHealValue->SetText(FText::AsNumber(FMath::CeilToFloat(OverHeal)));
 	
 	const float Shield = status->GetResultShield();	//getresult--
-	ShieldValue->SetText(FText::AsNumber(FMath::FloorToInt(Shield)));
+	ShieldValue->SetText(FText::AsNumber(FMath::CeilToFloat(Shield)));
 
-	const float Armor = status->GetResultArmor();	//getresult--
+	const float Armor = status->GetResultArmor() * 100.0f;	//getresult--
 	ArmorValue->SetText(
 		FText::Format(FText::FromString(TEXT("{0}%")), 
-			FText::AsNumber(FMath::FloorToInt(Armor))));
+			FText::AsNumber(FMath::CeilToFloat(Armor))));
 
-	const float Evasion = status->GetResultEvasionChance();	//getresult--
+	const float Evasion = status->GetResultEvasionChance() * 100.0f;	//getresult--
 	EvasionValue->SetText(
 		FText::Format(FText::FromString(TEXT("{0}%")), 
-			FText::AsNumber(FMath::FloorToInt(Evasion))));
+			FText::AsNumber(FMath::CeilToFloat(Evasion))));
 
 	const float LifeDrain = status->GetResultLifeDrain();	//getresult--
 	LifeDrainValue->SetText(
 		FText::Format(FText::FromString(TEXT("{0}%")), 
-			FText::AsNumber(FMath::FloorToInt(LifeDrain))));
+			FText::AsNumber(FMath::CeilToFloat(LifeDrain))));
 
 	const float Thorn = status->GetResultThorn();	//getresult--
-	ThornValue->SetText(FText::AsNumber(FMath::FloorToInt(Thorn)));
-
+	ThornValue->SetText(FText::AsNumber(FMath::CeilToFloat(Thorn)));
 
 }

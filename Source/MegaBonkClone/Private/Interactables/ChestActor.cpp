@@ -2,6 +2,8 @@
 
 
 #include "Interactables/ChestActor.h"
+#include "Framework/MainHUD.h"
+#include "Kismet/GameplayStatics.h"
 #include "Interfaces/InventoryOwner.h"
 
 // Sets default values
@@ -56,10 +58,27 @@ void AChestActor::Interact_Implementation(AActor* PlayerActor)
 	UE_LOG(LogTemp, Log,TEXT("아이템 추가 %s"),*SelectedItemID.ToString());
 	IInventoryOwner::Execute_ReceiveItem(PlayerActor, SelectedItemID, 1);
 
+	FItemData* ItemData = ItemDataTable->FindRow<FItemData>(SelectedItemID, TEXT("ChestLoot"));
 
+	//HUD에 상자OpenUI띄우기 요청
+	if (ItemData)
+	{
+		// PlayerActor(캐릭터) -> Controller -> HUD 순서로 접근
+		if (APawn* PlayerPawn = Cast<APawn>(PlayerActor))
+		{
+			if (APlayerController* PC = Cast<APlayerController>(PlayerPawn->GetController()))
+			{
+				// HUD로 캐스팅해서 함수 호출
+				if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
+				{
+					HUD->ShowChestReward(*ItemData);
+				}
+			}
+		}
+	}
 
-	// 아이템 획득 이펙트 추가
-	//Destroy();
+	//상자 삭제 
+	Destroy();
 }
 
 FName AChestActor::GetRandomItemID()
@@ -112,7 +131,7 @@ FName AChestActor::GetRandomItemID()
 			return Candidate.ItemID; // 당첨된 ID 반환
 		}
 	}
-
+	
 	return Candidates.Last().ItemID;
 }
 

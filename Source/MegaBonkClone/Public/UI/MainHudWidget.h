@@ -35,6 +35,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "UI|Inventory")
 	void ClosePanels();
 
+	//중앙 패널을 교체하는 함수
+	UFUNCTION(BlueprintCallable, Category = "UI")
+	void SetCenterContent(UUserWidget* NewWidget);
+
+	//중앙 패널을 비우는 함수
+	UFUNCTION(BlueprintCallable, Category = "UI")
+	void ClearCenterContent();
+
 	//인벤토리 열림 상태 GETTER
 	inline EOpenState GetOpenState() const { return OpenState; }
 	inline UInventoryWidget* GetInventoryWidget() const { return InventoryPanel; }
@@ -60,6 +68,10 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon", meta = (BindWidget))
 	TObjectPtr<UInGameWeaponBarWidget> WeaponBar = nullptr; //플레이어스탯 위젯
+
+	//에디터의 Named Slot과 바인딩
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Center",meta = (BindWidget))
+	TObjectPtr<UNamedSlot> CenterSlot = nullptr;
 
 
 private:

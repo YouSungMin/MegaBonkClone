@@ -23,7 +23,7 @@ protected:
 
 	//델리게이트 바인딩될함수
 	UFUNCTION()
-	void HandleStatusUpdated();
+	void HandleSurvivalStatusUpdated();
 
 	//이벤트만들기
 	UFUNCTION(BlueprintCallable)
