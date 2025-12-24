@@ -89,6 +89,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Upgrades", meta = (DisplayName = "강화 선택지 목록 (Pool)", TitleProperty = "StatType"))
 	TArray<FWeaponUpgradeOption> UpgradeOptions;
 
+	// 생성될 BP 클래스
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Class", meta = (DisplayName = "무기 액터 클래스"))
+	TSubclassOf<AActor> WeaponClass;
+
 	// =========================================================
 	// [리소스]
 	// =========================================================
