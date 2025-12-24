@@ -278,6 +278,17 @@ void UStatusComponent::UpdateCharacterStatus()
 	//UI 델리게이트 갱신용 BroadCast
 	//
 	OnStatusUpdated.Broadcast();
+	if (OnHPChanged.IsBound())
+	{
+		OnHPChanged.Broadcast(CurrentHP, ResultMaxHP);
+	}
+
+	if (OnShieldChanged.IsBound())
+	{
+		// 쉴드는 보통 MaxHP 대비 비율로 보여주거나, 쉴드량 자체를 보여줍니다.
+		// 여기선 (현재 쉴드, 최대 체력)을 보내서 UI가 비율을 정하게 합니다.
+		OnShieldChanged.Broadcast(ResultShield, ResultShield);
+	}
 
     //디버그용 프린트 
 	if (GEngine)
@@ -705,6 +716,10 @@ void UStatusComponent::AddCurrentHP(float Amount)
 	// 현재 체력 변경 (0 ~ 최대 체력 사이로 제한)
 	// Amount가 양수면 회복, 음수면 데미지
 	CurrentHP = FMath::Clamp(CurrentHP + Amount, 0.0f, ResultMaxHP);
+	if (OnHPChanged.IsBound())
+	{
+		OnHPChanged.Broadcast(CurrentHP, ResultMaxHP);
+	}
 
 	if (Amount < 0.0f)
 	{
