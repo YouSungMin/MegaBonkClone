@@ -81,6 +81,8 @@ void AMainHUD::ShowChestReward(const FItemData& ItemData)
 		{
 			PC->SetShowMouseCursor(true);
 			PC->SetInputMode(FInputModeUIOnly());
+
+			UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.001f);
 		}
 	}
 }
@@ -124,6 +126,8 @@ void AMainHUD::CloseCenterUI()
 		{
 			PC->SetShowMouseCursor(false);
 			PC->SetInputMode(FInputModeGameOnly());
+
+			UGameplayStatics::SetGlobalTimeDilation(GetWorld(),1.0f);
 		}
 	}
 }
