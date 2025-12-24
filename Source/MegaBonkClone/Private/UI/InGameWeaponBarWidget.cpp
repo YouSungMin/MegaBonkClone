@@ -23,7 +23,7 @@ void UInGameWeaponBarWidget::NativeConstruct()
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("WeaponBar %d (GridPanel ÀÚ½Ä È®ÀÎ)"), i);
+			UE_LOG(LogTemp, Warning, TEXT("WeaponBar %d (GridPanel ï¿½Ú½ï¿½ È®ï¿½ï¿½)"), i);
 		}
 	}
 
@@ -36,11 +36,11 @@ void UInGameWeaponBarWidget::InitializeInventoryWidget(UWeaponSystemComponent* W
 
 	if (!TargetWeaponInventory.IsValid())
 	{
-		//UE_LOG(LogTemp, Warning, TEXT("Å¸±êÀÎº¥Åä¸® È®ÀÎÇÏ±â"));
+		//UE_LOG(LogTemp, Warning, TEXT("Å¸ï¿½ï¿½ï¿½Îºï¿½ï¿½ä¸® È®ï¿½ï¿½ï¿½Ï±ï¿½"));
 		return;
 	}
 
-	// NativeConstructº¸´Ù ¸ÕÀú È£ÃâµÇ´Â °æ¿ì ´ëºñ(¾ÈÀüÀåÄ¡)
+	// NativeConstructï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ È£ï¿½ï¿½Ç´ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½(ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¡)
 	if (WeaponSlotWidgets.Num() == 0 && WeaponSlotGridPanel)
 	{
 		const int32 ChildCount = WeaponSlotGridPanel->GetChildrenCount();
@@ -52,7 +52,7 @@ void UInGameWeaponBarWidget::InitializeInventoryWidget(UWeaponSystemComponent* W
 			}
 		}
 	}
-	//¾ÆÀÌÅÛ Ãß°¡µÇ¸é °»½Å
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ß°ï¿½ï¿½Ç¸ï¿½ ï¿½ï¿½ï¿½ï¿½
 
 	TargetWeaponInventory->OnWeaponChanged.RemoveDynamic(this, &UInGameWeaponBarWidget::HandleWeaponChanged);
 	TargetWeaponInventory->OnWeaponChanged.AddDynamic(this, &UInGameWeaponBarWidget::HandleWeaponChanged);
@@ -76,7 +76,7 @@ void UInGameWeaponBarWidget::RefreshInventoryWidget()
 	if (!TargetWeaponInventory.IsValid())
 		return;
 
-	// 1) ÀüºÎ ºñ¿ì±â
+	// 1) ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	for (UWeaponSlotWidget* SlotWidget : WeaponSlotWidgets)
 	{
 		if (SlotWidget)
@@ -85,7 +85,7 @@ void UInGameWeaponBarWidget::RefreshInventoryWidget()
 		}
 	}
 
-	// 2) ¹«±â µ¥ÀÌÅÍ Ã¤¿ì±â (3Ä­)
+	// 2) ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Ã¤ï¿½ï¿½ï¿½ (3Ä­)
 	const TArray<FWeaponSlot>& Slots = TargetWeaponInventory->GetWeaponSlots();
 
 	const int32 Count = FMath::Min(Slots.Num(), WeaponSlotWidgets.Num());
@@ -116,8 +116,8 @@ void UInGameWeaponBarWidget::HandleWeaponChanged()
 {
 	UE_LOG(LogTemp, Warning, TEXT("[WeaponBar] HandleWeaponChanged() CALLED"));
 
-	//ÀüÃ¼¸®ÇÁ·¹½Ã
+	//ï¿½ï¿½Ã¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	RefreshInventoryWidget();
-	UE_LOG(LogTemp, Warning, TEXT("µ¨¸®°ÔÀÌÆ® ¹ß»ý"));
+	UE_LOG(LogTemp, Warning, TEXT("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ß»ï¿½"));
 
 }

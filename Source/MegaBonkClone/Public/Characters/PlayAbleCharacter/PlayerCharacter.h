@@ -18,6 +18,8 @@ public:
 	// Sets default values for this character's properties
 	APlayerCharacter();
 
+	void DefaultWeaponEquip();
+
 	//캐릭터 초기 설정 함수
 	void InitializeCharacterComponents();
 
@@ -58,7 +60,7 @@ public:
 	inline UStatusComponent* GetStatusComponent() { return StatusComponent2; }
 	//무기 시스템 컴포넌트 GETTER 함수
 	UFUNCTION(BlueprintCallable)
-	inline UWeaponSystemComponent* GetWeaponComponent() { return WeaponComponent; }
+	inline UWeaponSystemComponent* GetWeaponComponent() { return WeaponComponent2; }
 	//인벤토리 컴포넌트 GETTER 함수
 	UFUNCTION(BlueprintCallable)
 	inline UInventoryComponent* GetInventoryComponent() { return InventoryComponent; }
@@ -150,7 +152,7 @@ protected:
 	TObjectPtr<UStatusComponent> StatusComponent2 = nullptr;
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadWrite, Category = "Player|Components")
-	TObjectPtr<class UWeaponSystemComponent> WeaponComponent = nullptr;
+	TObjectPtr<class UWeaponSystemComponent> WeaponComponent2 = nullptr;
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadWrite, Category = "Player|Components")
 	TObjectPtr<class UInventoryComponent> InventoryComponent = nullptr;

@@ -18,10 +18,10 @@ class MEGABONKCLONE_API UInGameWeaponBarWidget : public UUserWidget
 public:
 	virtual void NativeConstruct() override;
 
-	//¿ÜºÎ ÀÎº¥Åä¸® ÄÄÆ÷³ÍÆ® ÁÖÀÔ
+	//ï¿½Üºï¿½ ï¿½Îºï¿½ï¿½ä¸® ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½
 	void InitializeInventoryWidget(UWeaponSystemComponent* WeaponSystemComponent);
 
-	//ÇöÀç ÀÎº¥Åä¸®·Î UIÃ¤¿ì±â
+	//ï¿½ï¿½ï¿½ï¿½ ï¿½Îºï¿½ï¿½ä¸®ï¿½ï¿½ UIÃ¤ï¿½ï¿½ï¿½
 	UFUNCTION()
 	void RefreshInventoryWidget();
 
@@ -30,7 +30,7 @@ public:
 	void ClearInventoryWidget();
 
 private:
-	//¾ÆÀÌÅÛ Ãß°¡½Ã ÀÌº¥Æ® ÀüÃ¼ ¸®ÇÁ·¹½Ã
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ß°ï¿½ï¿½ï¿½ ï¿½Ìºï¿½Æ® ï¿½ï¿½Ã¼ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	UFUNCTION()
 	void HandleWeaponChanged();
 
@@ -43,7 +43,7 @@ private:
 	TWeakObjectPtr<class UWeaponSystemComponent> TargetWeaponInventory = nullptr;
 
 
-	//NativeConstruct¿¡¼­ ±×¸®µåÆÐ³Î 8°³ ½½·Ô Ä³½Ì
+	//NativeConstructï¿½ï¿½ï¿½ï¿½ ï¿½×¸ï¿½ï¿½ï¿½ï¿½Ð³ï¿½ 8ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Ä³ï¿½ï¿½
 	UPROPERTY()
 	TArray<TObjectPtr<class UWeaponSlotWidget>> WeaponSlotWidgets;
 

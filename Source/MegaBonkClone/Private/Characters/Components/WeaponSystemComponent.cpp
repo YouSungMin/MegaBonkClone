@@ -12,152 +12,183 @@ UWeaponSystemComponent::UWeaponSystemComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
 
-	// ...
-	//고정 무기 슬롯
-	
-	PlayerWeapons.Empty();
-	PlayerWeapons.SetNum(MaxWeaponNum);
 
-	//UI용
-	WeaponSlots.Empty();
-	WeaponSlots.SetNum(MaxWeaponNum);
+	ActiveSlots.Empty();
+	ActiveSlots.SetNum(MaxWeaponSlots);
 
 }
 
-void UWeaponSystemComponent::EquipWeapon()
+void UWeaponSystemComponent::AddWeapon(FName WeaponID)
 {
-	ACharacter* character = Cast<ACharacter>(GetOwner());
-	for (const TSubclassOf<AActor> elements : PlayerWeapons) {
-		if (elements) {
-			AActor* spawnWeapon = GetWorld()->SpawnActor<AActor>(elements, FVector::ZeroVector, FRotator::ZeroRotator);
-			spawnWeapon->AttachToComponent(character->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, NAME_None);
+	if (!WeaponDataTable) return;
+
+	// 1. 이미 가지고 있는지 체크 (안전장치)
+	if (HasWeapon(WeaponID)) return;
+
+	// 2. 데이터 조회
+	FWeaponData* Row = WeaponDataTable->FindRow<FWeaponData>(WeaponID, TEXT("AddWeapon"));
+	if (!Row || !Row->WeaponClass) return;
+
+	// 3. 빈 슬롯 찾기
+	for (auto& Slot : ActiveSlots)
+	{
+		if (Slot.IsEmpty()) // 비어있다면
+		{
+			// A. 실제 액터 스폰
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.Owner = GetOwner();
+
+			AWeaponBase* NewWeapon = GetWorld()->SpawnActor<AWeaponBase>(Row->WeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+
+			if (NewWeapon)
+			{
+				// B. 캐릭터에 부착
+				ACharacter* OwnerChar = Cast<ACharacter>(GetOwner());
+				if (OwnerChar)
+				{
+					NewWeapon->AttachToComponent(OwnerChar->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, NAME_None);
+				}
+
+				// C. 슬롯 데이터 채우기 (통합!)
+				Slot.WeaponID = WeaponID;
+				Slot.Level = 1;
+				Slot.WeaponInstance = NewWeapon; // 인스턴스 저장
+
+				// D. UI 알림
+				OnWeaponChanged.Broadcast();
+
+				UE_LOG(LogTemp, Log, TEXT("[WeaponSystem] 무기 추가 완료: %s"), *WeaponID.ToString());
+			}
+			return; // 추가했으니 종료
 		}
 	}
+	UE_LOG(LogTemp, Warning, TEXT("[WeaponSystem] 슬롯이 가득 찼습니다."));
 }
 
-void UWeaponSystemComponent::AddWeapon(TSubclassOf<AActor> InWeapon)
+void UWeaponSystemComponent::LevelUpWeapon(FName WeaponID, EItemStatType StatType, float IncreaseValue)
 {
-	if (!InWeapon) return;
-
-	/*UE_LOG(LogTemp, Warning, TEXT("[WeaponSystem] AddWeapon Class=%s"),
-		InWeapon ? *InWeapon->GetName() : TEXT("NULL"));*/
-
-	//무기 클래스 이름 -> 데이터테이블으로 변환 
-	const FName WeaponID = ResolveWeaponIDFromClass(InWeapon);
-
-	//클래스 이름찍기
-	/*UE_LOG(LogTemp, Warning, TEXT("[WeaponSystem] AddWeapon Class=%s -> ResolvedID=%s"),
-		*InWeapon->GetName(), *WeaponID.ToString());*/
-
-
-	for (int32 i = 0; i < PlayerWeapons.Num(); i++)
+	// 슬롯을 순회하며 내 무기 찾기
+	for (auto& Slot : ActiveSlots)
 	{
-		// 현재 슬롯이 비어있다면?
-		if (PlayerWeapons[i] == nullptr)
+		if (Slot.WeaponID == WeaponID)
 		{
-			PlayerWeapons[i] = InWeapon;
+			// 1. 레벨 증가
+			Slot.Level++;
 
-			//UI가 사용할 WeaponID/Level 저장
-			WeaponSlots[i].WeaponID = WeaponID;
-			WeaponSlots[i].Level = 1;
+			// 2. 실제 무기 스탯 적용 (인스턴스가 있으니 바로 접근 가능!)
+			if (Slot.WeaponInstance)
+			{
+				// AWeaponBase에 스탯 적용 함수가 있다고 가정 (없으면 변수 직접 수정)
+				// Slot.WeaponInstance->ApplyUpgrade(StatType, IncreaseValue); 
+
+				// 예시: 변수 직접 수정
+				if (StatType == EItemStatType::Damage)
+				{
+					Slot.WeaponInstance->WeaponDamage += IncreaseValue;
+				}
+				// ... 다른 스탯 처리
+			}
 
 			OnWeaponChanged.Broadcast();
-
-			UE_LOG(LogWeapon, Log, TEXT("무기 장착 성공: 슬롯 %d"), i);
-			EquipWeapon();
 			return;
 		}
 	}
-
-	UE_LOG(LogWeapon, Warning, TEXT("무기 슬롯이 가득 찼습니다! (추가 실패)"));
 }
 
-//UI에서 아이콘 이름 가져올떄 사용
+// ================= Helpers =================
+
+bool UWeaponSystemComponent::HasWeapon(FName WeaponID) const
+{
+	for (const auto& Slot : ActiveSlots)
+	{
+		if (Slot.WeaponID == WeaponID) return true;
+	}
+	return false;
+}
+
+int32 UWeaponSystemComponent::GetWeaponLevel(FName WeaponID) const
+{
+	for (const auto& Slot : ActiveSlots)
+	{
+		if (Slot.WeaponID == WeaponID) return Slot.Level;
+	}
+	return 0;
+}
+
+int32 UWeaponSystemComponent::GetCurrentWeaponCount() const
+{
+	int32 Count = 0;
+	for (const auto& Slot : ActiveSlots)
+	{
+		if (!Slot.IsEmpty()) Count++;
+	}
+	return Count;
+}
+
 FWeaponData* UWeaponSystemComponent::GetWeaponInfo(FName WeaponID) const
 {
-	if (!WeaponDataTable)
-	{
-		UE_LOG(LogTemp, Error, TEXT("WeaponDataTable is not set in WeaponComponent!"));
-		return nullptr;
-	}
+	// 1. 데이터 테이블이 없거나 ID가 없으면 빈 값 반환
+	if (!WeaponDataTable || WeaponID.IsNone()) return nullptr;
+
+	// 2. 데이터 테이블에서 ID로 검색해서 반환
 	static const FString ContextString(TEXT("GetWeaponInfo"));
-	
 	return WeaponDataTable->FindRow<FWeaponData>(WeaponID, ContextString);
-
 }
 
 
-// Called when the game starts
-void UWeaponSystemComponent::BeginPlay()
+FName UWeaponSystemComponent::ResolveWeaponIDFromClass(TSubclassOf<AActor> InWeaponClass) const
 {
-	Super::BeginPlay();
+	// 1. 유효성 검사 (입력값 및 DT 확인)
+	if (!InWeaponClass || !WeaponDataTable) return NAME_None;
 
+	// 2. 데이터 테이블의 모든 행(Row) 이름 가져오기
+	TArray<FName> RowNames = WeaponDataTable->GetRowNames();
 
-	// ...
-	//DTRowName찍기
-	//UE_LOG(LogTemp, Warning, TEXT("[WeaponDT] BeginPlay DT=%s"),
-	//	WeaponDataTable ? *WeaponDataTable->GetName() : TEXT("NULL"));
-
-	if (WeaponDataTable)
+	// 3. 반복문을 돌면서 클래스 비교 (역참조 방식)
+	for (const FName& RowName : RowNames)
 	{
-		const TArray<FName> Names = WeaponDataTable->GetRowNames();
-		for (const FName& N : Names)
+		// 해당 행의 데이터 가져오기
+		FWeaponData* RowData = WeaponDataTable->FindRow<FWeaponData>(RowName, TEXT("ResolveWeaponID"));
+
+		// 데이터가 유효하고, 클래스가 일치하는지 확인
+		if (RowData && RowData->WeaponClass == InWeaponClass)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("[WeaponDT] RowName=%s"), *N.ToString());
+			// 일치하는 행의 ID(RowName) 반환
+			return RowName;
 		}
 	}
-	//
 
-	UE_LOG(LogTemp, Warning, TEXT("[WeaponSystem] BeginPlay called"));
-
-	// 시작 시 PlayerWeapons -> WeaponSlots 동기화
-	for (int32 i = 0; i < MaxWeaponNum; ++i)
-	{
-		if (!PlayerWeapons.IsValidIndex(i) || PlayerWeapons[i] == nullptr)
-		{
-			WeaponSlots[i].WeaponID = NAME_None;
-			WeaponSlots[i].Level = 0;
-			continue;
-		}
-
-		WeaponSlots[i].WeaponID = ResolveWeaponIDFromClass(PlayerWeapons[i]);
-		WeaponSlots[i].Level = 1;
-	}
-
-	OnWeaponChanged.Broadcast();
-	UE_LOG(LogTemp, Warning, TEXT("[WeaponSystem] Broadcast OnWeaponChanged"));
-}
-
-
-//무기클래스 이름 -> DTRow로 변환함 
-FName UWeaponSystemComponent::ResolveWeaponIDFromClass(TSubclassOf<AActor> InWeapon) const
-{
-	if (!InWeapon) return NAME_None;
-
-	FString Name = InWeapon->GetName();
-
-	// 1) BP_ 접두어 제거
-	Name.RemoveFromStart(TEXT("BP_"));
-
-	// 2) _C 접미어 제거
-	Name.RemoveFromEnd(TEXT("_C"));
-
-	// 3) 첫 글자만 대문자 (RowName이 Flamewalker 형태라면)
-	if (Name.Len() > 0)
-	{
-		Name[0] = FChar::ToUpper(Name[0]);
-	}
-
-	const FName Candidate(*Name);
-
-	// 4) 진짜로 DT에 Row가 있으면 그걸 반환
-	if (WeaponDataTable->FindRow<FWeaponData>(Candidate, TEXT("ResolveWeaponIDFromClass")))
-	{
-		return Candidate;
-	}
-
+	// 4. 일치하는 무기가 없으면 None 반환
 	return NAME_None;
 }
 
+void UWeaponSystemComponent::Debug_TestWeapon(FName WeaponID)
+{
+	if (WeaponID.IsNone())
+	{
+		UE_LOG(LogTemp, Error, TEXT("[Debug] 테스트할 무기 ID가 입력되지 않았습니다 (None)."));
+		return;
+	}
 
+	UE_LOG(LogTemp, Warning, TEXT("=========== [Weapon Test Logic] ==========="));
 
+	// 1. 이미 가지고 있는지 확인
+	if (HasWeapon(WeaponID))
+	{
+		// [강화] 가지고 있다면 -> 데미지 +5.0 강화 테스트
+		UE_LOG(LogTemp, Log, TEXT("[Debug] 이미 보유 중인 무기입니다. 강화를 시도합니다: %s"), *WeaponID.ToString());
+
+		// EItemStatType::Damage는 프로젝트의 Enum에 정의된 값이어야 합니다.
+		// 만약 다른 스탯을 테스트하고 싶다면 파라미터로 받게 수정해도 됩니다.
+		LevelUpWeapon(WeaponID, EItemStatType::Damage, 5.0f);
+	}
+	else
+	{
+		// [신규] 없다면 -> 신규 장착 테스트
+		UE_LOG(LogTemp, Log, TEXT("[Debug] 보유하지 않은 무기입니다. 신규 추가를 시도합니다: %s"), *WeaponID.ToString());
+
+		AddWeapon(WeaponID);
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("==========================================="));
+}
