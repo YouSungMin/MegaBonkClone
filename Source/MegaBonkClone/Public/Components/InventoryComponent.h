@@ -46,6 +46,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	void AddItem(FName ItemID, int32 Count = 1);
 
+	// 일반 아이템 제거 함수
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	void RemoveItem(FName ItemID, int32 Count = 1);
+
 	UFUNCTION(BlueprintPure, Category = "Inventory")
 	const TArray<FInventorySlot>& GetSecretBookSlots() const { return SecretBookSlots; }
 

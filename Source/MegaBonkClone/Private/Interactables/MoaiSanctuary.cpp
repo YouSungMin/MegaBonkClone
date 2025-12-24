@@ -2,7 +2,3 @@
 
 
 #include "Interactables/MoaiSanctuary.h"
-
-void AMoaiSanctuary::ApplyEffect_Implementation(AActor* Player)
-{
-}

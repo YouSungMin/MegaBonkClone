@@ -118,7 +118,7 @@ void AShadyGuyActor::DetermineRarity()
 		}
 	}
 
-	UE_LOG(LogTemp, Log, TEXT("ShadyGuy Rarity Decided: %d"), (int32)CurrentRarity);
+	//UE_LOG(LogTemp, Log, TEXT("ShadyGuy Rarity Decided: %d"), (int32)CurrentRarity);
 }
 
 void AShadyGuyActor::UpdateMeshTexture()
