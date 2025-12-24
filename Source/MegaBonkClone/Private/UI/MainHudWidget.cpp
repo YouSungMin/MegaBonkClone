@@ -5,6 +5,7 @@
 #include "Characters/PlayAbleCharacter/PlayerCharacter.h"
 #include "Characters/Components/StatusComponent.h"
 #include "Components/InventoryComponent.h"
+#include "Components/NamedSlot.h"
 #include "Characters/Components/WeaponSystemComponent.h"
 #include "UI/ResourceBarWidget.h"
 
@@ -70,5 +71,27 @@ void UMainHudWidget::ClosePanels()
 	InventoryPanel->SetVisibility(ESlateVisibility::Hidden);	//인벤토리 패널 숨기기
 	PlayerStatsPanel->SetVisibility(ESlateVisibility::Hidden);	//플레이어스탯 패널 숨기기
 
+}
+
+void UMainHudWidget::SetCenterContent(UUserWidget* NewWidget)
+{
+	if (!CenterSlot) return;
+
+	// 1. 기존 내용물 비우기
+	CenterSlot->ClearChildren();
+
+	// 2. 새 위젯이 있다면 슬롯에 넣기
+	if (NewWidget)
+	{
+		CenterSlot->SetContent(NewWidget);
+	}
+}
+
+void UMainHudWidget::ClearCenterContent()
+{
+	if (CenterSlot)
+	{
+		CenterSlot->ClearChildren();
+	}
 }
 

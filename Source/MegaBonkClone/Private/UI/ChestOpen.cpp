@@ -6,6 +6,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Data/ItemDataStructs.h"
 #include "Misc/OutputDeviceNull.h"
+#include "Framework/MainHUD.h"
 //초기화
 void UChestOpen::NativeConstruct()
 {
@@ -33,6 +34,7 @@ void UChestOpen::NativeConstruct()
 //외부 호출: 연출 시작
 void UChestOpen::PlayLootSequence(const FItemData& InRowData)
 {
+
 	//열기 버튼만 보이기
 	if (Btn_OpenChest) Btn_OpenChest->SetVisibility(ESlateVisibility::Visible); 
 	//이아래는 숨기기
@@ -139,17 +141,20 @@ void UChestOpen::ShowItemIcon()
 //버튼 클릭: 닫기
 void UChestOpen::OnClaimClicked()
 {
-	// 위젯 닫기
-	RemoveFromParent();
-
-	// 로그 출력
-	UE_LOG(LogTemp, Log, TEXT("아이템 획득 확인! 창을 닫습니다."));
+	// HUD를 찾아서 닫기 요청
+	if (APlayerController* PC = GetOwningPlayer())
+	{
+		if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
+		{
+			HUD->CloseCenterUI(); // 중앙 슬롯을 비우고 게임 모드로 돌아감
+		}
+	}
 }
 
 void UChestOpen::OnDeclineClicked()
 {
 	// 위젯 닫기
-	RemoveFromParent();
+	SetVisibility(ESlateVisibility::Hidden);
 
 	// 로그 출력
 	UE_LOG(LogTemp, Log, TEXT("아이템 획득 거절! 창을 닫습니다."));

@@ -22,12 +22,12 @@ void AMegaBonkGameState::Tick(float DeltaTime)
 	if (IsOvertime())
 	{
 		// 제한 시간 초과: 오버타임 로직 (다른 몬스터만 소환)
-		CheckOvertimeLogic();
+		//CheckOvertimeLogic();
 	}
 	else
 	{
 		// 제한 시간 이내: 기존 웨이브 로직 (데이터 테이블)
-		CheckWaveLogic();
+		//CheckWaveLogic();
 	}
 }
 
