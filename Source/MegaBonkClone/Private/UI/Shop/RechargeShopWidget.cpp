@@ -14,14 +14,33 @@ void URechargeShopWidget::NativeConstruct()
 	Slot2->ClearRechargeSlot();
 	Slot3->ClearRechargeSlot();
 
-	if (Slot1) Slot1->OnSlotClicked.AddDynamic(this, &URechargeShopWidget::OnAnySlotClicked);
-	if (Slot2) Slot2->OnSlotClicked.AddDynamic(this, &URechargeShopWidget::OnAnySlotClicked);
-	if (Slot3) Slot3->OnSlotClicked.AddDynamic(this, &URechargeShopWidget::OnAnySlotClicked);
 
+	UE_LOG(LogTemp, Warning, TEXT("[RechargeShop] NativeConstruct called"));
+
+	UE_LOG(LogTemp, Warning, TEXT("[RechargeShop] ExitButton ptr = %s"),
+		ExitButton ? TEXT("VALID") : TEXT("NULL"));
+
+	if (Slot1)
+	{
+		Slot1->OnSlotClicked.RemoveDynamic(this, &URechargeShopWidget::OnAnySlotClicked);
+		Slot1->OnSlotClicked.AddDynamic(this, &URechargeShopWidget::OnAnySlotClicked);
+	}
+	if (Slot2)
+	{
+		Slot2->OnSlotClicked.RemoveDynamic(this, &URechargeShopWidget::OnAnySlotClicked);
+		Slot2->OnSlotClicked.AddDynamic(this, &URechargeShopWidget::OnAnySlotClicked);
+	}
+	if (Slot3)
+	{
+		Slot3->OnSlotClicked.RemoveDynamic(this, &URechargeShopWidget::OnAnySlotClicked);
+		Slot3->OnSlotClicked.AddDynamic(this, &URechargeShopWidget::OnAnySlotClicked);
+	}
 	// Exit 버튼
 	if (ExitButton)
 	{
 		ExitButton->OnClicked.AddDynamic(this, &URechargeShopWidget::OnExitClicked);
+		UE_LOG(LogTemp, Warning, TEXT("[RechargeShop] ExitButton bind OK"));
+
 	}
 }
 
