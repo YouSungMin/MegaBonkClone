@@ -4,6 +4,7 @@
 #include "Items/PickupItem/PickupBaseActor.h"
 #include "Components/SphereComponent.h"
 #include "Components/TimelineComponent.h"
+#include "Framework/ObjectPoolSubsystem.h"
 #include <Kismet/GameplayStatics.h>
 
 // Sets default values
@@ -26,6 +27,7 @@ APickupBaseActor::APickupBaseActor()
 	Mesh->SetupAttachment(BaseRoot);
 	Mesh->SetCollisionProfileName(TEXT("NoCollision"));
 	Mesh->AddRelativeRotation(FRotator(0, 0, -10.0f));
+
 
 	PickupTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("PickupTimeline"));
 }
@@ -88,7 +90,6 @@ void APickupBaseActor::OnPickup_Implementation(AActor* Target)
 		bPickuped = true;
 		PickupOwner = Target;
 		PickupStartLocation = GetActorLocation();
-		SetActorEnableCollision(false);		// 이 액터와 액터가 포함하는 모든 컴포넌트의 충돌 정지
 		BaseRoot->SetSimulatePhysics(false);// 바닥으로 가라앉는것 방지
 		PickupTimeline->PlayFromStart();	// 타임라인 시작
 	}
@@ -96,11 +97,87 @@ void APickupBaseActor::OnPickup_Implementation(AActor* Target)
 
 void APickupBaseActor::OnPickupComplete_Implementation()
 {
+	UWorld* World = GetWorld();
+	if (World)
+	{
+		UObjectPoolSubsystem* Pool = World->GetSubsystem<UObjectPoolSubsystem>();
+		if (Pool)
+		{
+			Pool->ReturnToPool(this);
+			UE_LOG(LogTemp, Log, TEXT("ReturnToPool 완료"));
+			return;
+		}
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("ReturnToPool 실패"));
 	Destroy();
+}
+void APickupBaseActor::OnPoolActivate_Implementation()
+{
+	// 1. 로직 상태 변수 리셋
+	bPickuped = false;
+	PickupOwner = nullptr;
+	PickupStartLocation = FVector::ZeroVector;
+
+	// 2. 가시성 및 충돌 다시 켜기
+	SetActorHiddenInGame(false);
+
+	// 3. 루트 컴포넌트 물리 상태 복구
+	if (BaseRoot)
+	{
+		// 물리 시뮬레이션 다시 켜기
+		BaseRoot->SetSimulatePhysics(true);
+		BaseRoot->SetCollisionProfileName(TEXT("BlockAllDynamic"));
+
+		// [중요] 이전 움직임(가속도/회전)이 남아있지 않게 속도 0으로 초기화
+		BaseRoot->SetPhysicsLinearVelocity(FVector::ZeroVector);
+		BaseRoot->SetPhysicsAngularVelocityInDegrees(FVector::ZeroVector);
+	}
+
+	// 4. 타임라인에 의해 변경된 메시 크기/위치 복구
+	if (Mesh)
+	{
+		Mesh->SetRelativeScale3D(FVector(0.3f));
+	}
+
+	// 5. 타임라인 컴포넌트 리셋
+	if (PickupTimeline)
+	{
+		PickupTimeline->Stop();
+		PickupTimeline->SetPlaybackPosition(0.0f, false);
+	}
+}
+
+void APickupBaseActor::OnPoolDeactivate_Implementation()
+{
+	// 1. 화면에서 숨기고 충돌 끄기
+	SetActorHiddenInGame(true);
+	// 2. 물리 연산 중지 (성능 절약)
+	if (BaseRoot)
+	{
+		BaseRoot->SetSimulatePhysics(false);
+	}
+
+	// 3. 실행 중인 타임라인 강제 정지
+	if (PickupTimeline)
+	{
+		PickupTimeline->Stop();
+	}
+
+	// (선택 사항) 만약 틱(Tick)을 껐다 켰다 한다면 여기서 SetActorTickEnabled(false);
 }
 
 void APickupBaseActor::OnTimelineUpdate(float Value)
 {
+	if (!bPickuped)
+	{
+		if (PickupTimeline && PickupTimeline->IsPlaying())
+		{
+			PickupTimeline->Stop();
+		}
+		return;
+	}
+
 	// 플레이어가 유효하지 않으면 아이템을 삭제
 	if (!PickupOwner.IsValid())
 	{
@@ -121,7 +198,7 @@ void APickupBaseActor::OnTimelineUpdate(float Value)
 	//NewLocation += heightValue * PickupHeight * FVector::UpVector;
 	SetActorLocation(NewLocation);
 
-	FVector NewScale = FVector::One() * scaleValue;
+	FVector NewScale = FVector(scaleValue);
 	Mesh->SetRelativeScale3D(NewScale);
 }
 

@@ -4,11 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Interfaces/ObjectPoolInterface.h"
 #include "Interfaces/PickupInterface.h"
 #include "PickupBaseActor.generated.h"
 
 UCLASS()
-class MEGABONKCLONE_API APickupBaseActor : public AActor , public IPickupInterface
+class MEGABONKCLONE_API APickupBaseActor : public AActor , public IPickupInterface, public IObjectPoolInterface
 {
 	GENERATED_BODY()
 	
@@ -30,6 +31,9 @@ public:
 	virtual void OnPickupComplete_Implementation() override;
 
 	inline bool IsPickup() const { return bPickuped;}
+
+	virtual void OnPoolActivate_Implementation() override;
+	virtual void OnPoolDeactivate_Implementation() override;
 private:
 	UFUNCTION()
 	void OnTimelineUpdate(float Value);
