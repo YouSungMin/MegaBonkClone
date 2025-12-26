@@ -29,7 +29,7 @@ AActor* UObjectPoolSubsystem::SpawnPooledActor(UClass* Class, FVector location, 
 	if (!PooledActor)
 	{
 		FActorSpawnParameters Params;
-		Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 		PooledActor = GetWorld()->SpawnActor<AActor>(Class, location, rotation, Params);
 
 		if (PooledActor)

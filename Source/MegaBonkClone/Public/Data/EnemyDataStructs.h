@@ -60,6 +60,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Reward", meta = (DisplayName = "드랍 경험치"))
 	int32 DropExp = 10;
 
+	//돈
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Reward", meta = (DisplayName = "드랍 골드"))
+	int32 DropGold = 10;
+
 	// ============================================================
 	// [리소스]
 	// ============================================================
