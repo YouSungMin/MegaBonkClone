@@ -19,8 +19,7 @@ class MEGABONKCLONE_API UDamageValueWidget : public UUserWidget
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "UI")
-	void PlayDamagePopup(float Damage);
-
+	float PlayDamagePopup(float Damage);
 protected:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> DamageText = nullptr;;
