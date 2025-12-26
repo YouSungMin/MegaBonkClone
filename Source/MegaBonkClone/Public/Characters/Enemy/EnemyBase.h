@@ -35,6 +35,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Enemy|Drop")
 	void SpawnDrops(UDataTable* DataTable, FName RowName, float ScatterRadius = 100.0f);
 
+	//데미지 UI 액터 스폰 함수
+	UFUNCTION(BlueprintCallable, Category = "UI")
+	void ShowDamagePopup(float DamageAmount);
+
 private:
 
 	// 내부적으로 반복해서 스폰하는 헬퍼 함수
@@ -45,4 +49,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy|Drop")
 	TSubclassOf<AResourcePickup> GoldItemClass; 
+
+	//데미지 UI 액터
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	TSubclassOf<class ADamageTextActor> DamageTextActorClass;
 };
