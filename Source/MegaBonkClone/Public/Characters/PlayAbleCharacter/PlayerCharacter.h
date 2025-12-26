@@ -157,6 +157,9 @@ protected:
 	UPROPERTY(VisibleAnywhere,BlueprintReadWrite, Category = "Player|Components")
 	TObjectPtr<class UInventoryComponent> InventoryComponent = nullptr;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Player|Components")
+	TObjectPtr<class URewardSystemComponent> RewardSystemComponent = nullptr;
+
 private:
 	// 캐릭터가 무적 상태 변수
 	bool bIsInvincible = false;

@@ -74,7 +74,7 @@ void UInventoryComponent::BeginPlay()
 	GeneralItems.Empty();
 }
 
-bool UInventoryComponent::AddSecretBook(FName BookID)
+bool UInventoryComponent::AddSecretBook(FName BookID, float AddValue)
 {
     FItemData* FoundData = GetItemInfo(BookID);
     if (!FoundData)
@@ -91,7 +91,7 @@ bool UInventoryComponent::AddSecretBook(FName BookID)
         {
             Slot.Level++;
             UE_LOG(LogTemp, Log, TEXT("SecretBook Level Up: %s (Lv.%d)"), *BookID.ToString(), Slot.Level);
-			ApplyPassiveStats(*FoundData, 1, false);
+			ApplyPassiveStats(*FoundData, 1, false, AddValue, EItemType::SecretBook);
 			OnItemAdd.Broadcast(BookID, *FoundData);
             return true;
         }
@@ -111,7 +111,7 @@ bool UInventoryComponent::AddSecretBook(FName BookID)
     NewSlot.Quantity = 1;
 
     SecretBookSlots.Add(NewSlot);
-	ApplyPassiveStats(*FoundData, 1, true);
+	ApplyPassiveStats(*FoundData, 1, true, AddValue, EItemType::SecretBook);
     OnItemAdd.Broadcast(BookID, *FoundData);
     UE_LOG(LogTemp, Log, TEXT("SecretBook Added: %s"), *BookID.ToString());
 
@@ -137,7 +137,7 @@ void UInventoryComponent::AddItem(FName ItemID, int32 Count)
         {
             Slot.Quantity += Count;
             UE_LOG(LogTemp, Log, TEXT("Item 갯수 추가: %s (Qty: %d)"), *ItemID.ToString(), Slot.Quantity);
-			ApplyPassiveStats(*FoundData, Count, false);
+			ApplyPassiveStats(*FoundData, Count, false, 0.0f, EItemType::GeneralItem);
 			
 			OnItemAdd.Broadcast(ItemID, *FoundData);
             return;
@@ -151,7 +151,7 @@ void UInventoryComponent::AddItem(FName ItemID, int32 Count)
     NewSlot.Quantity = Count;
 
     GeneralItems.Add(NewSlot);
-	ApplyPassiveStats(*FoundData, Count, true);
+	ApplyPassiveStats(*FoundData, Count, true, 0.0f, EItemType::GeneralItem);
     OnItemAdd.Broadcast(ItemID, *FoundData);
     UE_LOG(LogTemp, Log, TEXT("Item 추가: %s (Qty: %d)"), *ItemID.ToString(), Count);
 }
@@ -204,203 +204,240 @@ FItemData* UInventoryComponent::GetItemInfo(FName ItemID) const
 	return ItemDataTable->FindRow<FItemData>(ItemID, ContextString);
 }
 
-void UInventoryComponent::ApplyPassiveStats(const FItemData& ItemData, int32 Count, bool bIsFirstGet)
+void UInventoryComponent::ApplyPassiveStats(const FItemData& ItemData, int32 Count, bool bIsFirstGet, float AddValue, EItemType ItemType)
 {
 	if (!CachedStatusComponent)
 	{
-		AActor* Owner = GetOwner();
-		if (Owner)
+		if (AActor* Owner = GetOwner())
 		{
 			CachedStatusComponent = Owner->FindComponentByClass<UStatusComponent>();
 		}
 	}
     if (!CachedStatusComponent || Count <= 0) return;
 
-    for (const FItemStatModifier& Mod : ItemData.Modifiers)
-    {
-        float RawValue = 0.0f;
-        if (bIsFirstGet)
-            RawValue = Mod.BaseValue + (Mod.StackValue * (Count - 1));
-        else
-            RawValue = Mod.StackValue * Count;
+	for (int32 i = 0; i < ItemData.Modifiers.Num(); ++i)
+	{
+		const FItemStatModifier& Mod = ItemData.Modifiers[i];
 
-        auto ApplyStatHelper = [&](float CurrentBaseStat, TFunction<void(float)> SetterFunc)
-            {
-                float FinalAddValue = RawValue;
+		float FinalAddValue = 0.0f;
 
-                if (Mod.bIsPercentage)
-                {
-                    FinalAddValue = CurrentBaseStat * (RawValue / 100.0f);
-                }
+		// 1. 외부에서 주입된 값(AddValue)이 있다면 최우선 사용
+		// (보통 비전서의 메인 스탯은 0번 인덱스라고 가정)
+		if (i == 0 && AddValue > 0.0f)
+		{
+			FinalAddValue = AddValue;
+		}
+		// 2. 주입된 값이 없다면(0.0), 기존 테이블 데이터 계산
+		else
+		{
+			if (bIsFirstGet)
+				FinalAddValue = Mod.BaseValue + (Mod.StackValue * (Count - 1));
+			else
+				FinalAddValue = Mod.StackValue * Count;
+		}
 
-                // 실제 적용 함수 실행
-                SetterFunc(FinalAddValue);
+		// ... (이하 ApplyStatHelper 및 스위치문 로직은 기존과 동일) ...
+		// FinalAddValue를 사용하여 스탯 적용
 
-                // 로그 출력 (선택 사항)
-                UE_LOG(LogTemp, Log, TEXT("Stat Applied [%s]: Added %.2f"), *UEnum::GetValueAsString(Mod.StatType), FinalAddValue);
-            };
+		auto ApplyStatHelper = [&](TFunction<void(float)> PlayerFunc, TFunction<void(float)> VisionFunc)
+			{
+				float ApplyVal = FinalAddValue;
 
-        switch (Mod.StatType)
-        {
+				// [A] 비전서(SecretBook)
+				// -> StatusComponent 내부 로직에 맡기므로 값 그대로 전달
+				if (ItemType == EItemType::SecretBook)
+				{
+					VisionFunc(ApplyVal);
+				}
+				// [B] 일반 아이템(Player)
+				else
+				{
+					// 퍼센트 체크 (합연산)
+					if (Mod.bIsPercentage)
+					{
+						// 예: 공격력 15% 증가 -> 1.0(기본) + 0.15(추가)
+						// 예: 체력 10% 증가 -> (주의) 0.1이 더해짐. 
+						// 만약 체력이 깡수치 변수라면 퍼센트 옵션은 사용하지 않거나,
+						// StatusComponent가 0.1을 받아서 처리하도록 설계되어 있어야 함.
+						ApplyVal = FinalAddValue / 100.0f;
+					}
+					else
+					{
+						// 예: 체력 +50 -> 그대로 50 더함
+						ApplyVal = FinalAddValue;
+					}
+
+					PlayerFunc(ApplyVal);
+				}
+
+				UE_LOG(LogTemp, Log, TEXT("[%s] 적용: %.2f (Source: %s)"),
+					*UEnum::GetValueAsString(Mod.StatType),
+					ApplyVal,
+					(ItemType == EItemType::SecretBook) ? TEXT("Vision") : TEXT("Player"));
+			};
+
+		switch (Mod.StatType)
+		{
 		case EItemStatType::MaxHP:
-			ApplyStatHelper(CachedStatusComponent->GetResultMaxHP(), [&](float Val) {
-				CachedStatusComponent->AddPlayerMaxHP(Val);
-				});
+			ApplyStatHelper(
+				[&](float Val) { CachedStatusComponent->AddPlayerMaxHP(Val); },
+				[&](float Val) { CachedStatusComponent->AddVisionMaxHP(Val); });
 			break;
 
 		case EItemStatType::HPRegen:
-			ApplyStatHelper(CachedStatusComponent->GetResultHPRegen(), [&](float Val) {
-				CachedStatusComponent->AddPlayerHPRegen(Val);
-				});
+			ApplyStatHelper(
+				[&](float Val) { CachedStatusComponent->AddPlayerHPRegen(Val); },
+				[&](float Val) { CachedStatusComponent->AddVisionHPRegen(Val); });
 			break;
 
 		case EItemStatType::OverHeal:
-			ApplyStatHelper(CachedStatusComponent->GetResultOverHeal(), [&](float Val) {
-				CachedStatusComponent->AddPlayerOverHeal(Val);
-				});
+			ApplyStatHelper(
+				[&](float Val) { CachedStatusComponent->AddPlayerOverHeal(Val); },
+				[&](float Val) { CachedStatusComponent->AddVisionOverHeal(Val); });
 			break;
 
 		case EItemStatType::Shield:
-			ApplyStatHelper(CachedStatusComponent->GetResultShield(), [&](float Val) {
-				CachedStatusComponent->AddPlayerShield(Val);
-				});
+			ApplyStatHelper(
+				[&](float Val) { CachedStatusComponent->AddPlayerShield(Val); },
+				[&](float Val) { CachedStatusComponent->AddVisionShield(Val); });
 			break;
 
 		case EItemStatType::Armor:
-			ApplyStatHelper(CachedStatusComponent->GetResultArmor(), [&](float Val) {
-				CachedStatusComponent->AddPlayerArmor(Val);
-				});
+			ApplyStatHelper(
+				[&](float Val) { CachedStatusComponent->AddPlayerArmor(Val); },
+				[&](float Val) { CachedStatusComponent->AddVisionArmor(Val); });
 			break;
 
 		case EItemStatType::EvasionChance:
-			ApplyStatHelper(CachedStatusComponent->GetResultEvasionChance(), [&](float Val) {
-				CachedStatusComponent->AddPlayerEvasionChance(Val);
-				});
+			ApplyStatHelper(
+				[&](float Val) { CachedStatusComponent->AddPlayerEvasionChance(Val); },
+				[&](float Val) { CachedStatusComponent->AddVisionEvasionChance(Val); });
 			break;
 
 		case EItemStatType::LifeDrain:
-			ApplyStatHelper(CachedStatusComponent->GetResultLifeDrain(), [&](float Val) {
-				CachedStatusComponent->AddPlayerLifeDrain(Val);
-				});
+			ApplyStatHelper(
+				[&](float Val) { CachedStatusComponent->AddPlayerLifeDrain(Val); },
+				[&](float Val) { CachedStatusComponent->AddVisionLifeDrain(Val); });
 			break;
 
 		case EItemStatType::Thorn:
-			ApplyStatHelper(CachedStatusComponent->GetResultThorn(), [&](float Val) {
-				CachedStatusComponent->AddPlayerThorn(Val);
-				});
+			ApplyStatHelper(
+				[&](float Val) { CachedStatusComponent->AddPlayerThorn(Val); },
+				[&](float Val) { CachedStatusComponent->AddVisionThorn(Val); });
 			break;
 
 		case EItemStatType::ExpGain:
-			ApplyStatHelper(CachedStatusComponent->GetResultExpGain(), [&](float Val) {
-				CachedStatusComponent->AddPlayerExpGain(Val);
-				});
+			ApplyStatHelper(
+				[&](float Val) { CachedStatusComponent->AddPlayerExpGain(Val); },
+				[&](float Val) { CachedStatusComponent->AddVisionExpGain(Val); });
 			break;
 
 		case EItemStatType::SilverGain:
-			ApplyStatHelper(CachedStatusComponent->GetResultSilverGain(), [&](float Val) {
-				CachedStatusComponent->AddPlayerSilverGain(Val);
-				});
+			ApplyStatHelper(
+				[&](float Val) { CachedStatusComponent->AddPlayerSilverGain(Val); },
+				[&](float Val) { CachedStatusComponent->AddVisionSilverGain(Val); });
 			break;
 
 		case EItemStatType::GoldGain:
-			ApplyStatHelper(CachedStatusComponent->GetResultGoldGain(), [&](float Val) {
-				CachedStatusComponent->AddPlayerGoldGain(Val);
-				});
+			ApplyStatHelper(
+				[&](float Val) { CachedStatusComponent->AddPlayerGoldGain(Val); },
+				[&](float Val) { CachedStatusComponent->AddVisionGoldGain(Val); });
 			break;
 
 		case EItemStatType::PickUpRange:
-			ApplyStatHelper(CachedStatusComponent->GetResultPickUpRange(), [&](float Val) {
-				CachedStatusComponent->AddPlayerPickUpRange(Val);
-				});
+			ApplyStatHelper(
+				[&](float Val) { CachedStatusComponent->AddPlayerPickUpRange(Val); },
+				[&](float Val) { CachedStatusComponent->AddVisionPickUpRange(Val); });
 			break;
 
 		case EItemStatType::Difficulty:
-			ApplyStatHelper(CachedStatusComponent->GetResultDifficulty(), [&](float Val) {
-				CachedStatusComponent->AddPlayerDifficulty(Val);
-				});
+			ApplyStatHelper(
+				[&](float Val) { CachedStatusComponent->AddPlayerDifficulty(Val); },
+				[&](float Val) { CachedStatusComponent->AddVisionDifficulty(Val); });
 			break;
 
 		case EItemStatType::Damage:
-			ApplyStatHelper(CachedStatusComponent->GetResultDamage(), [&](float Val) {
-				CachedStatusComponent->AddPlayerDamage(Val);
-				});
+			ApplyStatHelper(
+				[&](float Val) { CachedStatusComponent->AddPlayerDamage(Val); },
+				[&](float Val) { CachedStatusComponent->AddVisionDamage(Val); });
 			break;
 
 		case EItemStatType::CritChance:
-			ApplyStatHelper(CachedStatusComponent->GetResultCriticalChance(), [&](float Val) {
-				CachedStatusComponent->AddPlayerCriticalChance(Val);
-				});
+			ApplyStatHelper(
+				[&](float Val) { CachedStatusComponent->AddPlayerCriticalChance(Val); },
+				[&](float Val) { CachedStatusComponent->AddVisionCriticalChance(Val); });
 			break;
 
-		//case EItemStatType::MegaCritChance:
-		//	ApplyStatHelper(CachedStatusComponent->GetResultMegaCritChance(), [&](float Val) {
-		//		CachedStatusComponent->AddPlayerMegaCritChance(Val);
-		//		});
-		//	break;
+			//case EItemStatType::MegaCritChance:
+			//	ApplyStatHelper(
+			//		[&](float Val) { CachedStatusComponent->AddPlayerMegaCritChance(Val); },
+			//		[&](float Val) { CachedStatusComponent->AddVisionMegaCritChance(Val); });
+			//	break;
 
 		case EItemStatType::AttackSpeed:
-			ApplyStatHelper(CachedStatusComponent->GetResultAttackSpeed(), [&](float Val) {
-				CachedStatusComponent->AddPlayerAttackSpeed(Val);
-				});
+			ApplyStatHelper(
+				[&](float Val) { CachedStatusComponent->AddPlayerAttackSpeed(Val); },
+				[&](float Val) { CachedStatusComponent->AddVisionAttackSpeed(Val); });
 			break;
 
 		case EItemStatType::ProjectileCount:
-			ApplyStatHelper(CachedStatusComponent->GetResultProjectileCount(), [&](float Val) {
-				CachedStatusComponent->AddPlayerProjectileCount(Val);
-				});
+			ApplyStatHelper(
+				[&](float Val) { CachedStatusComponent->AddPlayerProjectileCount(Val); },
+				[&](float Val) { CachedStatusComponent->AddVisionProjectileCount(Val); });
 			break;
 
 		case EItemStatType::ProjectileReflectCount:
-			ApplyStatHelper(CachedStatusComponent->GetResultProjectileReflectCount(), [&](float Val) {
-				CachedStatusComponent->AddPlayerProjectileReflectCount(Val);
-				});
+			ApplyStatHelper(
+				[&](float Val) { CachedStatusComponent->AddPlayerProjectileReflectCount(Val); },
+				[&](float Val) { CachedStatusComponent->AddVisionProjectileReflectCount(Val); });
 			break;
 
 		case EItemStatType::AttackSize:
-			ApplyStatHelper(CachedStatusComponent->GetResultAttackSize(), [&](float Val) {
-				CachedStatusComponent->AddPlayerAttackSize(Val);
-				});
+			ApplyStatHelper(
+				[&](float Val) { CachedStatusComponent->AddPlayerAttackSize(Val); },
+				[&](float Val) { CachedStatusComponent->AddVisionAttackSize(Val); });
 			break;
 
 		case EItemStatType::ProjectileSpeed:
-			ApplyStatHelper(CachedStatusComponent->GetResultProjectileSpeed(), [&](float Val) {
-				CachedStatusComponent->AddPlayerProjectileSpeed(Val);
-				});
+			ApplyStatHelper(
+				[&](float Val) { CachedStatusComponent->AddPlayerProjectileSpeed(Val); },
+				[&](float Val) { CachedStatusComponent->AddVisionProjectileSpeed(Val); });
 			break;
 
 		case EItemStatType::AttackDuration:
-			ApplyStatHelper(CachedStatusComponent->GetResultAttackDuration(), [&](float Val) {
-				CachedStatusComponent->AddPlayerAttackDuration(Val);
-				});
+			ApplyStatHelper(
+				[&](float Val) { CachedStatusComponent->AddPlayerAttackDuration(Val); },
+				[&](float Val) { CachedStatusComponent->AddVisionAttackDuration(Val); });
 			break;
 
 		case EItemStatType::KnockBack:
-			ApplyStatHelper(CachedStatusComponent->GetResultKnockBack(), [&](float Val) {
-				CachedStatusComponent->AddPlayerKnockBack(Val);
-				});
+			ApplyStatHelper(
+				[&](float Val) { CachedStatusComponent->AddPlayerKnockBack(Val); },
+				[&](float Val) { CachedStatusComponent->AddVisionKnockBack(Val); });
 			break;
 
 		case EItemStatType::MoveSpeed:
-			ApplyStatHelper(1.0f, [&](float Val) {
-				CachedStatusComponent->AddPlayerMoveSpeed(Val);
-				});
+			ApplyStatHelper(
+				[&](float Val) { CachedStatusComponent->AddPlayerMoveSpeed(Val); },
+				[&](float Val) { CachedStatusComponent->AddVisionMoveSpeed(Val); });
 			break;
 
 		case EItemStatType::JumpPower:
-			ApplyStatHelper(CachedStatusComponent->GetResultJumpPower(), [&](float Val) {
-				CachedStatusComponent->AddPlayerJumpPower(Val);
-				});
+			ApplyStatHelper(
+				[&](float Val) { CachedStatusComponent->AddPlayerJumpPower(Val); },
+				[&](float Val) { CachedStatusComponent->AddVisionJumpPower(Val); });
 			break;
 
 		case EItemStatType::Luck:
-			ApplyStatHelper(CachedStatusComponent->GetResultLuck(), [&](float Val) {
-				CachedStatusComponent->AddPlayerLuck(Val);
-				});
+			ApplyStatHelper(
+				[&](float Val) { CachedStatusComponent->AddPlayerLuck(Val); },
+				[&](float Val) { CachedStatusComponent->AddVisionLuck(Val); });
 			break;
-        default:
-            break;
-        }
-    }
+
+		default:
+			break;
+		}
+	}
 }
 
 void UInventoryComponent::ExecuteProcEffect(const FItemProcData& Proc, int32 StackCount, AActor* TargetActor, float TriggerValue)

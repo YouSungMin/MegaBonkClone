@@ -40,7 +40,7 @@ public:
 public:	
 	// 비전서 획득 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	bool AddSecretBook(FName BookID);
+	bool AddSecretBook(FName BookID, float AddValue);
 
 	// 일반 아이템 획득
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
@@ -69,7 +69,7 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-	void ApplyPassiveStats(const FItemData& ItemData, int32 Count, bool bIsFirstGet);
+	void ApplyPassiveStats(const FItemData& ItemData, int32 Count, bool bIsFirstGet, float AddValue, EItemType ItemType);
 private:
 	// 내부적으로 효과를 실행하는 분기 함수
 	void ExecuteProcEffect(const FItemProcData& Proc, int32 StackCount, AActor* TargetActor, float TriggerValue);

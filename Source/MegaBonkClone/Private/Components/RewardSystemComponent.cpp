@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #include "Components/RewardSystemComponent.h"
 #include "Components/InventoryComponent.h"
+#include "Characters/Components/StatusComponent.h"
 #include "Characters/Components/WeaponSystemComponent.h"
 #include "Data/WeaponDataStructs.h"
 #include "GameFramework/Character.h"
@@ -21,31 +22,21 @@ URewardSystemComponent::URewardSystemComponent()
 
 void URewardSystemComponent::GenerateLevelUpRewards()
 {
-	// 1. 컴포넌트 찾기
-	AActor* Owner = GetOwner();
-	APawn* PlayerPawn = nullptr;
-
-	if (APlayerController* PC = Cast<APlayerController>(Owner))
-		PlayerPawn = PC->GetPawn();
-	else
-		PlayerPawn = Cast<APawn>(Owner);
-
-	if (PlayerPawn)
+	if (!FindComponents())
 	{
-		WeaponComp = PlayerPawn->FindComponentByClass<UWeaponSystemComponent>();
-		InventoryComp = PlayerPawn->FindComponentByClass<UInventoryComponent>();
-		StatusComp = PlayerPawn->FindComponentByClass<UStatusComponent>();
+		UE_LOG(LogTemp, Error, TEXT("RewardSystem: 컴포넌트가 유효하지 않아 보상을 생성할 수 없습니다."));
+		return;
 	}
 
-	if (!WeaponComp || !InventoryComp || !StatusComp || !WeaponDataTable || !ItemDataTable)
+	if (!WeaponDataTable || !ItemDataTable)
 	{
 		UE_LOG(LogTemp, Error, TEXT("RewardSystem: Components or DataTables are missing!"));
 		return;
 	}
 
 	// 2. 슬롯 여유 확인 (4개 제한)
-	bool bCanNewWeapon = (WeaponComp->GetCurrentWeaponCount() < 4);
-	bool bCanNewBook = (InventoryComp->GetSecretBookSlots().Num() < 4);
+	bool bCanNewWeapon = (WeaponComp->GetCurrentWeaponCount() < 3);
+	bool bCanNewBook = (InventoryComp->GetSecretBookSlots().Num() < 3);
 
 	TArray<FRewardOption> Pool;
 
@@ -104,7 +95,7 @@ void URewardSystemComponent::GenerateLevelUpRewards()
 			Opt.Name = Row->Name;
 
 			Opt.NewLevel = CurLv + 1;
-			Opt.Description = bHas ? FText::FromString(FString::Printf(TEXT("Lv.%d 로 강화"), CurLv + 1)) : Row->Description;
+			ApplySecretBookLogic(Row, CurLv, bHas, Opt);
 
 			Pool.Add(Opt);
 		}
@@ -124,12 +115,24 @@ void URewardSystemComponent::GenerateLevelUpRewards()
 		// 등급 부여
 		Selected.Rarity = CalculateRandomRarity();
 
+		UE_LOG(LogTemp, Log, TEXT("ItemID = %s, Type = %s, StateType = %s, NewLevel = %d, CurrentStatValue = %.1f, NextStatValue = %.1f, Rarity = %s"),
+			*Selected.ItemID.ToString(),
+			*UEnum::GetValueAsString(Selected.Type), 
+			*UEnum::GetValueAsString(Selected.StatType),
+			Selected.NewLevel,
+			Selected.CurrentStatValue,
+			Selected.NextStatValue,
+			*UEnum::GetValueAsString(Selected.Rarity)
+		);
 		FinalRewards.Add(Selected);
 		Pool.RemoveAtSwap(RandIdx); // 중복 방지
 	}
 
 	// UI 생성 요청
-	OnRewardsGenerated(FinalRewards);
+	if (OnRewardsGenerated.IsBound())
+	{
+		OnRewardsGenerated.Broadcast(FinalRewards);
+	}
 
 	// 게임 일시정지
 	if (APlayerController* PC = Cast<APlayerController>(GetOwner()))
@@ -256,6 +259,58 @@ void URewardSystemComponent::ApplyWeaponUpgradeLogic(const FWeaponData* Row, int
 	}
 }
 
+void URewardSystemComponent::ApplySecretBookLogic(const FItemData* Row, int32 CurLv, bool bHas, FRewardOption& OutOption)
+{
+	if (!Row) return;
+
+	if (Row->Modifiers.Num() > 0)
+	{
+		// 비전서는 0번 인덱스 효과를 메인으로 사용
+		const FItemStatModifier& MainMod = Row->Modifiers[0];
+
+		// 1. StatType 설정
+		OutOption.StatType = MainMod.StatType;
+
+		// 2. 수치 계산
+		if (bHas)
+		{
+			// [강화] 현재 수치 = 기본값 + (현재레벨 - 1) * 중첩값
+			OutOption.CurrentStatValue = MainMod.BaseValue + ((CurLv - 1) * MainMod.StackValue);
+
+			// 다음 수치 = 현재 수치 + 중첩값
+			OutOption.NextStatValue = OutOption.CurrentStatValue + MainMod.StackValue;
+
+			// 설명 텍스트 생성
+			FString StatName = UEnum::GetDisplayValueAsText(OutOption.StatType).ToString();
+
+			// 퍼센트 여부에 따라 표시 형식 다르게
+			if (MainMod.bIsPercentage)
+			{
+				OutOption.Description = FText::FromString(FString::Printf(TEXT("%s %+.0f%%"), *StatName, MainMod.StackValue));
+			}
+			else
+			{
+				OutOption.Description = FText::FromString(FString::Printf(TEXT("%s %+.1f"), *StatName, MainMod.StackValue));
+			}
+		}
+		else
+		{
+			// [신규]
+			OutOption.CurrentStatValue = 0.0f;
+			OutOption.NextStatValue = MainMod.BaseValue;
+
+			// 신규 획득은 데이터 테이블 설명을 그대로 사용
+			OutOption.Description = Row->Description;
+		}
+	}
+	else
+	{
+		// 데이터 테이블에 Modifiers가 비어있을 경우 예외 처리
+		OutOption.StatType = EItemStatType::None;
+		OutOption.Description = Row->Description;
+	}
+}
+
 EItemGrade URewardSystemComponent::CalculateRandomRarity()
 {
 	float Total = 0.0f;
@@ -278,16 +333,52 @@ void URewardSystemComponent::OnPlayerLevelChanged(float NewLevel)
 	GenerateLevelUpRewards();
 }
 
+bool URewardSystemComponent::FindComponents()
+{
+	// 이미 다 찾아져 있다면 true 반환 (중복 검색 방지)
+	if (WeaponComp && InventoryComp && StatusComp) return true;
+
+	AActor* Owner = GetOwner();
+	APawn* PlayerPawn = nullptr;
+
+	if (APlayerController* PC = Cast<APlayerController>(Owner))
+		PlayerPawn = PC->GetPawn();
+	else
+		PlayerPawn = Cast<APawn>(Owner);
+
+	if (PlayerPawn)
+	{
+		WeaponComp = PlayerPawn->FindComponentByClass<UWeaponSystemComponent>();
+		InventoryComp = PlayerPawn->FindComponentByClass<UInventoryComponent>();
+		StatusComp = PlayerPawn->FindComponentByClass<UStatusComponent>();
+	}
+
+
+	// 셋 다 있어야 true 반환
+	return (WeaponComp != nullptr && InventoryComp != nullptr && StatusComp != nullptr);
+}
+
 void URewardSystemComponent::SelectReward(const FRewardOption& SelectedOption)
 {
+	// 컴포넌트 유효성 재확
+	if (!WeaponComp || !InventoryComp)
+	{
+		// 만약 캐싱된게 없다면 다시 찾기 시도
+		if (!FindComponents())
+		{
+			UE_LOG(LogTemp, Error, TEXT("RewardSystem: 컴포넌트가 없어 보상을 지급할 수 없습니다."));
+			return;
+		}
+	}
+	float IncrementValue = SelectedOption.NextStatValue - SelectedOption.CurrentStatValue;
+
 	if (SelectedOption.Type == EItemType::Weapon)
 	{
-		WeaponComp->AddWeapon(SelectedOption.ItemID);
+		WeaponComp->LevelUpWeapon(SelectedOption.ItemID, SelectedOption.StatType, IncrementValue);
 	}
 	else
 	{
-		// 인벤토리 컴포넌트는 기존에 만드신 함수를 사용합니다.
-		InventoryComp->AddSecretBook(SelectedOption.ItemID);
+		InventoryComp->AddSecretBook(SelectedOption.ItemID, IncrementValue);
 	}
 
 	// 게임 재개
@@ -300,4 +391,15 @@ void URewardSystemComponent::SelectReward(const FRewardOption& SelectedOption)
 void URewardSystemComponent::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (FindComponents())
+	{
+		// 2. 이벤트 바인딩
+		StatusComp->OnLevelChanged.AddDynamic(this, &URewardSystemComponent::OnPlayerLevelChanged);
+		UE_LOG(LogTemp, Log, TEXT("RewardSystem: 초기화 및 이벤트 구독 완료"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("RewardSystem: 필수 컴포넌트를 찾지 못했습니다."));
+	}
 }
