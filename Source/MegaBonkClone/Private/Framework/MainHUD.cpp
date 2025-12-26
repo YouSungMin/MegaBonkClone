@@ -3,6 +3,7 @@
 
 #include "Framework/MainHUD.h"
 #include "Blueprint/UserWidget.h"
+#include "UI/Shop/RechargeShopWidget.h"
 #include "Kismet/GameplayStatics.h"
 #include "Characters/PlayAbleCharacter/PlayAbleCharacterController.h"
 
@@ -86,6 +87,34 @@ void AMainHUD::ShowChestReward(const FItemData& ItemData)
 		}
 	}
 }
+
+void AMainHUD::ShowRechargeSanctuary(ARechargeSanctuary* Sanctuary)
+{
+	if (!Sanctuary) return;
+
+	//1.RechargePanelClass로 위젯 생성 + centerSlot에 끼우기
+	OpenCenterPanel(RechargePanelClass, RechargeWidget);
+
+	//2.URechargePanelClass로 캐스트해서 Sanctuary바인딩
+	if (URechargeShopWidget* Shop = Cast<URechargeShopWidget>(RechargeWidget))
+	{
+		Shop->InitWithSanctuary(Sanctuary);
+	}
+
+	//3. 인벤토리/스탯 패널 열기
+	MainWidgetInstance->OpenPanels();
+
+	//4. 입력 모드 변경 (마우스 필요 시)
+	APlayerController* PC = GetOwningPlayerController();
+	if (PC)
+	{
+		PC->SetShowMouseCursor(true);
+		PC->SetInputMode(FInputModeUIOnly());
+
+		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.001f);
+	}
+}
+
 
 void AMainHUD::OpenCenterPanel(TSubclassOf<UUserWidget> PanelClass, TObjectPtr<UUserWidget>& WidgetInstance)
 {

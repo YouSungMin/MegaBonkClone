@@ -27,7 +27,7 @@ public:
 /**
  * 
  */
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSanctuaryRewardsGenerated, const TArray<FSanctuaryRewardInfo>&, Rewards);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnSanctuaryRewardsGenerated, const TArray<FSanctuaryRewardInfo>&, Rewards, ARechargeSanctuary*, SanctuaryActor);
 UCLASS()
 class MEGABONKCLONE_API ARechargeSanctuary : public ASanctuaryBase
 {
@@ -37,13 +37,17 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "Sanctuary|Event")
 	FOnSanctuaryRewardsGenerated OnRewardsGenerated;
+
+public:
+	UFUNCTION(BlueprintCallable, Category = "Sanctuary")
+	void ApplySelectedReward(const FSanctuaryRewardInfo& RewardInfo);
+
 protected:
 	virtual void BeginPlay()override;
 
 	virtual void ApplyEffect_Implementation(AActor* Player)override;
 
-	UFUNCTION(BlueprintCallable, Category = "Sanctuary")
-	void ApplySelectedReward(AActor* Player, const FSanctuaryRewardInfo& RewardInfo);
+	virtual void Interact_Implementation(AActor* PlayerActor) override;
 
 	UFUNCTION()
 	void OnProximityBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
@@ -78,7 +82,7 @@ protected:
 	TMap<EItemGrade, float> RarityMultipliers;
 
 	UPROPERTY(EditAnywhere, Category = "Recharge")
-	float ChargeTime = 3.0f;
+	float ChargeTime = 1.0f; //3초에서 1로 바꿈
 
 	// 금색 성소 확률 (0.0 ~ 1.0)
 	UPROPERTY(EditAnywhere, Category = "Recharge")
@@ -86,6 +90,9 @@ protected:
 
 	// 현재 금색 성소인가?
 	bool bIsGoldSanctuary = false;
+	
+	// E 눌렀을떄
+	bool bIsCharging = false;
 
 	// 타이머 핸들
 	FTimerHandle ChargeTimerHandle;

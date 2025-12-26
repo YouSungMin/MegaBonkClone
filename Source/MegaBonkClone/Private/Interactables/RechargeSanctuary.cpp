@@ -6,6 +6,8 @@
 #include "Characters/PlayAbleCharacter/PlayerCharacter.h"
 #include "TimerManager.h"
 
+#include "Framework/MainHUD.h"
+#include "GameFramework/PlayerController.h"
 ARechargeSanctuary::ARechargeSanctuary()
 {
 	ProximitySphere = CreateDefaultSubobject<USphereComponent>(TEXT("ProximitySphere"));
@@ -16,6 +18,8 @@ ARechargeSanctuary::ARechargeSanctuary()
 
 void ARechargeSanctuary::BeginPlay()
 {
+	Super::BeginPlay();
+
 	ProximitySphere->OnComponentBeginOverlap.AddDynamic(this, &ARechargeSanctuary::OnProximityBeginOverlap);
 	ProximitySphere->OnComponentEndOverlap.AddDynamic(this, &ARechargeSanctuary::OnProximityEndOverlap);
 
@@ -38,8 +42,27 @@ void ARechargeSanctuary::ApplyEffect_Implementation(AActor* Player)
 {
 }
 
-void ARechargeSanctuary::ApplySelectedReward(AActor* Player, const FSanctuaryRewardInfo& RewardInfo)
+void ARechargeSanctuary::Interact_Implementation(AActor* PlayerActor)
 {
+	if (bIsUsed) return;
+	if (!OverlappingPlayer.IsValid() || OverlappingPlayer.Get() != PlayerActor) return;
+
+	GetWorldTimerManager().SetTimer(ChargeTimerHandle, this, &ARechargeSanctuary::OnChargeComplete, ChargeTime, false);
+
+}
+
+void ARechargeSanctuary::ApplySelectedReward(const FSanctuaryRewardInfo& RewardInfo)
+{
+	if (!OverlappingPlayer.IsValid())
+
+	{
+		UE_LOG(LogTemp, Error, TEXT("보상을 적용하려 했으나 플레이어가 더 이상 유효하지 않습니다."));
+
+		return;
+	}
+
+	AActor* PlayerActor = OverlappingPlayer.Get();
+
 	bIsUsed = true;
 	UE_LOG(LogTemp, Log, TEXT("보상 생성: %d (%d) -> Value: %.1f"), RewardInfo.StatType, RewardInfo.Rarity, RewardInfo.Value);
 }
@@ -48,15 +71,15 @@ void ARechargeSanctuary::OnProximityBeginOverlap(UPrimitiveComponent* Overlapped
 {
 	if (!bIsUsed)
 	{
-		UE_LOG(LogTemp, Log, TEXT("충전 시작"), ChargeTime);
-		if (!OtherActor->IsA(APlayerCharacter::StaticClass()))
-		{
-			return;
-		}
-		OverlappingPlayer = OtherActor;
+			UE_LOG(LogTemp, Log, TEXT("충전 시작"), ChargeTime);
+			if (!OtherActor->IsA(APlayerCharacter::StaticClass()))
+			{
+				return;
+			}
+			OverlappingPlayer = OtherActor;
 
-		// 타이머 시작
-		GetWorldTimerManager().SetTimer(ChargeTimerHandle, this, &ARechargeSanctuary::OnChargeComplete, ChargeTime, false);
+			// 타이머 시작 //자동시작 막기
+			//GetWorldTimerManager().SetTimer(ChargeTimerHandle, this, &ARechargeSanctuary::OnChargeComplete, ChargeTime, false);
 	}
 	else
 	{
@@ -82,6 +105,14 @@ void ARechargeSanctuary::OnProximityEndOverlap(UPrimitiveComponent* OverlappedCo
 
 void ARechargeSanctuary::OnChargeComplete()
 {
+	if (!OverlappingPlayer.IsValid())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("충전 완료되었으나 플레이어가 유효하지 않습니다. (사망/로그아웃)"));
+		// 필요하다면 타이머 핸들 초기화나 상태 리셋
+
+		return;
+	}
+
 	if (AvailableStats.Num() == 0) return;
 
 	TArray<FSanctuaryRewardInfo> FinalRewards;
@@ -132,11 +163,25 @@ void ARechargeSanctuary::OnChargeComplete()
 		
 	}
 
-	// UI 호출
+	//1. HUD로 UI열기
+	if (APawn* PlayerPawn = Cast<APawn>(OverlappingPlayer.Get()))
+	{
+		if (APlayerController* PC = Cast<APlayerController>(PlayerPawn->GetController()))
+		{
+			if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
+			{
+				HUD->ShowRechargeSanctuary(this);
+			}
+		}
+	}
+
+		// UI 호출
 	if (OnRewardsGenerated.IsBound())
 	{
-		OnRewardsGenerated.Broadcast(FinalRewards);
+			OnRewardsGenerated.Broadcast(FinalRewards, this);
 	}
+
+	//bIsCharging = false;
 }
 
 EItemGrade ARechargeSanctuary::PickRandomRarity()
