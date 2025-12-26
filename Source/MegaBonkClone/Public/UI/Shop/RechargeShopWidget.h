@@ -8,6 +8,7 @@
 #include "RechargeShopWidget.generated.h"
 
 class URechargeSlotWidget;
+class UButton;
 /**
  * 
  */
@@ -42,4 +43,15 @@ protected:
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<URechargeSlotWidget> Slot3 = nullptr;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UButton> ExitButton = nullptr;
+
+	//Slot3개중에 선택
+	UFUNCTION()
+	void OnAnySlotClicked(const FSanctuaryRewardInfo& RewardInfo);
+
+	//제안거절하기 선택
+	UFUNCTION()
+	void OnExitClicked();
 };

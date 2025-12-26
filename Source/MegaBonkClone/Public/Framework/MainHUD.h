@@ -26,6 +26,8 @@ public:
 	//외부(상자)에서 호출할 함수
 	UFUNCTION(BlueprintCallable)
 	void ShowChestReward(const FItemData& ItemData);
+	UFUNCTION(BlueprintCallable)
+	void ShowRechargeSanctuary(class ARechargeSanctuary* Sanctuary);
 
 	void OpenCenterPanel(TSubclassOf<UUserWidget> PanelClass, TObjectPtr<UUserWidget>& WidgetInstance);
 

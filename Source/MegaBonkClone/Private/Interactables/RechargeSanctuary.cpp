@@ -6,6 +6,8 @@
 #include "Characters/PlayAbleCharacter/PlayerCharacter.h"
 #include "TimerManager.h"
 
+#include "Framework/MainHUD.h"
+#include "GameFramework/PlayerController.h"
 ARechargeSanctuary::ARechargeSanctuary()
 {
 	ProximitySphere = CreateDefaultSubobject<USphereComponent>(TEXT("ProximitySphere"));
@@ -16,6 +18,8 @@ ARechargeSanctuary::ARechargeSanctuary()
 
 void ARechargeSanctuary::BeginPlay()
 {
+	Super::BeginPlay();
+
 	ProximitySphere->OnComponentBeginOverlap.AddDynamic(this, &ARechargeSanctuary::OnProximityBeginOverlap);
 	ProximitySphere->OnComponentEndOverlap.AddDynamic(this, &ARechargeSanctuary::OnProximityEndOverlap);
 
@@ -38,6 +42,15 @@ void ARechargeSanctuary::ApplyEffect_Implementation(AActor* Player)
 {
 }
 
+void ARechargeSanctuary::Interact_Implementation(AActor* PlayerActor)
+{
+	if (bIsUsed) return;
+	if (!OverlappingPlayer.IsValid() || OverlappingPlayer.Get() != PlayerActor) return;
+
+	GetWorldTimerManager().SetTimer(ChargeTimerHandle, this, &ARechargeSanctuary::OnChargeComplete, ChargeTime, false);
+
+}
+
 void ARechargeSanctuary::ApplySelectedReward(const FSanctuaryRewardInfo& RewardInfo)
 {
 	if (!OverlappingPlayer.IsValid())
@@ -58,15 +71,15 @@ void ARechargeSanctuary::OnProximityBeginOverlap(UPrimitiveComponent* Overlapped
 {
 	if (!bIsUsed)
 	{
-		UE_LOG(LogTemp, Log, TEXT("충전 시작"), ChargeTime);
-		if (!OtherActor->IsA(APlayerCharacter::StaticClass()))
-		{
-			return;
-		}
-		OverlappingPlayer = OtherActor;
+			UE_LOG(LogTemp, Log, TEXT("충전 시작"), ChargeTime);
+			if (!OtherActor->IsA(APlayerCharacter::StaticClass()))
+			{
+				return;
+			}
+			OverlappingPlayer = OtherActor;
 
-		// 타이머 시작
-		GetWorldTimerManager().SetTimer(ChargeTimerHandle, this, &ARechargeSanctuary::OnChargeComplete, ChargeTime, false);
+			// 타이머 시작 //자동시작 막기
+			//GetWorldTimerManager().SetTimer(ChargeTimerHandle, this, &ARechargeSanctuary::OnChargeComplete, ChargeTime, false);
 	}
 	else
 	{
@@ -150,11 +163,25 @@ void ARechargeSanctuary::OnChargeComplete()
 		
 	}
 
-	// UI 호출
+	//1. HUD로 UI열기
+	if (APawn* PlayerPawn = Cast<APawn>(OverlappingPlayer.Get()))
+	{
+		if (APlayerController* PC = Cast<APlayerController>(PlayerPawn->GetController()))
+		{
+			if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
+			{
+				HUD->ShowRechargeSanctuary(this);
+			}
+		}
+	}
+
+		// UI 호출
 	if (OnRewardsGenerated.IsBound())
 	{
-		OnRewardsGenerated.Broadcast(FinalRewards, this);
+			OnRewardsGenerated.Broadcast(FinalRewards, this);
 	}
+
+	//bIsCharging = false;
 }
 
 EItemGrade ARechargeSanctuary::PickRandomRarity()
