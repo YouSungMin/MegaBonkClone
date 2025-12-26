@@ -38,8 +38,18 @@ void ARechargeSanctuary::ApplyEffect_Implementation(AActor* Player)
 {
 }
 
-void ARechargeSanctuary::ApplySelectedReward(AActor* Player, const FSanctuaryRewardInfo& RewardInfo)
+void ARechargeSanctuary::ApplySelectedReward(const FSanctuaryRewardInfo& RewardInfo)
 {
+	if (!OverlappingPlayer.IsValid())
+
+	{
+		UE_LOG(LogTemp, Error, TEXT("보상을 적용하려 했으나 플레이어가 더 이상 유효하지 않습니다."));
+
+		return;
+	}
+
+	AActor* PlayerActor = OverlappingPlayer.Get();
+
 	bIsUsed = true;
 	UE_LOG(LogTemp, Log, TEXT("보상 생성: %d (%d) -> Value: %.1f"), RewardInfo.StatType, RewardInfo.Rarity, RewardInfo.Value);
 }
@@ -82,6 +92,14 @@ void ARechargeSanctuary::OnProximityEndOverlap(UPrimitiveComponent* OverlappedCo
 
 void ARechargeSanctuary::OnChargeComplete()
 {
+	if (!OverlappingPlayer.IsValid())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("충전 완료되었으나 플레이어가 유효하지 않습니다. (사망/로그아웃)"));
+		// 필요하다면 타이머 핸들 초기화나 상태 리셋
+
+		return;
+	}
+
 	if (AvailableStats.Num() == 0) return;
 
 	TArray<FSanctuaryRewardInfo> FinalRewards;
@@ -135,7 +153,7 @@ void ARechargeSanctuary::OnChargeComplete()
 	// UI 호출
 	if (OnRewardsGenerated.IsBound())
 	{
-		OnRewardsGenerated.Broadcast(FinalRewards);
+		OnRewardsGenerated.Broadcast(FinalRewards, this);
 	}
 }
 

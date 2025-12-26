@@ -27,7 +27,7 @@ public:
 /**
  * 
  */
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSanctuaryRewardsGenerated, const TArray<FSanctuaryRewardInfo>&, Rewards);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnSanctuaryRewardsGenerated, const TArray<FSanctuaryRewardInfo>&, Rewards, ARechargeSanctuary*, SanctuaryActor);
 UCLASS()
 class MEGABONKCLONE_API ARechargeSanctuary : public ASanctuaryBase
 {
@@ -43,7 +43,7 @@ protected:
 	virtual void ApplyEffect_Implementation(AActor* Player)override;
 
 	UFUNCTION(BlueprintCallable, Category = "Sanctuary")
-	void ApplySelectedReward(AActor* Player, const FSanctuaryRewardInfo& RewardInfo);
+	void ApplySelectedReward(const FSanctuaryRewardInfo& RewardInfo);
 
 	UFUNCTION()
 	void OnProximityBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
