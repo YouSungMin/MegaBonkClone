@@ -82,6 +82,7 @@ void APlayerCharacter::InitializeCharacterComponents()
 	StatusComponent2 = CreateDefaultSubobject<UStatusComponent>(TEXT("Status"));
 	WeaponComponent2 = CreateDefaultSubobject<UWeaponSystemComponent>(TEXT("WeaponSystem"));
 	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("Inventory"));
+	RewardSystemComponent = CreateDefaultSubobject<URewardSystemComponent>(TEXT("Reward"));
 	
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -70.0f), FRotator(0.0f, -90.0f, 0.0f));
 
