@@ -43,7 +43,7 @@ protected:
 	TObjectPtr<UTextBlock> Value = nullptr;	//값
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "RechargeSlot", meta = (BindWidget))
-	TObjectPtr<UTextBlock> Description = nullptr;	//부가설명
+	TObjectPtr<UTextBlock> StateType = nullptr;	//부가설명
 
 private:
 	UFUNCTION()

@@ -14,12 +14,6 @@ void URechargeShopWidget::NativeConstruct()
 	Slot2->ClearRechargeSlot();
 	Slot3->ClearRechargeSlot();
 
-
-	UE_LOG(LogTemp, Warning, TEXT("[RechargeShop] NativeConstruct called"));
-
-	UE_LOG(LogTemp, Warning, TEXT("[RechargeShop] ExitButton ptr = %s"),
-		ExitButton ? TEXT("VALID") : TEXT("NULL"));
-
 	if (Slot1)
 	{
 		Slot1->OnSlotClicked.RemoveDynamic(this, &URechargeShopWidget::OnAnySlotClicked);
@@ -73,8 +67,14 @@ void URechargeShopWidget::OnAnySlotClicked(const FSanctuaryRewardInfo& RewardInf
 {
 	if (!SanctuaryRef) return;
 
-	// 선택 적용
+	const FString StatName = UEnum::GetDisplayValueAsText(RewardInfo.StatType).ToString();
+	const FString GradeName = UEnum::GetDisplayValueAsText(RewardInfo.Rarity).ToString();
+
+	//선택한슬롯확인
+	UE_LOG(LogTemp, Warning, TEXT("[RechargeShop] Reward Clicked => Stat=%s / Grade=%s / Value=%.2f"), *StatName, *GradeName, RewardInfo.Value);
+
 	SanctuaryRef->ApplySelectedReward(RewardInfo);
+
 	UE_LOG(LogTemp, Warning, TEXT("슬롯선택 Clicked!!"));
 
 	// UI 닫기 

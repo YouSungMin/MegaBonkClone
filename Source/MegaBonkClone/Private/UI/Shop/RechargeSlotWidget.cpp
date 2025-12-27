@@ -23,7 +23,8 @@ void URechargeSlotWidget::SetRewardInfo(const FSanctuaryRewardInfo& RewardInfo)
 
 	Type->SetText(UEnum::GetDisplayValueAsText(RewardInfo.Rarity));
 	Value->SetText(FText::FromString(FString::Printf(TEXT("%.1f"), RewardInfo.Value)));
-	Description->SetText(FText::FromString(FString::Printf(TEXT("%.1f"), RewardInfo.Rarity)));
+	StateType->SetText(UEnum::GetDisplayValueAsText(RewardInfo.StatType));
+
 }
 
 void URechargeSlotWidget::ClearRechargeSlot()
@@ -32,7 +33,7 @@ void URechargeSlotWidget::ClearRechargeSlot()
 
 	Type->SetText(FText::GetEmpty());
 	Value->SetText(FText::GetEmpty());
-	Description->SetText(FText::GetEmpty());
+	StateType->SetText(FText::GetEmpty());
 }
 
 void URechargeSlotWidget::HandleSlotClicked()
