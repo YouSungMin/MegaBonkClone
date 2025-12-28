@@ -6,7 +6,10 @@
 #include "Blueprint/UserWidget.h"
 #include "MicroSlotWidget.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMicroSlotClicked, FName, ItemID);
+
 class UImage;
+class UButton;
 /**
  * 
  */
@@ -18,6 +21,25 @@ class MEGABONKCLONE_API UMicroSlotWidget : public UUserWidget
 public:
 	virtual void NativeConstruct() override;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "RechargeSlot", meta = (BindWidget))
-	TObjectPtr<UImage> Image = nullptr;	//값
+
+	// 슬롯에 표시할 데이터 세팅
+	UFUNCTION(BlueprintCallable)
+	void SetSlotInfo(const FMicrowaveSlotInfo& Info);
+
+	UPROPERTY(BlueprintAssignable)
+	FOnMicroSlotClicked OnSlotClicked;
+
+private:
+	UFUNCTION()
+	void HandleClicked();
+
+protected:
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UButton> SlotButton = nullptr;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UImage> Image = nullptr;	
+
+private:
+	FName CachedItemID = NAME_None;
 };
