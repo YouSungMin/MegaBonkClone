@@ -5,6 +5,8 @@
 #include "Components/InventoryComponent.h"
 #include <Characters/Components/StatusComponent.h>
 
+#include "Framework/MainHUD.h"
+
 // Sets default values
 AMicrowaveActor::AMicrowaveActor()
 {
@@ -237,9 +239,21 @@ void AMicrowaveActor::Interact_Implementation(AActor* PlayerActor)
 		}
 
 		// 조건 만족 시 UI 오픈 (비용은 UI에서 선택 시 차감)
-		if (OnMicrowaveOpen.IsBound())
+		//if (OnMicrowaveOpen.IsBound())
+		//{
+			//OnMicrowaveOpen.Broadcast(FilteredList, this);
+		//}
+
+		// E눌렀을때 HUD에 UI 오픈 요청
+		if (APawn* PlayerPawn = Cast<APawn>(PlayerActor))
 		{
-			OnMicrowaveOpen.Broadcast(FilteredList, this);
+			if (APlayerController* PC = Cast<APlayerController>(PlayerPawn->GetController()))
+			{
+				if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
+				{
+					HUD->ShowMicrowave(this, FilteredList);
+				}
+			}
 		}
 	}
 	break;

@@ -3,6 +3,7 @@
 
 #include "Interactables/ShadyGuyActor.h"
 #include "Interfaces/InventoryOwner.h"
+#include "Framework/MainHUD.h"
 #include "Data/ItemDataStructs.h"
 
 // Sets default values
@@ -72,9 +73,21 @@ void AShadyGuyActor::Interact_Implementation(AActor* PlayerActor)
 	if (!bIsUsed)
 	{
 		Player = PlayerActor;
-		if (OnShopOpen.IsBound())
+		//if (OnShopOpen.IsBound())
+		//{
+			//OnShopOpen.Broadcast(CurrentShopItems, this);
+		//}
+
+		// E 눌렀을 때 HUD 중앙 패널 열기
+		if (APawn* PlayerPawn = Cast<APawn>(PlayerActor))
 		{
-			OnShopOpen.Broadcast(CurrentShopItems, this);
+			if (APlayerController* PC = Cast<APlayerController>(PlayerPawn->GetController()))
+			{
+				if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
+				{
+					HUD->ShowShadyStore(this, CurrentShopItems);
+				}
+			}
 		}
 	}
 	else

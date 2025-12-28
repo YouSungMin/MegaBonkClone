@@ -6,8 +6,10 @@
 #include "GameFramework/HUD.h"
 #include "UI/ChestOpen.h" 
 #include "Data/ItemDataStructs.h"
+#include "Interactables/MicrowaveActor.h" 
 #include "UI/MainHudWidget.h"
 #include "MainHUD.generated.h"
+
 
 /**
  * 
@@ -28,6 +30,14 @@ public:
 	void ShowChestReward(const FItemData& ItemData);
 	UFUNCTION(BlueprintCallable)
 	void ShowRechargeSanctuary(class ARechargeSanctuary* Sanctuary);
+	UFUNCTION(BlueprintCallable)
+	void ShowShadyStore(class AShadyGuyActor* ShadyGuy, const TArray<struct FShopSlotInfo>& Items);
+	UFUNCTION(BlueprintCallable)
+	void ShowMicrowave(class AMicrowaveActor* Microwave, const TArray<FMicrowaveSlotInfo>& FilteredList);
+	//UFUNCTION(BlueprintCallable)
+	//void ShowMagneticUpgrade(class AMagneticSanctuary* Sanctuary);
+
+
 
 	void OpenCenterPanel(TSubclassOf<UUserWidget> PanelClass, TObjectPtr<UUserWidget>& WidgetInstance);
 
