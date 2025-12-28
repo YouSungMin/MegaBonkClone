@@ -115,7 +115,7 @@ void AMainHUD::ShowRechargeSanctuary(ARechargeSanctuary* Sanctuary)
 		PC->SetShowMouseCursor(true);
 		PC->SetInputMode(FInputModeUIOnly());
 
-		//UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.001f);
+		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.001f);
 	}
 }
 
@@ -142,7 +142,7 @@ void AMainHUD::ShowShadyStore(class AShadyGuyActor* ShadyGuy, const TArray<struc
 		PC->SetShowMouseCursor(true);
 		PC->SetInputMode(FInputModeUIOnly());
 
-		//UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.001f);
+		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.001f);
 	}
 }
 
@@ -170,7 +170,7 @@ void AMainHUD::ShowMicrowave(AMicrowaveActor* Microwave, const TArray<FMicrowave
 		PC->SetShowMouseCursor(true);
 		PC->SetInputMode(FInputModeUIOnly());
 
-		//UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.001f);
+		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.001f);
 	}
 }
 
