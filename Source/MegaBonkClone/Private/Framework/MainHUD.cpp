@@ -4,6 +4,10 @@
 #include "Framework/MainHUD.h"
 #include "Blueprint/UserWidget.h"
 #include "UI/Shop/RechargeShopWidget.h"
+#include "UI/Shop/MicroShopWidget.h"
+#include "UI/Shop/ShadyStoreShopWidget.h"
+#include "UI/Shop/MagneticUpgradeShopWidget.h"
+
 #include "Kismet/GameplayStatics.h"
 #include "Characters/PlayAbleCharacter/PlayAbleCharacterController.h"
 
@@ -111,9 +115,91 @@ void AMainHUD::ShowRechargeSanctuary(ARechargeSanctuary* Sanctuary)
 		PC->SetShowMouseCursor(true);
 		PC->SetInputMode(FInputModeUIOnly());
 
-		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.001f);
+		//UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.001f);
 	}
 }
+
+void AMainHUD::ShowShadyStore(class AShadyGuyActor* ShadyGuy, const TArray<struct FShopSlotInfo>& Items)
+{
+	if (!ShadyGuy) return;
+
+	//1.RechargePanelClass로 위젯 생성 + centerSlot에 끼우기
+	OpenCenterPanel(StorePanelClass, StoreWidget);
+
+	//2.URechargePanelClass로 캐스트해서 Sanctuary바인딩
+	if (UShadyStoreShopWidget* Shop = Cast<UShadyStoreShopWidget>(StoreWidget))
+	{
+		Shop->InitWithShadyGuy(ShadyGuy, Items);
+	}
+
+	//3. 인벤토리/스탯 패널 열기
+	MainWidgetInstance->OpenPanels();
+
+	//4. 입력 모드 변경 (마우스 필요 시)
+	APlayerController* PC = GetOwningPlayerController();
+	if (PC)
+	{
+		PC->SetShowMouseCursor(true);
+		PC->SetInputMode(FInputModeUIOnly());
+
+		//UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.001f);
+	}
+}
+
+
+void AMainHUD::ShowMicrowave(AMicrowaveActor* Microwave, const TArray<FMicrowaveSlotInfo>& FilteredList)
+{
+	if (!Microwave) return;
+
+	//1.RechargePanelClass로 위젯 생성 + centerSlot에 끼우기
+	OpenCenterPanel(MicroWavePanelClass, MicroWaveWidget);
+
+	//2.URechargePanelClass로 캐스트해서 Sanctuary바인딩
+	if (UMicroShopWidget* Shop = Cast<UMicroShopWidget>(MicroWaveWidget))
+	{
+		Shop->InitWithMicrowave(Microwave, FilteredList);
+	}
+
+	//3. 인벤토리/스탯 패널 열기
+	MainWidgetInstance->OpenPanels();
+
+	//4. 입력 모드 변경 (마우스 필요 시)
+	APlayerController* PC = GetOwningPlayerController();
+	if (PC)
+	{
+		PC->SetShowMouseCursor(true);
+		PC->SetInputMode(FInputModeUIOnly());
+
+		//UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.001f);
+	}
+}
+
+//void AMainHUD::ShowMagneticUpgrade(AMagneticSanctuary* Sanctuary)
+//{
+//	if (!Sanctuary) return;
+//
+//	//1.RechargePanelClass로 위젯 생성 + centerSlot에 끼우기
+//	OpenCenterPanel(UpgradePanelClass, UpgradeWidget);
+//
+//	//2.URechargePanelClass로 캐스트해서 Sanctuary바인딩
+//	if (UMagneticUpgradeShopWidget* Shop = Cast<UMagneticUpgradeShopWidget>(UpgradeWidget))
+//	{
+//		//Shop->InitWithMicrowave(Microwave, FilteredList);
+//	}
+//
+//	//3. 인벤토리/스탯 패널 열기
+//	MainWidgetInstance->OpenPanels();
+//
+//	//4. 입력 모드 변경 (마우스 필요 시)
+//	APlayerController* PC = GetOwningPlayerController();
+//	if (PC)
+//	{
+//		PC->SetShowMouseCursor(true);
+//		PC->SetInputMode(FInputModeUIOnly());
+//
+//		//UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.001f);
+//	}
+//}
 
 
 void AMainHUD::OpenCenterPanel(TSubclassOf<UUserWidget> PanelClass, TObjectPtr<UUserWidget>& WidgetInstance)
