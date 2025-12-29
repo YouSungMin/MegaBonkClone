@@ -40,7 +40,6 @@ private:
 
 	UFUNCTION()
 	void OnTimelineFinished();
-
 protected:
 	// 물리 적용용 루트
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
@@ -98,4 +97,8 @@ private:
 	// 획득 되었는지 여부(true면 획득 처리 중)
 	bool bPickuped = false;
 
+	//바로 먹어지는거 검사
+	bool bCanBePickedUp = false;
+
+	
 };

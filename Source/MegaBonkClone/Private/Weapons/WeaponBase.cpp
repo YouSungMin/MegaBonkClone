@@ -147,7 +147,7 @@ void AWeaponBase::StartAttackTimer()
 	if (AttackSpeedRate <= 0.01f) AttackSpeedRate = 0.01f;
 
 	// 새로 계산된 간격
-	float NewInterval = 3.0f / AttackSpeedRate;
+	float NewInterval = DefaultAttackSpeed / AttackSpeedRate;
 
 	// [핵심] 기존 간격과 거의 차이가 없다면(변화 없음), 타이머를 건드리지 않고 리턴!
 	if (FMath::IsNearlyEqual(CurrentAttackInterval, NewInterval, 0.001f))
