@@ -73,10 +73,10 @@ private:
 	UTexture2D* CommonTexture;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Microwave Textures")
-	UTexture2D* UnCommonTexture;
+	UTexture2D* RareTexture;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Microwave Textures")
-	UTexture2D* RareTexture;
+	UTexture2D* EpicTexture;
 
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Microwave Textures")

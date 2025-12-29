@@ -109,8 +109,8 @@ void AMicrowaveActor::UpdateMeshTexture()
 
 	switch (CurrentRarity)
 	{
-	case EItemGrade::UnCommon:
-		SelectedTexture = UnCommonTexture;
+	case EItemGrade::Epic:
+		SelectedTexture = EpicTexture;
 		break;
 
 	case EItemGrade::Rare:

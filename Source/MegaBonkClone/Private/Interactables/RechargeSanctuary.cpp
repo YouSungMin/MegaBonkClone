@@ -32,8 +32,8 @@ void ARechargeSanctuary::BeginPlay()
 	if (RarityWeights.Num() == 0)
 	{
 		RarityWeights.Add(EItemGrade::Common, 60.0f);
-		RarityWeights.Add(EItemGrade::UnCommon, 30.0f);
-		RarityWeights.Add(EItemGrade::Rare, 9.0f);
+		RarityWeights.Add(EItemGrade::Rare, 30.0f);
+		RarityWeights.Add(EItemGrade::Epic, 9.0f);
 		RarityWeights.Add(EItemGrade::Legendary, 1.0f);
 	}
 }
