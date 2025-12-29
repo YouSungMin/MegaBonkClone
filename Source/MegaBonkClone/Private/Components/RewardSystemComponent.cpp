@@ -113,7 +113,7 @@ void URewardSystemComponent::GenerateLevelUpRewards()
 		FRewardOption Selected = Pool[RandIdx];
 
 		// 등급 부여
-		Selected.Rarity = CalculateRandomRarity();
+		//Selected.Rarity = CalculateRandomRarity();
 
 		UE_LOG(LogTemp, Log, TEXT("ItemID = %s, Type = %s, StateType = %s, NewLevel = %d, CurrentStatValue = %.1f, NextStatValue = %.1f, Rarity = %s"),
 			*Selected.ItemID.ToString(),

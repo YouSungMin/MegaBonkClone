@@ -40,7 +40,8 @@ void UWeaponSlotWidget::RefreshWeaponSlot()
     WeaponIconImage->SetBrushFromTexture(Tex);
     WeaponIconImage->SetBrushTintColor(FLinearColor::White);
 
-    LevelText->SetText(FText::AsNumber(Level));
+    LevelText->SetText(FText::FromString(FString::Printf(TEXT("LV%d"), Level)));
+    //LevelText->SetText(FText::AsNumber(Level));
     LevelText->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
     
 }
