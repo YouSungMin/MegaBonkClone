@@ -15,18 +15,18 @@ void UChestOpen::NativeConstruct()
 	// 버튼에 클릭 함수 연결하기
 	if (Btn_Claim)
 	{
-		Btn_Claim->OnClicked.AddDynamic(this, &UChestOpen::OnClaimClicked);
+		Btn_Claim->OnClicked.AddUniqueDynamic(this, &UChestOpen::OnClaimClicked);
 	}
 
 	if (Btn_Decline)
 	{
-		Btn_Decline->OnClicked.AddDynamic(this, &UChestOpen::OnDeclineClicked);
+		Btn_Decline->OnClicked.AddUniqueDynamic(this, &UChestOpen::OnDeclineClicked);
 		Btn_Decline->bIsEnabled = false;
 	}
 
 	if (Btn_OpenChest)
 	{
-		Btn_OpenChest->OnClicked.AddDynamic(this, &UChestOpen::OnOpenChestClicked);;
+		Btn_OpenChest->OnClicked.AddUniqueDynamic(this, &UChestOpen::OnOpenChestClicked);;
 	}
 
 

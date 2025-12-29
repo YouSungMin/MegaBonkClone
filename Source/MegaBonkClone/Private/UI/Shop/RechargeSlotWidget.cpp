@@ -4,7 +4,6 @@
 #include "UI/Shop/RechargeSlotWidget.h"
 #include "Components/TextBlock.h"	//TextBlock
 #include "Components/Button.h"
-//#include "RechargeShopWidget.h"
 
 void URechargeSlotWidget::NativeConstruct()
 {
@@ -12,8 +11,18 @@ void URechargeSlotWidget::NativeConstruct()
 
 	if (ButtonSlot)
 	{
+		ButtonSlot->OnClicked.RemoveDynamic(this, &URechargeSlotWidget::HandleSlotClicked);
 		ButtonSlot->OnClicked.AddDynamic(this, &URechargeSlotWidget::HandleSlotClicked);
 	}
+}
+
+void URechargeSlotWidget::NativeDestruct()
+{
+	if (ButtonSlot)
+	{
+		ButtonSlot->OnClicked.RemoveDynamic(this, &URechargeSlotWidget::HandleSlotClicked);
+	}
+	Super::NativeDestruct();
 }
 
 void URechargeSlotWidget::SetRewardInfo(const FSanctuaryRewardInfo& RewardInfo)

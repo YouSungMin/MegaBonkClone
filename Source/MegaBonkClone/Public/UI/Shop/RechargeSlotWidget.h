@@ -21,6 +21,7 @@ class MEGABONKCLONE_API URechargeSlotWidget : public UUserWidget
 	
 public:
 	virtual void NativeConstruct() override;  
+	virtual void NativeDestruct() override;
 
 	UFUNCTION(BlueprintCallable, Category = "RechargeSlot")
 	void SetRewardInfo(const FSanctuaryRewardInfo& RewardInfo);

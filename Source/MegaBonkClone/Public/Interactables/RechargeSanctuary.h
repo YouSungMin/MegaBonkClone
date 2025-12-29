@@ -82,7 +82,7 @@ protected:
 	TMap<EItemGrade, float> RarityMultipliers;
 
 	UPROPERTY(EditAnywhere, Category = "Recharge")
-	float ChargeTime = 1.0f; //3초에서 1로 바꿈
+	float ChargeTime = 0.5f; //3초에서 1로 바꿈
 
 	// 금색 성소 확률 (0.0 ~ 1.0)
 	UPROPERTY(EditAnywhere, Category = "Recharge")

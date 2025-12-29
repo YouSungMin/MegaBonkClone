@@ -17,22 +17,22 @@ void URechargeShopWidget::NativeConstruct()
 	if (Slot1)
 	{
 		Slot1->OnSlotClicked.RemoveDynamic(this, &URechargeShopWidget::OnAnySlotClicked);
-		Slot1->OnSlotClicked.AddDynamic(this, &URechargeShopWidget::OnAnySlotClicked);
+		Slot1->OnSlotClicked.AddUniqueDynamic(this, &URechargeShopWidget::OnAnySlotClicked);
 	}
 	if (Slot2)
 	{
 		Slot2->OnSlotClicked.RemoveDynamic(this, &URechargeShopWidget::OnAnySlotClicked);
-		Slot2->OnSlotClicked.AddDynamic(this, &URechargeShopWidget::OnAnySlotClicked);
+		Slot2->OnSlotClicked.AddUniqueDynamic(this, &URechargeShopWidget::OnAnySlotClicked);
 	}
 	if (Slot3)
 	{
 		Slot3->OnSlotClicked.RemoveDynamic(this, &URechargeShopWidget::OnAnySlotClicked);
-		Slot3->OnSlotClicked.AddDynamic(this, &URechargeShopWidget::OnAnySlotClicked);
+		Slot3->OnSlotClicked.AddUniqueDynamic(this, &URechargeShopWidget::OnAnySlotClicked);
 	}
 	// Exit 버튼
 	if (ExitButton)
 	{
-		ExitButton->OnClicked.AddDynamic(this, &URechargeShopWidget::OnExitClicked);
+		ExitButton->OnClicked.AddUniqueDynamic(this, &URechargeShopWidget::OnExitClicked);
 		UE_LOG(LogTemp, Warning, TEXT("[RechargeShop] ExitButton bind OK"));
 
 	}
