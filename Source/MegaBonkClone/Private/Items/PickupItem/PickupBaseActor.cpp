@@ -114,15 +114,15 @@ void APickupBaseActor::OnPickupComplete_Implementation()
 }
 void APickupBaseActor::OnPoolActivate_Implementation()
 {
-	// 1. 로직 상태 변수 리셋
+	//로직 상태 변수 리셋
 	bPickuped = false;
 	PickupOwner = nullptr;
 	PickupStartLocation = FVector::ZeroVector;
 
-	// 2. 가시성 및 충돌 다시 켜기
+	//가시성 및 충돌 다시 켜기
 	SetActorHiddenInGame(false);
 
-	// 3. 루트 컴포넌트 물리 상태 복구
+	//루트 컴포넌트 물리 상태 복구
 	if (BaseRoot)
 	{
 		// 물리 시뮬레이션 다시 켜기
@@ -146,13 +146,13 @@ void APickupBaseActor::OnPoolActivate_Implementation()
 		BaseRoot->SetPhysicsAngularVelocityInDegrees(FVector::ZeroVector);
 	}
 
-	// 4. 타임라인에 의해 변경된 메시 크기/위치 복구
+	//타임라인에 의해 변경된 메시 크기/위치 복구
 	if (Mesh)
 	{
 		Mesh->SetRelativeScale3D(FVector(0.3f));
 	}
 
-	// 5. 타임라인 컴포넌트 리셋
+	//타임라인 컴포넌트 리셋
 	if (PickupTimeline)
 	{
 		PickupTimeline->Stop();

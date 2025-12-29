@@ -97,6 +97,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Spawning")
 	int32 SanctuaryCount = 5; // 맵에 뿌릴 제단 개수
 
+	UPROPERTY(EditDefaultsOnly, Category = "Spawning")
+	TSubclassOf<AActor> BossSpawner = nullptr; // 보스제단 클래스 목록
+
+	UPROPERTY(EditDefaultsOnly, Category = "Spawning")
+	int32 BossSpawnerCount = 1; 
+
 	UPROPERTY(EditDefaultsOnly, Category = "Overtime")
 	TSubclassOf<AActor> OvertimeEnemyClass; // 예: 강력한 엘리트 몹
 
