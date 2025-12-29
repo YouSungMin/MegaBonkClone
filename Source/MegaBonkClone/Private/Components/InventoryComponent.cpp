@@ -39,16 +39,16 @@ void UInventoryComponent::ProcessProcTrigger(EProcTriggerType Trigger, AActor* T
 			// 기본 확률 + (중첩당 추가 확률 * (개수 - 1))
 			float FinalChance = Proc.BaseChance + (Proc.StackChance * (Slot.Quantity - 1));
 
-			// (선택 사항) 행운 스탯 적용
+			// 행운 스탯 적용
 			//if (CachedStatusComponent)
 			//{
 			//	FinalChance += CachedStatusComponent->GetResultLuck();
 			//}
 
-			// 4. 확률 주사위 굴리기 (0 ~ 100)
+			// 확률 주사위 굴리기 (0 ~ 100)
 			if (FMath::RandRange(0.0f, 100.0f) <= FinalChance)
 			{
-				// 발동 성공! -> 효과 실행
+				//효과 실행
 				ExecuteProcEffect(Proc, Slot.Quantity, TargetActor, TriggerValue);
 
 				// 쿨타임이 있는 스킬이라면 쿨타임 등록
@@ -453,7 +453,6 @@ void UInventoryComponent::ExecuteProcEffect(const FItemProcData& Proc, int32 Sta
 			{
 				// 소환 위치 결정 (타겟이 있으면 타겟 위치, 없으면 내 위치)
 				FVector SpawnLoc = OwnerActor->GetActorLocation() - FVector(0.0f, 0.0f, 75.0f);
-				// 예: 번개는 타겟 머리 위, 지뢰는 내 발밑 등 기획에 따라 분기 필요
 				UE_LOG(LogTemp, Log, TEXT("소환"));
 				GetWorld()->SpawnActor<AActor>(SpawnClass, SpawnLoc, FRotator::ZeroRotator);
 			}
@@ -508,7 +507,6 @@ void UInventoryComponent::ExecuteProcEffect(const FItemProcData& Proc, int32 Sta
 		UE_LOG(LogTemp,Log,TEXT("일시적 버프"));
 		break;
 
-		// ... 나머지 케이스 구현 ...
 	case EProcEffectType::PermanentBuffStat:
 	default:
 		break;
