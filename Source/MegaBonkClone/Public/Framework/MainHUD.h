@@ -34,9 +34,8 @@ public:
 	void ShowShadyStore(class AShadyGuyActor* ShadyGuy, const TArray<struct FShopSlotInfo>& Items);
 	UFUNCTION(BlueprintCallable)
 	void ShowMicrowave(class AMicrowaveActor* Microwave, const TArray<FMicrowaveSlotInfo>& FilteredList);
-	//UFUNCTION(BlueprintCallable)
-	//void ShowMagneticUpgrade(class AMagneticSanctuary* Sanctuary);
-
+	UFUNCTION(BlueprintCallable)
+	void ShowUpgrade(class URewardSystemComponent* RewardComp, const TArray<struct FRewardOption>& Options);
 
 
 	void OpenCenterPanel(TSubclassOf<UUserWidget> PanelClass, TObjectPtr<UUserWidget>& WidgetInstance);

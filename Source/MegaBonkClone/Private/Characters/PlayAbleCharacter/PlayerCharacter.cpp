@@ -6,6 +6,7 @@
 #include "EnhancedInputComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/TimelineComponent.h"
+#include "Components/RewardSystemComponent.h"
 #include "Interfaces/PickupInterface.h"
 #include "Interfaces/InteractionInterface.h"
 #include "Kismet/KismetSystemLibrary.h"

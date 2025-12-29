@@ -74,10 +74,6 @@ void UChestOpen::PlayLootSequence(const FItemData& InRowData)
 			GradeText = FText::FromString(TEXT("Common"));
 			GradeColor = FSlateColor(FLinearColor(0.8f, 0.8f, 0.8f, 1.0f)); // 회색
 			break;
-		case EItemGrade::UnCommon:
-			GradeText = FText::FromString(TEXT("UnCommon"));
-			GradeColor = FSlateColor(FLinearColor(0.1f, 1.0f, 0.1f, 1.0f));
-			break;
 		case EItemGrade::Rare:
 			GradeText = FText::FromString(TEXT("Rare"));
 			GradeColor = FSlateColor(FLinearColor(0.0f, 0.5f, 1.0f, 1.0f)); // 파랑

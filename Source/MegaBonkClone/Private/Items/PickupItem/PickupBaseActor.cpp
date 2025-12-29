@@ -5,7 +5,7 @@
 #include "Components/SphereComponent.h"
 #include "Components/TimelineComponent.h"
 #include "Framework/ObjectPoolSubsystem.h"
-#include <Kismet/GameplayStatics.h>
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 APickupBaseActor::APickupBaseActor()

@@ -5,6 +5,7 @@
 #include "Interfaces/InventoryOwner.h"
 #include "Framework/MainHUD.h"
 #include "Data/ItemDataStructs.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AShadyGuyActor::AShadyGuyActor()
@@ -22,12 +23,6 @@ AShadyGuyActor::AShadyGuyActor()
 
 void AShadyGuyActor::ProcessPurchase(int32 ItemIndex)
 {
-	if (bIsUsed)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("이미 사용된 상인입니다."));
-		return;
-	}
-
 	if (!Player.IsValid())
 	{
 		UE_LOG(LogTemp, Error, TEXT("구매자를 찾을 수 없습니다. (플레이어가 사망했거나 사라짐)"));
@@ -54,6 +49,7 @@ void AShadyGuyActor::ProcessPurchase(int32 ItemIndex)
 	IInventoryOwner::Execute_ReceiveItem(Player.Get(), SelectedItemID, 1);
 	UE_LOG(LogTemp, Log, TEXT("아이템 지급 완료: %s"), *SelectedItemID.ToString());
 	bIsUsed = true;
+	Destroy();
 
 	// (옵션) UI를 닫거나 갱신하는 로직이 필요하면 여기에 델리게이트 호출 추가
 }
@@ -146,11 +142,11 @@ void AShadyGuyActor::UpdateMeshTexture()
 
 	switch (CurrentRarity)
 	{
-	case EItemGrade::Epic:
-		SelectedTexture = EpicTexture;
-		break;
 	case EItemGrade::Rare:
 		SelectedTexture = RareTexture;
+		break;
+	case EItemGrade::Epic:
+		SelectedTexture = EpicTexture;
 		break;
 	case EItemGrade::Legendary:
 		SelectedTexture = LegendaryTexture;

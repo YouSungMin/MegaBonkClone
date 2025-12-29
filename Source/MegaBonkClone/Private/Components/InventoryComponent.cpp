@@ -19,7 +19,7 @@ UInventoryComponent::UInventoryComponent()
 
 void UInventoryComponent::ProcessProcTrigger(EProcTriggerType Trigger, AActor* TargetActor, float TriggerValue)
 {
-	// [최적화] 비전서는 특수 효과가 없으므로 제외하고, '일반 아이템'만 검사합니다.
+	// 비전서는 특수 효과가 없으므로 제외
 	for (const FInventorySlot& Slot : GeneralItems)
 	{
 		FItemData* Data = GetItemInfo(Slot.ItemID);
@@ -30,12 +30,12 @@ void UInventoryComponent::ProcessProcTrigger(EProcTriggerType Trigger, AActor* T
 		{
 			const FItemProcData& Proc = Data->ProcModifiers[i];
 
-			// 1. 트리거 조건 확인 (예: 맞았을 때인데, 공격 시 효과면 패스)
+			// 트리거 조건 확인
 			if (Proc.TriggerType != Trigger) continue;
-			// 2. 쿨타임 확인 (IsOnCooldown 함수는 아까 구현한 것 사용)
+			// 쿨타임 확인
 			if (Proc.Cooldown > 0.0f && IsOnCooldown(Slot.ItemID, i)) continue;
 
-			// 3. 확률 계산
+			// 확률 계산
 			// 기본 확률 + (중첩당 추가 확률 * (개수 - 1))
 			float FinalChance = Proc.BaseChance + (Proc.StackChance * (Slot.Quantity - 1));
 
@@ -221,13 +221,11 @@ void UInventoryComponent::ApplyPassiveStats(const FItemData& ItemData, int32 Cou
 
 		float FinalAddValue = 0.0f;
 
-		// 1. 외부에서 주입된 값(AddValue)이 있다면 최우선 사용
-		// (보통 비전서의 메인 스탯은 0번 인덱스라고 가정)
+		// 외부에서 주입된 값(AddValue)이 있다면 최우선 사용
 		if (i == 0 && AddValue > 0.0f)
 		{
 			FinalAddValue = AddValue;
 		}
-		// 2. 주입된 값이 없다면(0.0), 기존 테이블 데이터 계산
 		else
 		{
 			if (bIsFirstGet)

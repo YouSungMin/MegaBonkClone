@@ -6,6 +6,7 @@
 #include "Data/WeaponDataStructs.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/PlayerController.h"
+#include "Framework/MainHUD.h"
 #include "Kismet/KismetMathLibrary.h"
 
 URewardSystemComponent::URewardSystemComponent()
@@ -13,11 +14,10 @@ URewardSystemComponent::URewardSystemComponent()
 	PrimaryComponentTick.bCanEverTick = false;
 
 	// 기본 확률 가중치 설정
-	RarityWeights.Add(EItemGrade::Common, 60.0f);
-	RarityWeights.Add(EItemGrade::UnCommon, 30.0f);
-	RarityWeights.Add(EItemGrade::Rare, 20.0f);
-	RarityWeights.Add(EItemGrade::Epic, 10.0f);
-	RarityWeights.Add(EItemGrade::Legendary, 5.0f);
+	RarityWeights.Add(EItemGrade::Common, 50.0f);
+	RarityWeights.Add(EItemGrade::Rare, 30.0f);
+	RarityWeights.Add(EItemGrade::Epic, 20.0f);
+	RarityWeights.Add(EItemGrade::Legendary, 10.0f);
 }
 
 void URewardSystemComponent::GenerateLevelUpRewards()
@@ -34,7 +34,7 @@ void URewardSystemComponent::GenerateLevelUpRewards()
 		return;
 	}
 
-	// 2. 슬롯 여유 확인 (4개 제한)
+	// 2. 슬롯 여유 확인 (3개 제한)
 	bool bCanNewWeapon = (WeaponComp->GetCurrentWeaponCount() < 3);
 	bool bCanNewBook = (InventoryComp->GetSecretBookSlots().Num() < 3);
 
@@ -134,6 +134,24 @@ void URewardSystemComponent::GenerateLevelUpRewards()
 		OnRewardsGenerated.Broadcast(FinalRewards);
 	}
 
+	if (APawn* PawnOwner = Cast<APawn>(GetOwner()))
+	{
+		if (APlayerController* PC = Cast<APlayerController>(PawnOwner->GetController()))
+		{
+			if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
+			{
+				HUD->ShowUpgrade(this, FinalRewards);
+			}
+		}
+	}
+	else if (APlayerController* PC = Cast<APlayerController>(GetOwner()))
+	{
+		if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
+		{
+			HUD->ShowUpgrade(this, FinalRewards);
+		}
+	}
+
 	// 게임 일시정지
 	if (APlayerController* PC = Cast<APlayerController>(GetOwner()))
 	{
@@ -154,7 +172,7 @@ void URewardSystemComponent::ApplyWeaponUpgradeLogic(const FWeaponData* Row, int
 	else
 	{
 		// 신규 획득이라면: 등급 개념 없음 (기본 Common 설정)
-		OutOption.Rarity = EItemGrade::Common;
+		OutOption.Rarity = EItemGrade::None;
 	}
 
 	// 강화 옵션이 하나라도 있다면?
@@ -262,6 +280,18 @@ void URewardSystemComponent::ApplyWeaponUpgradeLogic(const FWeaponData* Row, int
 void URewardSystemComponent::ApplySecretBookLogic(const FItemData* Row, int32 CurLv, bool bHas, FRewardOption& OutOption)
 {
 	if (!Row) return;
+
+	// 등급(Rarity) 결정 로직
+	if (bHas)
+	{
+		// 강화라면: 확률에 따라 등급 결정 (Common ~ Legendary)
+		OutOption.Rarity = CalculateRandomRarity();
+	}
+	else
+	{
+		// 신규 획득이라면: 등급 개념 없음 (기본 Common 설정)
+		OutOption.Rarity = EItemGrade::None;
+	}
 
 	if (Row->Modifiers.Num() > 0)
 	{

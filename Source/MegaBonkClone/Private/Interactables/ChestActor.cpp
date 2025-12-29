@@ -5,6 +5,7 @@
 #include "Framework/MainHUD.h"
 #include "Kismet/GameplayStatics.h"
 #include "Interfaces/InventoryOwner.h"
+#include "Components/BoxComponent.h"
 
 // Sets default values
 AChestActor::AChestActor()
@@ -16,6 +17,11 @@ AChestActor::AChestActor()
 	SetRootComponent(ChestMesh);
 	ChestMesh->SetCollisionProfileName(TEXT("BlockAllDynamic"));
 	ChestMesh->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+
+	TriggerBox = CreateDefaultSubobject<UBoxComponent>(TEXT("TriggerBox"));
+	TriggerBox->SetupAttachment(RootComponent); // 루트(메시)에 부착
+	TriggerBox->SetBoxExtent(FVector(50.f, 50.f, 50.f)); // 크기 설정
+	TriggerBox->SetCollisionProfileName(TEXT("Trigger")); // 트리거 프리셋 사용
 }
 
 // Called when the game starts or when spawned
@@ -23,6 +29,13 @@ void AChestActor::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	if (bAutoOpen)
+	{
+		if (TriggerBox)
+		{
+			TriggerBox->OnComponentBeginOverlap.AddDynamic(this, &AChestActor::OnOverlapBegin);
+		}
+	}
 }
 
 void AChestActor::Interact_Implementation(AActor* PlayerActor)
@@ -79,6 +92,20 @@ void AChestActor::Interact_Implementation(AActor* PlayerActor)
 
 	//상자 삭제 
 	Destroy();
+}
+
+void AChestActor::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (!bAutoOpen) return;
+
+	// 이미 열렸거나 대상이 없으면 리턴
+	if (bIsOpened || !OtherActor) return;
+
+	// 플레이어인지 확인 후 열기
+	if (OtherActor->Implements<UInventoryOwner>())
+	{
+		Interact_Implementation(OtherActor);
+	}
 }
 
 FName AChestActor::GetRandomItemID()
