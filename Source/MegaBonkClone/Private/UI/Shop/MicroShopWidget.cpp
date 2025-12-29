@@ -20,12 +20,25 @@ void UMicroShopWidget::NativeConstruct()
 	}
 }
 
+void UMicroShopWidget::NativeDestruct()
+{
+	TeardownMicrowave();
+	Super::NativeDestruct();
+}
+
 //전자레인지 액터와 아이템 목록으로 초기화
 void UMicroShopWidget::InitWithMicrowave(AMicrowaveActor* InMicrowave, const TArray<FMicrowaveSlotInfo>& InList)
 {
+	TeardownMicrowave();
 
 	MicrowaveRef = InMicrowave;
 	CachedList = InList;
+
+	if (MicrowaveRef)
+	{
+		MicrowaveRef->OnInventoryUpdated.RemoveDynamic(this, &UMicroShopWidget::HandleInventoryUpdated);
+		MicrowaveRef->OnInventoryUpdated.AddDynamic(this, &UMicroShopWidget::HandleInventoryUpdated);
+	}
 
 	RebuildGrid();
 }
@@ -96,4 +109,17 @@ void UMicroShopWidget::OnExitClicked()
 			HUD->CloseCenterUI();
 		}
 	}
+}
+
+void UMicroShopWidget::TeardownMicrowave()
+{
+	if (MicrowaveRef)
+	{
+		MicrowaveRef->OnInventoryUpdated.RemoveDynamic(this, &UMicroShopWidget::HandleInventoryUpdated);
+	}
+}
+
+void UMicroShopWidget::HandleInventoryUpdated()
+{
+	OnExitClicked();
 }

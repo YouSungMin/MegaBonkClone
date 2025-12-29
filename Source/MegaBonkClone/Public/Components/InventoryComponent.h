@@ -9,7 +9,6 @@
 #include "InventoryComponent.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnItemUpdate, FName, ItemID, const FItemData&, ItemData);
-
 USTRUCT(BlueprintType)
 struct FInventorySlot
 {
@@ -70,6 +69,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	void ApplyPassiveStats(const FItemData& ItemData, int32 Count, bool bIsFirstGet, float AddValue, EItemType ItemType);
+	void RemovePassiveStats(const FItemData& ItemData, int32 Count, bool bIsFirstGet, float AddValue, EItemType ItemType);
 private:
 	// 내부적으로 효과를 실행하는 분기 함수
 	void ExecuteProcEffect(const FItemProcData& Proc, int32 StackCount, AActor* TargetActor, float TriggerValue);
@@ -97,4 +97,5 @@ private:
 
 	TObjectPtr<class UStatusComponent> CachedStatusComponent = nullptr;
 
+	void ProcessPassiveStats(const FItemData& ItemData, int32 Count, bool bIsFirstGet, float AddValue, EItemType ItemType, float Multiplier);
 };

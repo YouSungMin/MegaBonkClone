@@ -39,5 +39,4 @@ private:
 
 	UPROPERTY()
 	TWeakObjectPtr<UInventoryComponent> TargetItemInventory;
-
 };

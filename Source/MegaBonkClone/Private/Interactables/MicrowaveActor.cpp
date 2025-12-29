@@ -178,6 +178,12 @@ void AMicrowaveActor::RetrieveResult()
 		// 인벤토리 컴포넌트에 구현한 RemoveItem 호출
 		Inventory->RemoveItem(TargetDeleteID, 1);
 		UE_LOG(LogTemp, Warning, TEXT("등가교환 발생! 사라진 아이템: %s"), *TargetDeleteID.ToString());
+
+		// UI 업데이트 알림
+		if (OnInventoryUpdated.IsBound())
+		{
+			OnInventoryUpdated.Broadcast();
+		}
 	}
 	else
 	{
