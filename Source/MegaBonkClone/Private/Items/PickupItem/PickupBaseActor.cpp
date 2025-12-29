@@ -15,7 +15,7 @@ APickupBaseActor::APickupBaseActor()
 
 	BaseRoot = CreateDefaultSubobject<USphereComponent>(TEXT("BaseRoot"));
 	SetRootComponent(BaseRoot);
-	BaseRoot->InitSphereRadius(1.0f);
+	BaseRoot->InitSphereRadius(10.0f);
 	BaseRoot->SetSimulatePhysics(true);
 	BaseRoot->BodyInstance.bLockXRotation = true;
 	BaseRoot->BodyInstance.bLockYRotation = true;
@@ -127,9 +127,21 @@ void APickupBaseActor::OnPoolActivate_Implementation()
 	{
 		// 물리 시뮬레이션 다시 켜기
 		BaseRoot->SetSimulatePhysics(true);
-		BaseRoot->SetCollisionProfileName(TEXT("BlockAllDynamic"));
+	
+		BaseRoot->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		BaseRoot->SetCollisionObjectType(ECC_WorldDynamic);
+		BaseRoot->SetCollisionResponseToAllChannels(ECR_Ignore);
+		BaseRoot->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+		BaseRoot->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);  // 벽, 바닥 등
+		BaseRoot->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Block); // 다른 움직이는 물체
+		BaseRoot->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+		BaseRoot->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);        // 캐릭터랑 부딪히지 않음
+		BaseRoot->SetCollisionResponseToChannel(ECC_PhysicsBody, ECR_Ignore);
+		BaseRoot->SetCollisionResponseToChannel(ECC_Vehicle, ECR_Ignore);
+		BaseRoot->SetCollisionResponseToChannel(ECC_Destructible, ECR_Ignore);
+		
 
-		// [중요] 이전 움직임(가속도/회전)이 남아있지 않게 속도 0으로 초기화
+		//이전 움직임(가속도/회전)이 남아있지 않게 속도 0으로 초기화
 		BaseRoot->SetPhysicsLinearVelocity(FVector::ZeroVector);
 		BaseRoot->SetPhysicsAngularVelocityInDegrees(FVector::ZeroVector);
 	}
@@ -150,21 +162,23 @@ void APickupBaseActor::OnPoolActivate_Implementation()
 
 void APickupBaseActor::OnPoolDeactivate_Implementation()
 {
-	// 1. 화면에서 숨기고 충돌 끄기
+	//화면에서 숨기고 충돌 끄기
 	SetActorHiddenInGame(true);
-	// 2. 물리 연산 중지 (성능 절약)
+	
 	if (BaseRoot)
 	{
 		BaseRoot->SetSimulatePhysics(false);
+		BaseRoot->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		BaseRoot->SetCollisionResponseToAllChannels(ECR_Ignore);
 	}
 
-	// 3. 실행 중인 타임라인 강제 정지
+	//실행 중인 타임라인 강제 정지
 	if (PickupTimeline)
 	{
 		PickupTimeline->Stop();
 	}
 
-	// (선택 사항) 만약 틱(Tick)을 껐다 켰다 한다면 여기서 SetActorTickEnabled(false);
+	
 }
 
 void APickupBaseActor::OnTimelineUpdate(float Value)
