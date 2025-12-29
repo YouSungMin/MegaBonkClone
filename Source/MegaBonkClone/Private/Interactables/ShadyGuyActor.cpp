@@ -5,13 +5,15 @@
 #include "Interfaces/InventoryOwner.h"
 #include "Framework/MainHUD.h"
 #include "Data/ItemDataStructs.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
+#include "GameFramework/Character.h"
 
 // Sets default values
 AShadyGuyActor::AShadyGuyActor()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	SetRootComponent(Root);
 
@@ -19,6 +21,8 @@ AShadyGuyActor::AShadyGuyActor()
 	ShadyGuyMesh->SetupAttachment(Root);
 	ShadyGuyMesh->SetCollisionProfileName(TEXT("BlockAllDynamic"));
 	ShadyGuyMesh->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+
+	ShadyGuyMesh->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
 }
 
 void AShadyGuyActor::ProcessPurchase(int32 ItemIndex)
@@ -54,6 +58,30 @@ void AShadyGuyActor::ProcessPurchase(int32 ItemIndex)
 	// (옵션) UI를 닫거나 갱신하는 로직이 필요하면 여기에 델리게이트 호출 추가
 }
 
+void AShadyGuyActor::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (Player.IsValid())
+	{
+		FVector StartLocation = GetActorLocation();
+		FVector TargetLocation = Player->GetActorLocation();
+
+		// 3. 바라봐야 할 목표 회전값 계산 (FindLookAtRotation)
+		FRotator TargetRotation = UKismetMathLibrary::FindLookAtRotation(StartLocation, TargetLocation);
+
+		// [중요] 적이 하늘/땅을 보지 않고 수평으로만 돌게 하려면 Pitch, Roll을 0으로 고정
+		TargetRotation.Pitch = 0.0f;
+		TargetRotation.Roll = 0.0f;
+
+		// 4. 현재 회전값에서 목표 회전값으로 부드럽게 보간 (RInterpTo)
+		FRotator NewRotation = FMath::RInterpTo(GetActorRotation(), TargetRotation, DeltaTime, 5.0f); // 5.0f는 회전 속도
+
+		// 5. 적용
+		SetActorRotation(NewRotation);
+	}
+}
+
 // Called when the game starts or when spawned
 void AShadyGuyActor::BeginPlay()
 {
@@ -62,6 +90,8 @@ void AShadyGuyActor::BeginPlay()
 	DetermineRarity();		// 등급 결정
 	UpdateMeshTexture();	// 외형 적용
 	GenerateShopItems();	// 아이템 데이터 생성
+
+	Player = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 }
 
 void AShadyGuyActor::Interact_Implementation(AActor* PlayerActor)

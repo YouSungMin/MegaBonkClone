@@ -5,8 +5,9 @@
 #include "Components/SphereComponent.h"
 #include "Characters/PlayAbleCharacter/PlayerCharacter.h"
 #include "TimerManager.h"
-
+#include "Characters/Components/StatusComponent.h"
 #include "Framework/MainHUD.h"
+#include "Data/TypeEnums.h"
 #include "GameFramework/PlayerController.h"
 ARechargeSanctuary::ARechargeSanctuary()
 {
@@ -61,10 +62,102 @@ void ARechargeSanctuary::ApplySelectedReward(const FSanctuaryRewardInfo& RewardI
 		return;
 	}
 
-	AActor* PlayerActor = OverlappingPlayer.Get();
-
 	bIsUsed = true;
 	UE_LOG(LogTemp, Log, TEXT("보상 생성: %d (%d) -> Value: %.1f"), RewardInfo.StatType, RewardInfo.Rarity, RewardInfo.Value);
+	
+
+	if (APlayerCharacter* PlayerActor = Cast<APlayerCharacter>(OverlappingPlayer.Get()))
+	{
+		if (UStatusComponent* StatusComponent = PlayerActor->GetStatusComponent())
+		{
+			switch (RewardInfo.StatType)
+			{
+			case EItemStatType::MaxHP:
+				StatusComponent->AddShrineMaxHP(RewardInfo.Value);
+				break;
+			case EItemStatType::HPRegen:
+				StatusComponent->AddShrineHPRegen(RewardInfo.Value);
+				break;
+			case EItemStatType::OverHeal:
+				StatusComponent->AddShrineOverHeal(RewardInfo.Value);
+				break;
+			case EItemStatType::Shield:
+				StatusComponent->AddShrineShield(RewardInfo.Value);
+				break;
+			case EItemStatType::Armor:
+				StatusComponent->AddShrineArmor(RewardInfo.Value/100);
+				break;
+			case EItemStatType::EvasionChance:
+				StatusComponent->AddShrineEvasionChance(RewardInfo.Value/100);
+				break;
+			case EItemStatType::LifeDrain:
+				StatusComponent->AddShrineLifeDrain(RewardInfo.Value);
+				break;
+			case EItemStatType::Thorn:
+				StatusComponent->AddShrineThorn(RewardInfo.Value);
+				break;
+			case EItemStatType::ExpGain:
+				StatusComponent->AddShrineExpGain(RewardInfo.Value);
+				break;
+			case EItemStatType::SilverGain:
+				StatusComponent->AddShrineSilverGain(RewardInfo.Value);
+				break;
+			case EItemStatType::GoldGain:
+				StatusComponent->AddShrineGoldGain(RewardInfo.Value);
+				break;
+			case EItemStatType::PickUpRange:
+				StatusComponent->AddShrinePickUpRange(RewardInfo.Value);
+				break;
+			case EItemStatType::Difficulty:
+				StatusComponent->AddShrineDifficulty(RewardInfo.Value);
+				break;
+			case EItemStatType::Damage:
+				StatusComponent->AddShrineDamage(RewardInfo.Value);
+				break;
+			case EItemStatType::CritChance:
+				StatusComponent->AddShrineCriticalChance(RewardInfo.Value/100);
+				break;
+			//case EItemStatType::MegaCritChance:
+			//	StatusComponent->AddShrineMegaCritChance(RewardInfo.Value);
+			//	break;
+			case EItemStatType::AttackSpeed:
+				StatusComponent->AddShrineAttackSpeed(RewardInfo.Value/100);
+				break;
+			case EItemStatType::ProjectileCount:
+				StatusComponent->AddShrineProjectileCount(RewardInfo.Value);
+				break;
+			case EItemStatType::ProjectileReflectCount:
+				StatusComponent->AddShrineProjectileReflectCount(RewardInfo.Value);
+				break;
+			case EItemStatType::AttackSize:
+				StatusComponent->AddShrineAttackSize(RewardInfo.Value);
+				break;
+			case EItemStatType::ProjectileSpeed:
+				StatusComponent->AddShrineProjectileSpeed(RewardInfo.Value);
+				break;
+			case EItemStatType::AttackDuration:
+				StatusComponent->AddShrineAttackDuration(RewardInfo.Value);
+				break;
+			case EItemStatType::KnockBack:
+				StatusComponent->AddShrineKnockBack(RewardInfo.Value);
+				break;
+			case EItemStatType::MoveSpeed:
+				StatusComponent->AddShrineMoveSpeed(RewardInfo.Value/100);
+				break;
+			case EItemStatType::JumpPower:
+				StatusComponent->AddShrineJumpPower(RewardInfo.Value);
+				break;
+			case EItemStatType::ExtraJump:
+				StatusComponent->AddShrineExtraJump(RewardInfo.Value);
+				break;
+			case EItemStatType::Luck:
+				StatusComponent->AddShrineLuck(RewardInfo.Value);
+				break;
+			default:
+				break;
+			}
+		}
+	}
 }
 
 void ARechargeSanctuary::OnProximityBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -97,8 +190,6 @@ void ARechargeSanctuary::OnProximityEndOverlap(UPrimitiveComponent* OverlappedCo
 		OverlappingPlayer = nullptr;
 
 		UE_LOG(LogTemp, Log, TEXT("범위를 벗어나 충전이 취소되었습니다."));
-
-		// TODO: UI 끄기
 	}
 }
 
@@ -160,7 +251,6 @@ void ARechargeSanctuary::OnChargeComplete()
 		FString StatName = UEnum::GetDisplayValueAsText(Reward.StatType).ToString();
 		FString GradeName = UEnum::GetDisplayValueAsText(Reward.Rarity).ToString();
 		UE_LOG(LogTemp, Log, TEXT("보상 생성: %s (%s) -> Value: %.1f"), *StatName, *GradeName, Reward.Value);
-		
 	}
 
 	//1. HUD로 UI열기
