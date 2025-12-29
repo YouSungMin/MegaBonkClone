@@ -99,8 +99,8 @@ void AShadyGuyActor::DetermineRarity()
 	if (RarityDropRates.Num() == 0)
 	{
 		RarityDropRates.Add(EItemGrade::Common, 60.0f);
-		RarityDropRates.Add(EItemGrade::UnCommon, 30.0f);
-		RarityDropRates.Add(EItemGrade::Rare, 10.0f);
+		RarityDropRates.Add(EItemGrade::Rare, 30.0f);
+		RarityDropRates.Add(EItemGrade::Epic, 10.0f);
 		RarityDropRates.Add(EItemGrade::Legendary, 5.0f);
 	}
 
@@ -145,8 +145,8 @@ void AShadyGuyActor::UpdateMeshTexture()
 	case EItemGrade::Rare:
 		SelectedTexture = RareTexture;
 		break;
-	case EItemGrade::UnCommon:
-		SelectedTexture = UnCommonTexture;
+	case EItemGrade::Epic:
+		SelectedTexture = EpicTexture;
 		break;
 	case EItemGrade::Legendary:
 		SelectedTexture = LegendaryTexture;
