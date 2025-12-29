@@ -55,6 +55,7 @@ public:
 	void ProcessPurchase(int32 ItemIndex);
 
 protected:
+	virtual void Tick(float DeltaTime)override;
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
