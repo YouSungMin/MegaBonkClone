@@ -4,6 +4,7 @@
 #include "Framework/MegaBonkGameState.h"
 #include "NavigationSystem.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 AMegaBonkGameState::AMegaBonkGameState()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -170,7 +171,7 @@ void AMegaBonkGameState::SpawnProps()
 		CurrentCount += CountForThisType;
 	}
 
-	// [보정] 반올림 오차 등으로 전체 개수가 모자라면, 첫 번째 항목(보통 가장 흔한 항아리)으로 채웁니다.
+	//반올림 오차 등으로 전체 개수가 모자라면, 첫 번째 항목(보통 가장 흔한 항아리)으로 채웁니다.
 	if (SpawnDeck.Num() < TotalPropCount && PropSpawnRules.Num() > 0)
 	{
 		int32 MissingCount = TotalPropCount - SpawnDeck.Num();
@@ -180,7 +181,7 @@ void AMegaBonkGameState::SpawnProps()
 		}
 	}
 
-	// 2. [셔플] 목록을 무작위로 섞습니다. (항아리, 항아리, 상자... 순서를 섞음)
+	// 2.목록을 무작위로 섞습니다. (항아리, 항아리, 상자... 순서를 섞음)
 	if (SpawnDeck.Num() > 0)
 	{
 		// Fisher-Yates Shuffle 알고리즘 (언리얼 내장 기능 이용)
@@ -195,7 +196,7 @@ void AMegaBonkGameState::SpawnProps()
 		}
 	}
 
-	// 3. [배치] 섞인 목록을 하나씩 꺼내서 맵에 배치합니다.
+	// 3.섞인 목록을 하나씩 꺼내서 맵에 배치합니다.
 	for (TSubclassOf<AActor> PropClassToSpawn : SpawnDeck)
 	{
 		FVector SpawnLoc;
@@ -212,7 +213,7 @@ void AMegaBonkGameState::SpawnProps()
 		}
 	}
 
-	// 2. 제단(Sanctuary) 배치
+	//제단(Sanctuary) 배치
 	for (int32 i = 0; i < SanctuaryCount; i++)
 	{
 		if (Sanctuaries.Num() == 0) break;
@@ -227,19 +228,32 @@ void AMegaBonkGameState::SpawnProps()
 
 }
 
+
 bool AMegaBonkGameState::GetRandomLocationOnNavMesh(FVector& OutLocation)
 {
-	UNavigationSystemV1* NavSystem= UNavigationSystemV1::GetCurrent(GetWorld());
-	if (NavSystem)
+	UNavigationSystemV1* NavSystem = UNavigationSystemV1::GetCurrent(GetWorld());
+	if (!NavSystem) return false;
+
+	//맵의 크기 정의 (예: 가로세로 12000 크기의 사각형 맵이라 가정)
+	// BoxExtent는 절반 크기이므로 6000으로 설정
+	FVector MapOrigin = FVector::ZeroVector;
+	FVector BoxExtent = FVector(6000.0f, 6000.0f, 0.0f); // Z는 무시
+
+	//박스 안에서 완전 랜덤한 지점 생성
+	FVector RandomPoint = UKismetMathLibrary::RandomPointInBoundingBox(MapOrigin, BoxExtent);
+
+	//그 랜덤 지점을 내비게이션 메쉬 위로 투영 (Project)
+	FNavLocation ResultLocation;
+
+	// QueryExtent: 검색할 때 높이 여유값 (Z축으로 얼마나 위아래를 찾을지)
+	FVector QueryExtent = FVector(500.0f, 500.0f, 2000.0f);
+
+	// ProjectPointToNavigation: 해당 좌표 수직 아래/위에 NavMesh가 있는지 확인
+	if (NavSystem->ProjectPointToNavigation(RandomPoint, ResultLocation, QueryExtent))
 	{
-		FNavLocation ResultLocation;
-		// 맵 전체 범위 (예: 10000) 내에서 랜덤 포인트
-		// (Origin은 맵 중앙(0,0,0)으로 가정)
-		if (NavSystem->GetRandomReachablePointInRadius(FVector::ZeroVector, 10000.0f, ResultLocation))
-		{
-			OutLocation = ResultLocation.Location;
-			return true;
-		}
+		OutLocation = ResultLocation.Location;
+		return true;
 	}
+
 	return false;
 }
