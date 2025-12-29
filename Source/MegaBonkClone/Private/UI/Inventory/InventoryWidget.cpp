@@ -36,6 +36,21 @@ void UInventoryWidget::NativeConstruct()
 	}
 
 	//UE_LOG(LogTemp, Warning, TEXT("InventoryWidget: Cached SlotWidgets = %d / GridChildren = %d"), i);
+	
+	// 2)시크릿북 슬롯 캐싱
+	if (SecretSlotGridPanel)
+	{
+		const int32 ChildSecretCount = SecretSlotGridPanel->GetChildrenCount();
+		for (int32 i = 0; i < ChildSecretCount; ++i)
+		{
+			if (USecretBookSlotWidget* SlotWidget = Cast<USecretBookSlotWidget>(SecretSlotGridPanel->GetChildAt(i)))
+			{
+				SecretSlotWidgets.Add(SlotWidget);
+			}
+		}
+	}
+
+
 }
 
 void UInventoryWidget::InitializeInventoryWidget(UInventoryComponent* InventoryComponent)
@@ -89,8 +104,9 @@ void UInventoryWidget::RefreshInventoryWidget()
 {
 	if (!TargetInventory.IsValid())
 		return;
-
-	// 1) 8칸 전부 비우기
+	//
+	//1) 일반 아이템슬롯 비우기/채우기
+	// 1. 8칸 전부 비우기
 	for (UItemSlotWidget* SlotWidget : ItemSlotWidgets)
 	{
 		if (SlotWidget)
@@ -99,7 +115,7 @@ void UInventoryWidget::RefreshInventoryWidget()
 		}
 	}
 
-	// 2) 인벤 데이터로 채우기 (앞에서부터)
+	// 2. 인벤 데이터로 채우기 (앞에서부터)
 	const TArray<FInventorySlot>& Items = TargetInventory->GetGeneralItemSlots();
 
 	int32 VisibleIndex = 0;
@@ -114,6 +130,37 @@ void UInventoryWidget::RefreshInventoryWidget()
 		ItemSlotWidgets[VisibleIndex]->InitializeItemSlot(InvSlot.ItemID, InvSlot.Quantity, TargetInventory.Get());
 		VisibleIndex++;
 	}
+
+	//----------------------
+	//2) 시크릿 슬롯 비우기/채우기
+
+	for (USecretBookSlotWidget* SlotWidget : SecretSlotWidgets)
+	{
+		if (SlotWidget)
+			SlotWidget->InitializeSecretBookSlot(NAME_None, 0, TargetInventory.Get()); // 또는 Clear 함수 호출
+		// SlotWidget->ClearSecretBookSlot();  이런 함수가 public이면 이게 더 깔끔
+	}
+
+	const TArray<FInventorySlot>& Secrets = TargetInventory->GetSecretBookSlots();
+
+	int32 SecretIndex = 0;
+	for (const FInventorySlot& SecretSlot : Secrets)
+	{
+		if (SecretSlot.ItemID.IsNone() || SecretSlot.Level <= 0)
+			continue;
+
+		if (!SecretSlotWidgets.IsValidIndex(SecretIndex))
+			break;
+
+		SecretSlotWidgets[SecretIndex]->InitializeSecretBookSlot(
+			SecretSlot.ItemID,
+			SecretSlot.Level,
+			TargetInventory.Get()
+		);
+
+		SecretIndex++;
+	}
+
 
 }
 

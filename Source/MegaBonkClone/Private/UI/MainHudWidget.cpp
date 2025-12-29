@@ -7,6 +7,10 @@
 #include "Components/InventoryComponent.h"
 #include "Components/NamedSlot.h"
 #include "Characters/Components/WeaponSystemComponent.h"
+#include "Components/InventoryComponent.h"	
+#include "Data/ItemDataStructs.h"
+#include "Components/UniformGridPanel.h"
+#include "UI/Inventory/SecretBookSlotWidget.h"
 #include "UI/ResourceBarWidget.h"
 
 
@@ -24,16 +28,29 @@ void UMainHudWidget::NativeConstruct()
 		{
 			// 인벤토리컴포넌트의 내용을 바탕으로 InventoryWidget 채우기
 			
+			CachedInventory = inventoryComponent;
 
 			//항상 떠있는 하단 아이템바
 			if (ItemBar)
 			{
 				ItemBar->InitializeInventoryWidget(inventoryComponent);  // 너가 만든 함수명 그대로
 			}
-			else
+			if (InventoryPanel)
 			{
-				UE_LOG(LogTemp, Warning, TEXT("아이템바 확인"));
+				InventoryPanel->InitializeInventoryWidget(inventoryComponent);
 			}
+
+			// 1. 비전시 WBP에 배치된 시크릿 슬롯들 캐싱
+			CacheSecretSlots();
+
+			// 2. 비전시 처음 한 번 채우기
+			RefreshSecretSlots();
+
+			// 3. 인벤 변경 시 HUD 시크릿도 갱신
+			CachedInventory->OnItemAdd.RemoveDynamic(this, &UMainHudWidget::HandleInventoryChanged);
+			CachedInventory->OnItemAdd.AddDynamic(this, &UMainHudWidget::HandleInventoryChanged);
+		}
+
 
 		}
 		if(UWeaponSystemComponent* weaponSystemComponent = player->FindComponentByClass<UWeaponSystemComponent>())
@@ -55,8 +72,6 @@ void UMainHudWidget::NativeConstruct()
 			HandleShieldChanged(status->GetResultShield(), status->GetResultShield());
 		}
 
-		
-	}
 }
 
 
@@ -98,6 +113,48 @@ void UMainHudWidget::ClearCenterContent()
 	{
 		CenterSlot->ClearChildren();
 	}
+}
+
+//비전시 슬롯 캐싱
+void UMainHudWidget::CacheSecretSlots()
+{
+	SecretSlotWidgets.Reset();
+
+	if (!SecretSlotGridPanel) return;
+
+	for (int32 i = 0; i < SecretSlotGridPanel->GetChildrenCount(); ++i)
+	{
+		if (USecretBookSlotWidget* SecretSlot = Cast<USecretBookSlotWidget>(SecretSlotGridPanel->GetChildAt(i)))
+		{
+			SecretSlotWidgets.Add(SecretSlot);
+		}
+	}
+}
+
+void UMainHudWidget::RefreshSecretSlots()
+{
+	//1. 전부 비우기
+	for (USecretBookSlotWidget* SecretSlot : SecretSlotWidgets)
+	{
+		if (SecretSlot) SecretSlot->InitializeSecretBookSlot(NAME_None, 0, CachedInventory);
+	}
+
+	//2. 데이터 있는 것만 순서대로 채우기
+	const TArray<FInventorySlot>& Secrets = CachedInventory->GetSecretBookSlots();
+
+	int32 idx = 0;
+	for (const FInventorySlot& S : Secrets)
+	{
+		if (idx >= SecretSlotWidgets.Num()) break;
+		if (S.ItemID.IsNone() || S.Level <= 0) continue;
+
+		SecretSlotWidgets[idx++]->InitializeSecretBookSlot(S.ItemID, S.Level, CachedInventory);
+	}
+}
+
+void UMainHudWidget::HandleInventoryChanged(FName ItemID, const FItemData& ItemData)
+{
+	RefreshSecretSlots();
 }
 
 void UMainHudWidget::HandleHPChanged(float CurrentHP, float MaxHP)

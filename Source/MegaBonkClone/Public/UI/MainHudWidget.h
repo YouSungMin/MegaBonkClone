@@ -43,18 +43,35 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "UI")
 	void ClearCenterContent();
 
+private:
+	//비전시 슬롯 캐싱
+	void CacheSecretSlots();
+	void RefreshSecretSlots();
+
+	// 인벤 변하면 갱신
+	UFUNCTION()
+	void HandleInventoryChanged(FName ItemID, const FItemData& ItemData);
+
+
 	UFUNCTION()
 	void HandleHPChanged(float CurrentHP, float MaxHP);
 
 	UFUNCTION()
 	void HandleShieldChanged(float CurrentShield, float MaxShield);
 
+public:
 	//인벤토리 열림 상태 GETTER
 	inline EOpenState GetOpenState() const { return OpenState; }
 	inline UInventoryWidget* GetInventoryWidget() const { return InventoryPanel; }
 	inline UInGameItemBarWidget* GetItemBarWidget() const { return ItemBar; }
 	inline UInGameWeaponBarWidget* GetWeaponBarWidget() const { return WeaponBar;}
 	
+private:
+	UPROPERTY()
+	TObjectPtr<UInventoryComponent> CachedInventory = nullptr;
+
+	UPROPERTY()
+	TArray<TObjectPtr<class USecretBookSlotWidget>> SecretSlotWidgets;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Resource", meta = (BindWidget))
@@ -74,6 +91,10 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon", meta = (BindWidget))
 	TObjectPtr<UInGameWeaponBarWidget> WeaponBar = nullptr; //플레이어스탯 위젯
+
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidget), Category = "UI|Inventory|Items")
+	TObjectPtr<class UUniformGridPanel> SecretSlotGridPanel = nullptr;
+
 
 	//에디터의 Named Slot과 바인딩
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Center",meta = (BindWidget))

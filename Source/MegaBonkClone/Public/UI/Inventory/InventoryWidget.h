@@ -70,6 +70,6 @@ private:
 
 	//NativeConstruct���� �������г� ĳ��
 	UPROPERTY()
-	TArray<TObjectPtr<class UItemSlotWidget>> SecretSlotWidgets;
+	TArray<TObjectPtr<class USecretBookSlotWidget>> SecretSlotWidgets;
 
 };
