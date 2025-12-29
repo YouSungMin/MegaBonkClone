@@ -53,6 +53,7 @@ public:
 	// UI에서 구매 버튼을 눌렀을 때 호출될 실제 처리 함수
 	UFUNCTION(BlueprintCallable, Category = "Shop")
 	void ProcessPurchase(int32 ItemIndex);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -81,10 +82,10 @@ protected:
 	UTexture2D* CommonTexture;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ShadyGuy Textures")
-	UTexture2D* RareTexture;
+	UTexture2D* UnCommonTexture;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ShadyGuy Textures")
-	UTexture2D* EpicTexture;
+	UTexture2D* RareTexture;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ShadyGuy Textures")
 	UTexture2D* LegendaryTexture;

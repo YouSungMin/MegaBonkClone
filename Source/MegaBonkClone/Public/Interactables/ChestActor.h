@@ -27,6 +27,9 @@ protected:
 	virtual void BeginPlay() override;
 
 	virtual void Interact_Implementation(AActor* PlayerActor) override;
+
+	UFUNCTION()
+	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 private:
 	FName GetRandomItemID();
 protected:
@@ -46,4 +49,14 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loot Settings")
 	float OpenCost = 0;
 
+
+	// 오버랩 감지용 트리거 박스
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<class UBoxComponent> TriggerBox;
+
+	// 이미 열렸는지 확인하는 플래그 (중복 실행 방지)
+	bool bIsOpened = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loot Settings")
+	bool bAutoOpen = false;
 };

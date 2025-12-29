@@ -79,7 +79,7 @@ void ARechargeSanctuary::OnProximityBeginOverlap(UPrimitiveComponent* Overlapped
 			OverlappingPlayer = OtherActor;
 
 			// 타이머 시작 //자동시작 막기
-			//GetWorldTimerManager().SetTimer(ChargeTimerHandle, this, &ARechargeSanctuary::OnChargeComplete, ChargeTime, false);
+			GetWorldTimerManager().SetTimer(ChargeTimerHandle, this, &ARechargeSanctuary::OnChargeComplete, ChargeTime, false);
 	}
 	else
 	{
