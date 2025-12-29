@@ -21,6 +21,8 @@ AShadyGuyActor::AShadyGuyActor()
 	ShadyGuyMesh->SetupAttachment(Root);
 	ShadyGuyMesh->SetCollisionProfileName(TEXT("BlockAllDynamic"));
 	ShadyGuyMesh->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+
+	ShadyGuyMesh->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
 }
 
 void AShadyGuyActor::ProcessPurchase(int32 ItemIndex)
