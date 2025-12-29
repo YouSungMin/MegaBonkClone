@@ -6,6 +6,7 @@
 #include "Data/WeaponDataStructs.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/PlayerController.h"
+#include "Framework/MainHUD.h"
 #include "Kismet/KismetMathLibrary.h"
 
 URewardSystemComponent::URewardSystemComponent()
@@ -132,6 +133,24 @@ void URewardSystemComponent::GenerateLevelUpRewards()
 	if (OnRewardsGenerated.IsBound())
 	{
 		OnRewardsGenerated.Broadcast(FinalRewards);
+	}
+
+	if (APawn* PawnOwner = Cast<APawn>(GetOwner()))
+	{
+		if (APlayerController* PC = Cast<APlayerController>(PawnOwner->GetController()))
+		{
+			if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
+			{
+				HUD->ShowUpgrade(this, FinalRewards);
+			}
+		}
+	}
+	else if (APlayerController* PC = Cast<APlayerController>(GetOwner()))
+	{
+		if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
+		{
+			HUD->ShowUpgrade(this, FinalRewards);
+		}
 	}
 
 	// 게임 일시정지
