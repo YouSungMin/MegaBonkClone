@@ -21,7 +21,9 @@ void URechargeSlotWidget::SetRewardInfo(const FSanctuaryRewardInfo& RewardInfo)
 	CachedReward = RewardInfo;
 	bHasReward = true;
 
-	Type->SetText(UEnum::GetDisplayValueAsText(RewardInfo.Rarity));
+	//Type->SetText(UEnum::GetDisplayValueAsText(RewardInfo.Rarity));
+	Type->SetText(FText::FromString(
+		StaticEnum<EItemGrade>()->GetNameStringByValue((int64)RewardInfo.Rarity)));
 	Value->SetText(FText::FromString(FString::Printf(TEXT("%.1f"), RewardInfo.Value)));
 	StateType->SetText(UEnum::GetDisplayValueAsText(RewardInfo.StatType));
 

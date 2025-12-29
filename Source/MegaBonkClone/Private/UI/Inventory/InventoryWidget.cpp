@@ -135,4 +135,7 @@ void UInventoryWidget::HandleItemAdded(FName ItemID, const FItemData& ItemData)
 
 void UInventoryWidget::HandleSecretAdded(FName ItemID, const FItemData& ItemData)
 {
+	//전체리프레시
+	RefreshInventoryWidget();
+	UE_LOG(LogTemp, Warning, TEXT("델리게이트 발생"));
 }

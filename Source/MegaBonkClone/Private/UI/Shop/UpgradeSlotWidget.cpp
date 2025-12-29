@@ -28,10 +28,35 @@ void UUpgradeSlotWidget::SetSlotInfo(const FRewardOption& Info, int32 InSlotInde
 		Image->SetBrushFromTexture(Tex, true);
 	}
 
-	StatType->SetText(UEnum::GetDisplayValueAsText(Info.Rarity));
-	Type->SetText(UEnum::GetDisplayValueAsText(Info.Type));
-	//if (Description) Description->SetText(Info.Description);
-	if (Level) Level->SetText(FText::AsNumber(Info.NewLevel));
+	//if (StatType) 
+	//{
+	//StatType->SetText(FText::FromString(
+	//	StaticEnum<EItemGrade>()->GetNameStringByValue((int64)Info.Rarity)));
+	//}
+
+	if (StatType)
+	{
+		const FString GradeText =
+			(Info.Rarity == EItemGrade::None)
+			? TEXT("New")
+			: StaticEnum<EItemGrade>()->GetNameStringByValue((int64)Info.Rarity);
+
+		StatType->SetText(FText::FromString(GradeText));
+	}
+
+	//if (Level) Level->SetText(FText::AsNumber(Info.NewLevel));
+	if (Level)
+	{
+		const FText LevelText =
+			(Info.Rarity == EItemGrade::None)
+			? FText::FromString(TEXT("New"))
+			: FText::FromString(FString::Printf(TEXT("LV %d"), Info.NewLevel));
+
+		Level->SetText(LevelText);
+	}
+
+
+	if (Type) Type->SetText(UEnum::GetDisplayValueAsText(Info.Type));
 	if (Title) Title->SetText(Info.Name);
 	if (Current) Current ->SetText(FText::AsNumber(Info.CurrentStatValue));
 	if (Next) Next->SetText(FText::AsNumber(Info.NextStatValue));
