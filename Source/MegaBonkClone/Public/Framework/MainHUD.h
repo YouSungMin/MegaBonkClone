@@ -43,6 +43,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void CloseCenterUI();
 
+	UFUNCTION(BlueprintCallable, Category = "UI")
+	void ShowGameOver();
+
+
 protected:
 	//mainwidgetclass는 Umainhudwidget를 상속받은 블루프린트 위젯 클래스
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
@@ -50,6 +54,14 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI")
 	TObjectPtr<UMainHudWidget> MainWidgetInstance = nullptr;
+
+	//게임오버 위젯클래스
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
+	TSubclassOf<UUserWidget> GameOverWidgetClass = nullptr;
+
+	UPROPERTY()
+	TObjectPtr<UUserWidget> GameOverWidgetInstance = nullptr;
+
 
 	//에디터에서 WBP_ChestPopup을 할당할 변수
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI|Panels")

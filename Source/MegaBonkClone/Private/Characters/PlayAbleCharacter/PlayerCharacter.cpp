@@ -24,6 +24,8 @@
 #include "Materials/MaterialInstanceDynamic.h"
 #include <Kismet/GameplayStatics.h>
 
+#include "Framework/MainHUD.h"
+
 // Sets default values
 APlayerCharacter::APlayerCharacter()
 {
@@ -326,6 +328,15 @@ void APlayerCharacter::OnCharacterDie()
 		UE_LOG(LogTemp, Warning, TEXT("타임라인 재생"));
 		DeathTimelineComp->PlayFromStart();
 	}
+
+	if (APlayerController* PC = Cast<APlayerController>(GetController()))
+	{
+		if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
+		{
+			HUD->ShowGameOver();
+		}
+	}
+
 
 }
 

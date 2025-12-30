@@ -9,6 +9,7 @@
 class UTextBlock;
 class UImage;
 class UButton;
+class UStatusComponent;
 /**
  * 
  */
@@ -34,6 +35,15 @@ private:
 	UFUNCTION()
 	void HandleClicked();
 
+	UPROPERTY()
+	TObjectPtr<UStatusComponent> CachedStatus = nullptr;
+
+
+	UFUNCTION()
+	void HandleGoldChanged(float NewGold);
+
+	void RefreshAffordableUI();
+
 protected:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> Type = nullptr;
@@ -52,6 +62,11 @@ protected:
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> GoldText = nullptr;
+
+
+private:
+	float CachedPrice = 0.f;
+	bool bAffordable = true;
 
 private:
 	int32 CachedIndex = INDEX_NONE;
