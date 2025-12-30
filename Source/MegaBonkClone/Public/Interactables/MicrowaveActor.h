@@ -26,7 +26,6 @@ struct FMicrowaveSlotInfo
 	int32 CurrentQuantity;
 };
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnMicrowaveOpen, const TArray<FMicrowaveSlotInfo>&, FilteredItems, AMicrowaveActor*, MicrowaveActor);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventoryUpdated);
 UCLASS()
 class MEGABONKCLONE_API AMicrowaveActor : public AActor, public IInteractionInterface
 {
@@ -39,9 +38,6 @@ public:
 	// UI 이벤트
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnMicrowaveOpen OnMicrowaveOpen;
-
-	UPROPERTY(BlueprintAssignable, Category = "Inventory")
-	FOnInventoryUpdated OnInventoryUpdated;
 
 	// UI에서 아이템 선택 시 호출할 함수
 	UFUNCTION(BlueprintCallable, Category = "Microwave")
@@ -108,4 +104,5 @@ private:
 	FTimerHandle CookingTimerHandle;
 	FName SavedItemID;
 	TWeakObjectPtr<AActor> Player;
+	TObjectPtr<class UInventoryComponent> Inventory = nullptr;
 };

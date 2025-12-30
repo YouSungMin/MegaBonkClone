@@ -34,6 +34,10 @@ public:
 	// 골드를 사용하는 함수
 	bool UseGold(float Amount);
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Status")
+	// 현재 골드를 리턴하는 함수
+	float GetGold(float Amount);
+
 	// 상자를 연 횟수를 증가시키는 함수
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Status")
 	void NotifyChestOpened();

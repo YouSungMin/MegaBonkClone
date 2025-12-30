@@ -45,6 +45,30 @@ void AMicrowaveActor::StartCooking(FName SelectedItemID)
 	SavedItemID = SelectedItemID;
 	CurrentState = EMicrowaveState::Cooking;
 
+	if (!Inventory) return;
+	// 2. [페널티] 선택한 아이템을 제외한 나머지 중 하나 랜덤 제거
+	TArray<FName> CandidateIDs;
+	const TArray<FInventorySlot>& CurrentSlots = Inventory->GetGeneralItemSlots();
+
+	for (const FInventorySlot& Slot : CurrentSlots)
+	{
+		// 방금 받은(복사된) 아이템 종류는 삭제 대상에서 제외
+		if (Slot.ItemID != SavedItemID)
+		{
+			CandidateIDs.Add(Slot.ItemID);
+		}
+	}
+
+	if (CandidateIDs.Num() > 0)
+	{
+		int32 RandIdx = FMath::RandRange(0, CandidateIDs.Num() - 1);
+		FName TargetDeleteID = CandidateIDs[RandIdx];
+
+		// 인벤토리 컴포넌트에 구현한 RemoveItem 호출
+		Inventory->RemoveItem(TargetDeleteID, 1);
+		UE_LOG(LogTemp, Warning, TEXT("등가교환 발생! 사라진 아이템: %s"), *TargetDeleteID.ToString());
+
+	}
 	// 2. 타이머 시작 (지정된 시간 후 OnCookingFinished 호출)
 	GetWorldTimerManager().SetTimer(CookingTimerHandle, this, &AMicrowaveActor::OnCookingFinished, CookTime, false);
 
@@ -149,46 +173,11 @@ void AMicrowaveActor::RetrieveResult()
 {
 	if (CurrentState != EMicrowaveState::Completed) return;
 	if(!Player.IsValid()) return;
-
-	UInventoryComponent* Inventory = Player.Get()->FindComponentByClass<UInventoryComponent>();
 	if (!Inventory) return;
 
 	// 1. [보상] 선택했던 아이템 1개 추가 (복사)
 	Inventory->AddItem(SavedItemID, 1);
 	UE_LOG(LogTemp, Log, TEXT("아이템 획득(복사): %s"), *SavedItemID.ToString());
-
-	// 2. [페널티] 선택한 아이템을 제외한 나머지 중 하나 랜덤 제거
-	TArray<FName> CandidateIDs;
-	const TArray<FInventorySlot>& CurrentSlots = Inventory->GetGeneralItemSlots();
-
-	for (const FInventorySlot& Slot : CurrentSlots)
-	{
-		// 방금 받은(복사된) 아이템 종류는 삭제 대상에서 제외
-		if (Slot.ItemID != SavedItemID)
-		{
-			CandidateIDs.Add(Slot.ItemID);
-		}
-	}
-
-	if (CandidateIDs.Num() > 0)
-	{
-		int32 RandIdx = FMath::RandRange(0, CandidateIDs.Num() - 1);
-		FName TargetDeleteID = CandidateIDs[RandIdx];
-
-		// 인벤토리 컴포넌트에 구현한 RemoveItem 호출
-		Inventory->RemoveItem(TargetDeleteID, 1);
-		UE_LOG(LogTemp, Warning, TEXT("등가교환 발생! 사라진 아이템: %s"), *TargetDeleteID.ToString());
-
-		// UI 업데이트 알림
-		if (OnInventoryUpdated.IsBound())
-		{
-			OnInventoryUpdated.Broadcast();
-		}
-	}
-	else
-	{
-		UE_LOG(LogTemp, Log, TEXT("운이 좋군요! 제거할 다른 아이템이 없어 페널티가 면제되었습니다."));
-	}
 
 	// 3. [초기화] 재사용 가능하도록 상태 리셋
 	CurrentState = EMicrowaveState::Ready;
@@ -216,7 +205,7 @@ void AMicrowaveActor::Interact_Implementation(AActor* PlayerActor)
 		}
 
 		// [인벤토리 체크] 복사할 아이템 목록 필터링
-		UInventoryComponent* Inventory = Player.Get()->FindComponentByClass<UInventoryComponent>();
+		Inventory = Player.Get()->FindComponentByClass<UInventoryComponent>();
 		if (!Inventory) return;
 
 		const TArray<FInventorySlot>& AllItems = Inventory->GetGeneralItemSlots();

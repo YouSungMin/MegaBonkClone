@@ -49,9 +49,12 @@ void AShadyGuyActor::ProcessPurchase(int32 ItemIndex)
 	// 선택된 아이템 정보 가져오기
 	FShopSlotInfo SelectedSlot = CurrentShopItems[ItemIndex];
 	FName SelectedItemID = SelectedSlot.ItemID;
+	int32 Price = SelectedSlot.Price;
 
 	IInventoryOwner::Execute_ReceiveItem(Player.Get(), SelectedItemID, 1);
-	UE_LOG(LogTemp, Log, TEXT("아이템 지급 완료: %s"), *SelectedItemID.ToString());
+	IInventoryOwner::Execute_UseGold(Player.Get(), Price);
+	UE_LOG(LogTemp, Log, TEXT("아이템 지급 완료: %s , 사용한 골드 : %d"), *SelectedItemID.ToString(),Price);
+	
 	bIsUsed = true;
 	Destroy();
 
@@ -248,7 +251,7 @@ void AShadyGuyActor::GenerateShopItems()
 			FShopSlotInfo NewSlot;
 
 			NewSlot.ItemID = SelectedID;
-			NewSlot.Price = ItemData->Price;
+			NewSlot.Price = FMath::RandRange(200, 500);
 
 			NewSlot.ItemName = ItemData->Name;
 			NewSlot.ItemDescription = ItemData->Description;

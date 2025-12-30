@@ -619,6 +619,11 @@ bool UStatusComponent::SpendGold(float Amount)
 	if (CurrentGold >= Amount)
 	{
 		CurrentGold -= Amount;
+		if (OnGoldChanged.IsBound())
+		{
+			OnGoldChanged.Broadcast(CurrentGold);
+		}
+		UE_LOG(LogTemp, Log, TEXT("남은 골드 : %f, 사용한 골드 : %f"), CurrentGold,Amount);
 		return true;
 	}
 	return false;

@@ -60,6 +60,9 @@ void UInGameItemBarWidget::InitializeInventoryWidget(UInventoryComponent* Invent
 	TargetInventory->OnItemAdd.RemoveDynamic(this, &UInGameItemBarWidget::HandleItemAdded);
 	TargetInventory->OnItemAdd.AddDynamic(this, &UInGameItemBarWidget::HandleItemAdded);
 
+	TargetInventory->OnInventoryUpdated.RemoveDynamic(this, &UInGameItemBarWidget::HandleInventoryUpdated);
+	TargetInventory->OnInventoryUpdated.AddDynamic(this, &UInGameItemBarWidget::HandleInventoryUpdated);
+
 	RefreshInventoryWidget();
 }
 
@@ -103,18 +106,6 @@ void UInGameItemBarWidget::ClearInventoryWidget()
 
 	}
 	TargetInventory = nullptr;
-}
-
-void UInGameItemBarWidget::ConnectToMicrowave(AMicrowaveActor* InMicrowave)
-{
-	if (InMicrowave)
-	{
-		// 안전하게 기존 연결 해제 후 재연결
-		InMicrowave->OnInventoryUpdated.RemoveDynamic(this, &UInGameItemBarWidget::HandleInventoryUpdated);
-		InMicrowave->OnInventoryUpdated.AddDynamic(this, &UInGameItemBarWidget::HandleInventoryUpdated);
-
-		UE_LOG(LogTemp, Log, TEXT("[InGameItemBar] 마이크로웨이브 델리게이트 연결 완료"));
-	}
 }
 
 void UInGameItemBarWidget::HandleItemAdded(FName ItemID, const FItemData& ItemData)
