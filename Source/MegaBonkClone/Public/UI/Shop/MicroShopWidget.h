@@ -53,9 +53,6 @@ private:
 	UFUNCTION()
 	void HandleInventoryUpdated();
 
-	// 델리게이트 연결 해제 헬퍼 함수
-	void TeardownMicrowave();
-
 protected:
 	//슬롯들 배치할 그리드 패널
 	UPROPERTY(meta = (BindWidget))

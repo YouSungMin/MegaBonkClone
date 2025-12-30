@@ -27,8 +27,6 @@ public:
 	UFUNCTION()
 	void ClearInventoryWidget();
 
-	UFUNCTION(BlueprintCallable)
-	void ConnectToMicrowave(class AMicrowaveActor* InMicrowave);
 private:
 	//������ �߰��� �̺�Ʈ ��ü ��������
 	UFUNCTION()

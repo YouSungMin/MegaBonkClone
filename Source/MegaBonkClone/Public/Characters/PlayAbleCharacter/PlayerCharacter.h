@@ -37,11 +37,14 @@ public:
 	// 상자 가격을 묻는 함수
 	virtual float GetAdjustedCost_Implementation(float BaseCost) override;
 
-	// 상자 가격에 따라 골드를 사용하는 함수
-	virtual bool UseGold_Implementation(float Amount) override;
-
 	// 상자를 연 횟수를 증가시키는 함수
 	virtual void NotifyChestOpened_Implementation() override;
+
+	// 골드를 사용하는 함수
+	virtual bool UseGold_Implementation(float Amount) override;
+
+	// 현재 골드를 가져오는 함수
+	virtual float GetGold_Implementation(float Amount) override;
 
 	// 자석 아이템 효과 적용
 	UFUNCTION(BlueprintCallable)

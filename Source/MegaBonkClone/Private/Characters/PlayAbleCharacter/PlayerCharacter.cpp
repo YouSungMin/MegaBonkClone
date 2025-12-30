@@ -353,6 +353,12 @@ bool APlayerCharacter::UseGold_Implementation(float Amount)
 	return 0;
 }
 
+float APlayerCharacter::GetGold_Implementation(float Amount)
+{
+	if(StatusComponent2) return StatusComponent2->GetCurrentGold();
+	return 0;
+}
+
 void APlayerCharacter::NotifyChestOpened_Implementation()
 {
 	if (StatusComponent2)
