@@ -185,6 +185,11 @@ void UInventoryComponent::RemoveItem(FName ItemID, int32 Count)
 				GeneralItems.RemoveAt(i);
 			}
 
+			if (OnInventoryUpdated.IsBound())
+			{
+				OnInventoryUpdated.Broadcast();
+			}
+
 			UE_LOG(LogTemp, Log, TEXT("Item 제거 완료: %s"), *ItemID.ToString());
 			return;
 		}

@@ -9,6 +9,7 @@
 #include "InventoryComponent.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnItemUpdate, FName, ItemID, const FItemData&, ItemData);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventoryUpdated);
 USTRUCT(BlueprintType)
 struct FInventorySlot
 {
@@ -57,6 +58,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnItemUpdate OnItemAdd;
+
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+	FOnInventoryUpdated OnInventoryUpdated;
 
 	void ProcessProcTrigger(EProcTriggerType Trigger, AActor* TargetActor = nullptr, float TriggerValue = 0.0f);
 
