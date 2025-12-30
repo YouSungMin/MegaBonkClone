@@ -251,6 +251,7 @@ public:
 	UFUNCTION(BlueprintCallable) inline float GetResultSilverGain() const { return ResultSilverGain; }
 	UFUNCTION(BlueprintCallable) inline float GetResultPowerUPRate() const { return ResultPowerUPRate; }
 	UFUNCTION(BlueprintCallable) inline float GetResultPowerUPDropRate() const { return ResultPowerUPDropRate; }
+
 public:
     UFUNCTION(BlueprintCallable)
     void UpdateCharacterStatus();
