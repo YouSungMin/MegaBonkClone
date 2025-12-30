@@ -36,6 +36,7 @@ void ATrailWeaponBase::AttackWeapon_Implementation()
 	FVector TraceStart = OwnerCharacter->GetActorLocation();
 	FVector TraceEnd = TraceStart - FVector(0.0f, 0.0f, 1000.0f); // 캐릭터 아래 1000유닛(10m)까지 탐색
 	FVector SpawnLocation = TraceStart;
+	FRotator SpawnRotation = FRotator::ZeroRotator;
 
 	//바닥 탐지 (라인 트레이스)
 	FHitResult HitResult;
@@ -55,7 +56,7 @@ void ATrailWeaponBase::AttackWeapon_Implementation()
 	{
 		// 바닥에 닿았다면 그 위치를 스폰 위치로 사용
 		SpawnLocation = HitResult.Location;
-
+		SpawnRotation = FRotationMatrix::MakeFromZ(HitResult.ImpactNormal).Rotator();
 		//바닥과 완벽하게 겹쳐서 깜빡이는 현상(Z-Fighting) 방지를 위해 살짝 위로 띄움
 		SpawnLocation.Z += 2.0f;
 	}
@@ -65,7 +66,6 @@ void ATrailWeaponBase::AttackWeapon_Implementation()
 		SpawnLocation.Z = 0.0f;
 	}
 
-	FRotator SpawnRot = FRotator(0.0f, FMath::RandRange(0.0f, 360.0f), 0.0f);
 
 	//오브젝트 풀 서브시스템 사용
 	UObjectPoolSubsystem* Pool = GetWorld()->GetSubsystem<UObjectPoolSubsystem>();
@@ -75,7 +75,7 @@ void ATrailWeaponBase::AttackWeapon_Implementation()
 	ATrailWeaponActor* NewTrail = Pool->SpawnPoolActor<ATrailWeaponActor>(
 		TrailClass,
 		SpawnLocation,
-		SpawnRot,
+		SpawnRotation,
 		this, // Owner
 		Cast<APawn>(OwnerCharacter.Get()) // Instigator
 	);
