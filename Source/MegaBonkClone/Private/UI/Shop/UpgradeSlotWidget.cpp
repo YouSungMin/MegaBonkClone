@@ -56,7 +56,7 @@ void UUpgradeSlotWidget::SetSlotInfo(const FRewardOption& Info, int32 InSlotInde
 	}
 
 
-	if (Type) Type->SetText(UEnum::GetDisplayValueAsText(Info.Type));
+	if (Type) Type->SetText(UEnum::GetDisplayValueAsText(Info.StatType));
 	if (Title) Title->SetText(Info.Name);
 	if (Current) Current ->SetText(FText::AsNumber(Info.CurrentStatValue));
 	if (Next) Next->SetText(FText::AsNumber(Info.NextStatValue));

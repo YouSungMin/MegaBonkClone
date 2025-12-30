@@ -8,8 +8,25 @@
 #include "Components/InventoryComponent.h"
 #include "Characters/PlayAbleCharacter/PlayerCharacter.h"
 
+#include "Kismet/GameplayStatics.h" 
+#include "Blueprint/WidgetLayoutLibrary.h"
+
 void APlayAbleCharacterController::BeginPlay()
 {
+	Super::BeginPlay();
+
+	//이전판 남은 상태 초기화
+	SetPause(false);
+	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.0f);
+
+	bShowMouseCursor = false;
+	SetInputMode(FInputModeGameOnly());
+	SetIgnoreMoveInput(false);
+	SetIgnoreLookInput(false);
+
+
+	UWidgetLayoutLibrary::RemoveAllWidgets(this);
+
 	//매핑컨텍스트 추가를 위한 서브시스템 가져오기
 	UEnhancedInputLocalPlayerSubsystem* subsystem = 
 		GetLocalPlayer()->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>();

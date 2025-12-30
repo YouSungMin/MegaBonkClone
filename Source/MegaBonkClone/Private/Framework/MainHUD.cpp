@@ -241,3 +241,28 @@ void AMainHUD::CloseCenterUI()
 	}
 }
 
+void AMainHUD::ShowGameOver()
+{
+	APlayerController* PC = GetOwningPlayerController();
+	if (!PC || !GameOverWidgetClass) return;
+
+	// 아직 없으면 생성
+	if (!GameOverWidgetInstance)
+	{
+		GameOverWidgetInstance = CreateWidget<UUserWidget>(PC, GameOverWidgetClass);
+	}
+
+	// 화면에 올리기 (항상 맨 위)
+	if (GameOverWidgetInstance && !GameOverWidgetInstance->IsInViewport())
+	{
+		GameOverWidgetInstance->AddToViewport(9999);
+	}
+
+	// UI 입력으로 전환 (버튼 클릭되게)
+	PC->SetShowMouseCursor(true);
+	PC->SetInputMode(FInputModeUIOnly());
+
+	// 게임멈춤
+	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.001f);
+}
+
