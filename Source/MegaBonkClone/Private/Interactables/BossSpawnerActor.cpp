@@ -60,12 +60,37 @@ void ABossSpawnerActor::Interact_Implementation(AActor* PlayerActor)
 
 void ABossSpawnerActor::SpawnBosses(int32 Amount)
 {
+	if (!BossClass)
+	{
+		UE_LOG(LogTemp, Error, TEXT("BossClass가 할당되지 않음"));
+		return;
+	}
+
 	for (int i = 0; i < Amount; i++)
 	{
 		// 보스 소환 함수
-		// EnemyDataTable에서 보스 데이터를 넘겨 받아서 스폰할듯 
-		UE_LOG(LogTemp, Log, TEXT("보스 %d 마리 소환 "), GameState->GetBossSummonCount());
+
+		FVector SpawnLocation = GetActorLocation();
+
+		// 여러 마리가 겹치지 않게 약간씩 띄우기
+		SpawnLocation.X += FMath::RandRange(-100.0f, 100.0f);
+		SpawnLocation.Y += FMath::RandRange(-100.0f, 100.0f);
+
+		FRotator SpawnRotation = GetActorRotation();
+
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn; // 겹쳐도 일단 소환
+
+		// 4. 실제 보스 소환 (템플릿 인자로 부모 클래스를 넣어줌)
+		AActor* NewBoss = GetWorld()->SpawnActor<AActor>(BossClass, SpawnLocation, SpawnRotation, SpawnParams);
+
+		if (NewBoss)
+		{
+			UE_LOG(LogTemp, Log, TEXT("보스 %d 마리 소환 성공: %s"), (i + 1), *NewBoss->GetName());
+		}
 	}
+	UE_LOG(LogTemp, Log, TEXT("보스 %d 마리 소환 "), GameState->GetBossSummonCount());
 	GameState->AddAliveBossCount(Amount);
 }
 
