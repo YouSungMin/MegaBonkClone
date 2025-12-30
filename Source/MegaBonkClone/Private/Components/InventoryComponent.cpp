@@ -361,6 +361,16 @@ void UInventoryComponent::ProcessPassiveStats(const FItemData& ItemData, int32 C
 				// -> StatusComponent 내부 로직에 맡기므로 값 그대로 전달
 				if (ItemType == EItemType::SecretBook)
 				{
+					// 퍼센트 체크 (합연산)
+					if (Mod.bIsPercentage)
+					{
+						ApplyVal = FinalAddValue / 100.0f;
+					}
+					else
+					{
+						// 예: 체력 +50 -> 그대로 50 더함
+						ApplyVal = FinalAddValue;
+					}
 					VisionFunc(ApplyVal);
 				}
 				// [B] 일반 아이템(Player)
@@ -369,10 +379,6 @@ void UInventoryComponent::ProcessPassiveStats(const FItemData& ItemData, int32 C
 					// 퍼센트 체크 (합연산)
 					if (Mod.bIsPercentage)
 					{
-						// 예: 공격력 15% 증가 -> 1.0(기본) + 0.15(추가)
-						// 예: 체력 10% 증가 -> (주의) 0.1이 더해짐. 
-						// 만약 체력이 깡수치 변수라면 퍼센트 옵션은 사용하지 않거나,
-						// StatusComponent가 0.1을 받아서 처리하도록 설계되어 있어야 함.
 						ApplyVal = FinalAddValue / 100.0f;
 					}
 					else
@@ -380,7 +386,6 @@ void UInventoryComponent::ProcessPassiveStats(const FItemData& ItemData, int32 C
 						// 예: 체력 +50 -> 그대로 50 더함
 						ApplyVal = FinalAddValue;
 					}
-
 					PlayerFunc(ApplyVal);
 				}
 
