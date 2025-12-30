@@ -103,6 +103,62 @@ void AEnemyBase::ShowDamagePopup(float DamageAmount)
     }
 }
 
+void AEnemyBase::PlayHitFlash()
+{
+    // [최적화] 1. DMI 배열이 비어있다면, 최초 피격이므로 이때 생성 (Lazy Initialization)
+    if (MeshMIDs.Num() == 0)
+    {
+        if (GetMesh())
+        {
+            const int32 MaterialCount = GetMesh()->GetNumMaterials();
+            for (int32 i = 0; i < MaterialCount; i++)
+            {
+                // 이 함수는 기존 머티리얼을 Dynamic Instance로 교체해줍니다.
+                UMaterialInstanceDynamic* DynMat = GetMesh()->CreateDynamicMaterialInstance(i);
+                if (DynMat)
+                {
+                    MeshMIDs.Add(DynMat);
+                }
+            }
+        }
+    }
+
+    // 2. 생성된 머티리얼들의 색상 변경 (기존 로직과 동일)
+    if (MeshMIDs.Num() > 0)
+    {
+        for (UMaterialInstanceDynamic* DynMat : MeshMIDs)
+        {
+            if (DynMat)
+            {
+                // 설정된 색(빨강)으로 변경
+                DynMat->SetVectorParameterValue(HitFlashParamName, HitFlashColor);
+            }
+        }
+
+        // 3. 타이머 설정 (기존 로직과 동일)
+        GetWorld()->GetTimerManager().SetTimer(
+            TimerHandle_HitFlash,
+            this,
+            &AEnemyBase::ResetEnemyHitFlash,
+            FlashDuration,
+            false
+        );
+    }
+}
+
+void AEnemyBase::ResetEnemyHitFlash()
+{
+    // 모든 머티리얼의 파라미터를 검정색(기본값)으로 되돌림
+    for (UMaterialInstanceDynamic* DynMat : MeshMIDs)
+    {
+        if (DynMat)
+        {
+            // 검정색(0,0,0)은 빛나지 않음
+            DynMat->SetVectorParameterValue(HitFlashParamName, FLinearColor::Black);
+        }
+    }
+}
+
 // 헬퍼 함수 수정: 어떤 클래스(ItemClass)를 스폰할지 받아서 처리
 void AEnemyBase::SpawnSinglePickup(TSubclassOf<AResourcePickup> ItemClass, EResourceType Type, float AmountPerItem, FVector Location)
 {

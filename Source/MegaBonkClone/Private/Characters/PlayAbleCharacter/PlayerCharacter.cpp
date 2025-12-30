@@ -434,8 +434,7 @@ void APlayerCharacter::OnPickupOverlap(AActor* OverlappedActor, AActor* OtherAct
 		UE_LOG(LogTemp, Warning, TEXT("Pickup : %s"), *OtherActor->GetName());
 		IPickupInterface::Execute_OnPickup(OtherActor,this);
 	}
-	
-	
+
 }
 
 
