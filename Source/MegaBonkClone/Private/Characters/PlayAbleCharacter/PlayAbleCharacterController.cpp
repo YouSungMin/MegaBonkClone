@@ -124,7 +124,7 @@ void APlayAbleCharacterController::ClosePanels()
 	}
 }
 
-inline void APlayAbleCharacterController::InitializeMainHudWidget(UMainHudWidget* InWidget)
+void APlayAbleCharacterController::InitializeMainHudWidget(UMainHudWidget* InWidget)
 {
 	if (InWidget)
 	{
