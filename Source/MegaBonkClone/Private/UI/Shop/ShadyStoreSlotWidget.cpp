@@ -36,8 +36,8 @@ void UShadyStoreSlotWidget::SetSlotInfo(const FShopSlotInfo& Info, int32 InSlotI
 	if (Type)
 	{
 		// 등급 표시 or 가격 표시
-		// Type->SetText(FText::AsNumber(Info.Price));
-		Type->SetText(UEnum::GetDisplayValueAsText(Info.ItemGrade));
+	Type->SetText(FText::FromString(
+		StaticEnum<EItemGrade>()->GetNameStringByValue((int64)Info.ItemGrade)));
 	}
 }
 

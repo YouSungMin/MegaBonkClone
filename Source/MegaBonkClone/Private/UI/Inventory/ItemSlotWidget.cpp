@@ -35,7 +35,8 @@ void UItemSlotWidget::RefreshItemSlot()
     ItemIconImage->SetBrushFromTexture(Tex);
     ItemIconImage->SetBrushTintColor(FLinearColor::White);
 
-    CountText->SetText(FText::AsNumber(Quantity));
+    CountText->SetText(FText::FromString(FString::Printf(TEXT("x%d"), Quantity)));
+    //CountText->SetText(FText::AsNumber(Quantity));
     CountText->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 }
 

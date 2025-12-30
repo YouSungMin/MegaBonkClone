@@ -23,6 +23,7 @@ class MEGABONKCLONE_API UMicroShopWidget : public UUserWidget
 public:
 	virtual void NativeConstruct() override;
 
+	virtual void NativeDestruct() override;
 public:
 	UFUNCTION(BlueprintCallable)
 	void InitWithMicrowave(class AMicrowaveActor* InMicrowave, const TArray<FMicrowaveSlotInfo>& InList);
@@ -48,6 +49,12 @@ private:
 	//UI에 표시할 아이템 목록 저장해둠
 	UPROPERTY()
 	TArray<FMicrowaveSlotInfo> CachedList;
+
+	UFUNCTION()
+	void HandleInventoryUpdated();
+
+	// 델리게이트 연결 해제 헬퍼 함수
+	void TeardownMicrowave();
 
 protected:
 	//슬롯들 배치할 그리드 패널

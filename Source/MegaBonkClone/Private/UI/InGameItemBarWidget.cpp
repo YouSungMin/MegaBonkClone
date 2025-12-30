@@ -3,11 +3,10 @@
 
 #include "UI/InGameItemBarWidget.h"
 #include "UI/Inventory/ItemSlotWidget.h"
-
 #include "Components/WrapBox.h"
 #include "Components/WrapBoxSlot.h"
 #include "Components/InventoryComponent.h"
-
+#include "Interactables/MicrowaveActor.h"
 void UInGameItemBarWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
@@ -28,7 +27,7 @@ void UInGameItemBarWidget::NativeConstruct()
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Inventor %d (GridPanel ÀÚ½Ä È®ÀÎ)"), i);
+			UE_LOG(LogTemp, Warning, TEXT("Inventor %d (GridPanel ï¿½Ú½ï¿½ È®ï¿½ï¿½)"), i);
 		}
 	}
 
@@ -41,11 +40,11 @@ void UInGameItemBarWidget::InitializeInventoryWidget(UInventoryComponent* Invent
 
 	if (!TargetInventory.IsValid())
 	{
-		//UE_LOG(LogTemp, Log, TEXT("Å¸±êÀÎº¥Åä¸® È®ÀÎÇÏ±â"));
+		//UE_LOG(LogTemp, Log, TEXT("Å¸ï¿½ï¿½ï¿½Îºï¿½ï¿½ä¸® È®ï¿½ï¿½ï¿½Ï±ï¿½"));
 		return;
 	}
 
-	// NativeConstructº¸´Ù ¸ÕÀú È£ÃâµÇ´Â °æ¿ì ´ëºñ(¾ÈÀüÀåÄ¡)
+	// NativeConstructï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ È£ï¿½ï¿½Ç´ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½(ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¡)
 	if (ItemSlotWidgets.Num() == 0 && ItemWrapBox)
 	{
 		const int32 ChildCount = ItemWrapBox->GetChildrenCount();
@@ -57,7 +56,7 @@ void UInGameItemBarWidget::InitializeInventoryWidget(UInventoryComponent* Invent
 			}
 		}
 	}
-	//¾ÆÀÌÅÛ Ãß°¡µÇ¸é °»½Å
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ß°ï¿½ï¿½Ç¸ï¿½ ï¿½ï¿½ï¿½ï¿½
 	TargetInventory->OnItemAdd.RemoveDynamic(this, &UInGameItemBarWidget::HandleItemAdded);
 	TargetInventory->OnItemAdd.AddDynamic(this, &UInGameItemBarWidget::HandleItemAdded);
 
@@ -69,7 +68,7 @@ void UInGameItemBarWidget::RefreshInventoryWidget()
 	if (!TargetInventory.IsValid())
 		return;
 
-	// 1) 8Ä­ ÀüºÎ ºñ¿ì±â
+	// 1) 8Ä­ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	for (UItemSlotWidget* SlotWidget : ItemSlotWidgets)
 	{
 		if (SlotWidget)
@@ -78,7 +77,7 @@ void UInGameItemBarWidget::RefreshInventoryWidget()
 		}
 	}
 
-	// 2) ÀÎº¥ µ¥ÀÌÅÍ·Î Ã¤¿ì±â (¾Õ¿¡¼­ºÎÅÍ)
+	// 2) ï¿½Îºï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Í·ï¿½ Ã¤ï¿½ï¿½ï¿½ (ï¿½Õ¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½)
 	const TArray<FInventorySlot>& Items = TargetInventory->GetGeneralItemSlots();
 
 	int32 VisibleIndex = 0;
@@ -101,13 +100,33 @@ void UInGameItemBarWidget::ClearInventoryWidget()
 	if (TargetInventory.IsValid())
 	{
 		TargetInventory->OnItemAdd.RemoveDynamic(this, &UInGameItemBarWidget::HandleItemAdded);
+
 	}
 	TargetInventory = nullptr;
 }
 
+void UInGameItemBarWidget::ConnectToMicrowave(AMicrowaveActor* InMicrowave)
+{
+	if (InMicrowave)
+	{
+		// ì•ˆì „í•˜ê²Œ ê¸°ì¡´ ì—°ê²° í•´ì œ í›„ ì¬ì—°ê²°
+		InMicrowave->OnInventoryUpdated.RemoveDynamic(this, &UInGameItemBarWidget::HandleInventoryUpdated);
+		InMicrowave->OnInventoryUpdated.AddDynamic(this, &UInGameItemBarWidget::HandleInventoryUpdated);
+
+		UE_LOG(LogTemp, Log, TEXT("[InGameItemBar] ë§ˆì´í¬ë¡œì›¨ì´ë¸Œ ë¸ë¦¬ê²Œì´íŠ¸ ì—°ê²° ì™„ë£Œ"));
+	}
+}
+
 void UInGameItemBarWidget::HandleItemAdded(FName ItemID, const FItemData& ItemData)
 {
-	//ÀüÃ¼¸®ÇÁ·¹½Ã
+	//ï¿½ï¿½Ã¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	RefreshInventoryWidget();
-	UE_LOG(LogTemp, Warning, TEXT("µ¨¸®°ÔÀÌÆ® ¹ß»ı"));
+	UE_LOG(LogTemp, Warning, TEXT("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ß»ï¿½"));
 }
+
+void UInGameItemBarWidget::HandleInventoryUpdated()
+{
+	RefreshInventoryWidget();
+}
+
+

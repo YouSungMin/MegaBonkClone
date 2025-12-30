@@ -35,7 +35,8 @@ void USecretBookSlotWidget::RefreshSecretBookSlot()
     SecretIconImage->SetBrushFromTexture(Tex);
     SecretIconImage->SetBrushTintColor(FLinearColor::White);
 
-    LevelText->SetText(FText::AsNumber(Level));
+    LevelText->SetText(FText::FromString(FString::Printf(TEXT("LV%d"), Level)));
+    //LevelText->SetText(FText::AsNumber(Level));
     LevelText->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 
 }
