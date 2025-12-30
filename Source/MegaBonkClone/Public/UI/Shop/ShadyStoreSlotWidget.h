@@ -50,6 +50,9 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UButton> SlotButton = nullptr;
 
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UTextBlock> GoldText = nullptr;
+
 private:
 	int32 CachedIndex = INDEX_NONE;
 };

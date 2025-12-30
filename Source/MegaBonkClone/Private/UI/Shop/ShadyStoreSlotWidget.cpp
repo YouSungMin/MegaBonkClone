@@ -39,6 +39,11 @@ void UShadyStoreSlotWidget::SetSlotInfo(const FShopSlotInfo& Info, int32 InSlotI
 	Type->SetText(FText::FromString(
 		StaticEnum<EItemGrade>()->GetNameStringByValue((int64)Info.ItemGrade)));
 	}
+
+	if (GoldText)
+	{
+		GoldText->SetText(FText::AsNumber(Info.Price));
+	}
 }
 
 void UShadyStoreSlotWidget::HandleClicked()

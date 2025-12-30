@@ -37,7 +37,7 @@ void AShadyGuyActor::ProcessPurchase(int32 ItemIndex)
 	{
 		UE_LOG(LogTemp, Error, TEXT("대상이 InventoryOwner 인터페이스를 구현하지 않았습니다."));
 		return;
-	}
+	}	
 
 	// 인덱스 유효성 검사
 	if (!CurrentShopItems.IsValidIndex(ItemIndex))
