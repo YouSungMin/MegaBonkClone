@@ -31,7 +31,7 @@ void ADamageTextActor::SetDamageValue(float DamageAmount)
 {
 	SetActorHiddenInGame(false);
 
-	// 2. 위젯 컴포넌트가 렌더링 준비를 마칠 시간을 주기 위해 '다음 틱'에 실행합니다.
+	//위젯 컴포넌트가 렌더링 준비를 마칠 시간을 주기 위해 '다음 틱'에 실행합니다.
 	// 람다 함수를 사용하여 안전하게 처리합니다.
 
 	TWeakObjectPtr<ADamageTextActor> WeakThis = this;

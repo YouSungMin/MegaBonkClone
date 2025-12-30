@@ -20,16 +20,6 @@ void AMegaBonkGameState::Tick(float DeltaTime)
 	// 1. 스테이지 타이머 진행
 	StageTimer += DeltaTime;
 
-	if (IsOvertime())
-	{
-		// 제한 시간 초과: 오버타임 로직 (다른 몬스터만 소환)
-		//CheckOvertimeLogic();
-	}
-	else
-	{
-		// 제한 시간 이내: 기존 웨이브 로직 (데이터 테이블)
-		//CheckWaveLogic();
-	}
 }
 
 bool AMegaBonkGameState::IsOvertime() const
@@ -223,6 +213,18 @@ void AMegaBonkGameState::SpawnProps()
 		if (GetRandomLocationOnNavMesh(SpawnLoc))
 		{
 			GetWorld()->SpawnActor<AActor>(Sanctuaries[Index], SpawnLoc, FRotator::ZeroRotator);
+		}
+	}
+
+	//보스제단 배치
+	for (int32 i = 0; i < BossSpawnerCount; i++)
+	{
+		if (!BossSpawner) return;
+
+		FVector SpawnLoc;
+		if (GetRandomLocationOnNavMesh(SpawnLoc))
+		{
+			GetWorld()->SpawnActor<AActor>(BossSpawner, SpawnLoc, FRotator::ZeroRotator);
 		}
 	}
 

@@ -99,6 +99,7 @@ public:
     // 내부 변수
     // ==========================================
  protected:
+     float DefaultAttackSpeed = 1.5f;
 
     UPROPERTY()
     FTimerHandle AttackTimerHandle;
@@ -123,4 +124,5 @@ public:
     float FinalReflectCount = 0.0f;
     float FinalDuration = 1.0f;
 
+  
 };
