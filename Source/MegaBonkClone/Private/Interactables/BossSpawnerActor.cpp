@@ -73,8 +73,9 @@ void ABossSpawnerActor::SpawnBosses(int32 Amount)
 		FVector SpawnLocation = GetActorLocation();
 
 		// 여러 마리가 겹치지 않게 약간씩 띄우기
-		SpawnLocation.X += FMath::RandRange(-100.0f, 100.0f);
-		SpawnLocation.Y += FMath::RandRange(-100.0f, 100.0f);
+		SpawnLocation.X += FMath::RandRange(-300.0f, 300.0f);
+		SpawnLocation.Y += FMath::RandRange(-300.0f, 300.0f);
+		SpawnLocation.Z += 150.0f;
 
 		FRotator SpawnRotation = GetActorRotation();
 
@@ -82,7 +83,7 @@ void ABossSpawnerActor::SpawnBosses(int32 Amount)
 		SpawnParams.Owner = this;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn; // 겹쳐도 일단 소환
 
-		// 4. 실제 보스 소환 (템플릿 인자로 부모 클래스를 넣어줌)
+		// 실제 보스 소환
 		AActor* NewBoss = GetWorld()->SpawnActor<AActor>(BossClass, SpawnLocation, SpawnRotation, SpawnParams);
 
 		if (NewBoss)
