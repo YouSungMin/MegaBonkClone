@@ -20,6 +20,8 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	void CheckOverlappingAndPickup();
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -34,6 +36,8 @@ public:
 
 	virtual void OnPoolActivate_Implementation() override;
 	virtual void OnPoolDeactivate_Implementation() override;
+
+	void EnablePickup();
 private:
 	UFUNCTION()
 	void OnTimelineUpdate(float Value);
@@ -90,6 +94,10 @@ protected:
 	bool bIsBillboard = false;
 
 	FRotator InitialMeshRotation = FRotator(0,0,0);
+
+	FTimerHandle CheckTimerHandle;
+
+	FTimerHandle EnablePickupTimerHandle;
 private:
 	// 획득했을 때 메시 위치(월드)
 	FVector PickupStartLocation = FVector(0,0,0);
