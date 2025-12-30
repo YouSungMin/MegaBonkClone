@@ -39,6 +39,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "UI")
 	void ShowDamagePopup(float DamageAmount);
 
+	UFUNCTION(BlueprintCallable, Category = "Enemy|VFX")
+	void PlayHitFlash();
+
+protected:
+	//원래 색으로 되돌리는 함수
+	void ResetEnemyHitFlash();
+
 private:
 
 	// 내부적으로 반복해서 스폰하는 헬퍼 함수
@@ -53,4 +60,20 @@ public:
 	//데미지 UI 액터
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
 	TSubclassOf<class ADamageTextActor> DamageTextActorClass;
+
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy|VFX")
+	FName HitFlashParamName = "HitColor"; // 머티리얼 파라미터 이름
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy|VFX")
+	FLinearColor HitFlashColor = FLinearColor(50.0f, 0.0f, 0.0f, 1.0f);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy|VFX")
+	float FlashDuration = 0.3f; // 반짝이는 시간 (초)
+
+private:
+	UPROPERTY()
+	TArray<UMaterialInstanceDynamic*> MeshMIDs;
+
+	FTimerHandle TimerHandle_HitFlash;
 };
