@@ -31,6 +31,9 @@ private:
 
 	// 보스를 파라미터의 값만큼 소환하는 함수
 	void SpawnBosses(int32 Amount);
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawning")
+	TSubclassOf<class AActor> BossClass;
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	USceneComponent* Root;
@@ -45,4 +48,5 @@ protected:
 private:
 	// 현재 보스 스포너의 상태 
 	EAltarState CurrentState = EAltarState::ReadyToSummon;
+
 };

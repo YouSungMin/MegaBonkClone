@@ -36,7 +36,6 @@ struct FShopSlotInfo
 	UTexture2D* IconTexture;
 };
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnShopOpen, const TArray<FShopSlotInfo>&, ShopItems, AShadyGuyActor*, MerchantInstance);
 UCLASS()
 class MEGABONKCLONE_API AShadyGuyActor : public AActor, public IInteractionInterface
 {
@@ -45,10 +44,6 @@ class MEGABONKCLONE_API AShadyGuyActor : public AActor, public IInteractionInter
 public:	
 	// Sets default values for this actor's properties
 	AShadyGuyActor();
-
-	// UI가 구독할 이벤트 (블루프린트 할당 가능)
-	UPROPERTY(BlueprintAssignable, Category = "Events")
-	FOnShopOpen OnShopOpen;
 
 	// UI에서 구매 버튼을 눌렀을 때 호출될 실제 처리 함수
 	UFUNCTION(BlueprintCallable, Category = "Shop")
