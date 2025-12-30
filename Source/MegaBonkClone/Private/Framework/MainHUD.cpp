@@ -80,6 +80,12 @@ void AMainHUD::ShowChestReward(const FItemData& ItemData)
 		// 연출 시작
 		ChestOpenWidget->PlayLootSequence(ItemData);
 
+		// 업그레이드 애니메이션 활성화
+		if (MainWidgetInstance)
+		{
+			MainWidgetInstance->SetUpgradeAnimEnabled(true);
+		}
+
 		// 입력 모드 변경 (마우스 필요 시)
 		APlayerController* PC = GetOwningPlayerController();
 		if (PC)
@@ -187,6 +193,12 @@ void AMainHUD::ShowUpgrade(URewardSystemComponent* RewardComp, const TArray<stru
 
 	MainWidgetInstance->OpenPanels();
 
+	// 업그레이드 애니메이션 활성화
+	if (MainWidgetInstance)
+	{
+		MainWidgetInstance->SetUpgradeAnimEnabled(true);
+	}
+
 	if (APlayerController * PC = GetOwningPlayerController())
 	{
 		PC->SetShowMouseCursor(true);
@@ -226,6 +238,9 @@ void AMainHUD::CloseCenterUI()
 {
 	if (MainWidgetInstance)
 	{
+		// 업그레이드 애니메이션 비활성화
+		MainWidgetInstance->SetUpgradeAnimEnabled(false);
+
 		// 중앙 비우기
 		MainWidgetInstance->ClearCenterContent();
 		MainWidgetInstance->ClosePanels();

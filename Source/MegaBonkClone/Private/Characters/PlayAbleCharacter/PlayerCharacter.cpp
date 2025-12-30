@@ -23,7 +23,7 @@
 #include "Materials/MaterialParameterCollection.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include <Kismet/GameplayStatics.h>
-
+#include "Framework/AudioManager.h"
 #include "Framework/MainHUD.h"
 
 // Sets default values
@@ -175,6 +175,9 @@ void APlayerCharacter::BeginPlay()
 
 	DefaultWeaponEquip();
 
+
+	//발자국 소리 타이머 시작
+	GetWorldTimerManager().SetTimer(FootstepTimerHandle, this, &APlayerCharacter::FootstepTick, FootstepInterval, true);
 }
 
 void APlayerCharacter::OnMoveInput(const FInputActionValue& InValue)
@@ -193,13 +196,42 @@ void APlayerCharacter::OnMoveInput(const FInputActionValue& InValue)
 
 void APlayerCharacter::OnJumpInput(const FInputActionValue& InValue)
 {
+	// 점프시 사운드 재생
+
+	// Pause면 점프 사운드도 X
+	if (UGameplayStatics::IsGamePaused(this)) return;
+
+	// 이미 공중이면 점프 소리 안 나게
+	if (GetCharacterMovement() && GetCharacterMovement()->IsFalling()) return;
+
+	// 점프 사운드 재생
+	if (AAudioManager* AM = Cast<AAudioManager>(
+		UGameplayStatics::GetActorOfClass(this, AAudioManager::StaticClass())))
+	{
+		AM->PlayJumpStepSFX();
+	}
+
 	Jump();
+}
+
+void APlayerCharacter::OnPauseInput(const FInputActionValue& InValue)
+{
 }
 
 void APlayerCharacter::HandleDeathProgress(float Value)
 {
 	FRotator NewRot = FMath::Lerp(DeathStartRot, DeathEndRot, Value);
 	SetActorRotation(NewRot);
+
+	// 카메라가 자연스럽게 탑다운으로
+	if (SpringArm)
+	{
+		const FRotator CamRot = FMath::Lerp(DeathCamStartRot, DeathCamTargetRot, Value);
+		SpringArm->SetWorldRotation(CamRot);
+
+		const FVector TargetUp = FRotationMatrix(DeathCamTargetRot).GetUnitAxis(EAxis::Z);
+		SpringArm->TargetOffset = -TargetUp * 100.f;
+	}
 
 	if (GlobalEffectMPC)
 	{
@@ -214,6 +246,14 @@ void APlayerCharacter::HandleDeathProgress(float Value)
 void APlayerCharacter::OnDeathTimelineFinished()
 {
 	UE_LOG(LogTemp, Warning, TEXT("죽음 UI 실행"));
+
+	if (APlayerController* PC = Cast<APlayerController>(GetController()))
+	{
+		if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
+		{
+			HUD->ShowGameOver();
+		}
+	}
 }
 
 void APlayerCharacter::ResetHitFlash()
@@ -226,6 +266,42 @@ void APlayerCharacter::ResetHitFlash()
 			DMI->SetScalarParameterValue(FName("HitAlpha"), 0.0f);
 		}
 	}
+}
+
+void APlayerCharacter::FootstepTick()
+{
+	// 게임이 Pause 상태면 발자국 X
+	if (UGameplayStatics::IsGamePaused(this)) return;
+
+	// 공중이면 X
+	if (GetCharacterMovement() && GetCharacterMovement()->IsFalling()) return;
+
+	// 실제로 이동 중일 때만
+	const float Speed2D = GetVelocity().Size2D();
+	if (Speed2D < MinMoveSpeedForFootstep) return;
+
+	// AudioManager 찾아서 발자국 재생
+	if (AAudioManager* AM = Cast<AAudioManager>(
+		UGameplayStatics::GetActorOfClass(this, AAudioManager::StaticClass())))
+	{
+		AM->PlayFootStepSFX(); // 네 AudioManager 함수명에 맞추기
+	}
+}
+
+void APlayerCharacter::ApplyDeathTopDownCamera()
+{
+	//카메라 회전 설정
+	if (SpringArm)
+	{
+		SpringArm->bUsePawnControlRotation = false;
+		SpringArm->SetUsingAbsoluteRotation(true);
+
+		DeathCamStartRot = SpringArm->GetComponentRotation(); // 현재 카메라 각도 저장
+		DeathCamTargetRot = FRotator(-90.f, DeathCamStartRot.Yaw+90.f, 0.f); // 위에서 보기
+	
+		//DeathCamStartSocketOffset = SpringArm->SocketOffset;
+	}
+
 }
 
 // Called to bind functionality to input
@@ -245,6 +321,9 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		}
 		if (IA_Interact) {
 			enhanced->BindAction(IA_Interact, ETriggerEvent::Started, this, &APlayerCharacter::TryInteract);
+		}
+		if (IA_Pause) {
+			enhanced->BindAction(IA_Pause, ETriggerEvent::Started, this, &APlayerCharacter::OnPauseInput);
 		}
 	}
 
@@ -322,6 +401,9 @@ void APlayerCharacter::OnCharacterDie()
 	DeathEndRot.Roll += 90.0f;
 	// 만약 앞/뒤로 눕히고 싶다면: DeathEndRot.Pitch += 90.0f;
 
+	//카메라 탑다운 시점으로 변경
+	ApplyDeathTopDownCamera();
+
 	//타임라인 재생!
 	if (DeathTimelineComp && DeathCurve)
 	{
@@ -329,15 +411,13 @@ void APlayerCharacter::OnCharacterDie()
 		DeathTimelineComp->PlayFromStart();
 	}
 
-	if (APlayerController* PC = Cast<APlayerController>(GetController()))
+	// 게임오버 사운드 재생
+	if (AAudioManager* AM = Cast<AAudioManager>(
+		UGameplayStatics::GetActorOfClass(this, AAudioManager::StaticClass())))
 	{
-		if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
-		{
-			HUD->ShowGameOver();
-		}
+		AM->PlayGameOverSFX();   // 게임오버 소리
+		AM->StopBGM();       // (선택) BGM 0.3초 페이드아웃하고 싶으면
 	}
-
-
 }
 
 void APlayerCharacter::ReceiveItem_Implementation(FName ItemID, int32 Count)

@@ -7,7 +7,10 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/PlayerController.h"
 #include "Framework/MainHUD.h"
+#include "Framework/AudioManager.h"
+#include "Kismet/GameplayStatics.h" 
 #include "Kismet/KismetMathLibrary.h"
+
 
 URewardSystemComponent::URewardSystemComponent()
 {
@@ -150,6 +153,15 @@ void URewardSystemComponent::GenerateLevelUpRewards()
 		{
 			HUD->ShowUpgrade(this, FinalRewards);
 		}
+	}
+
+	// 효과음 재생
+	if (AAudioManager* AM = Cast<AAudioManager>(
+		UGameplayStatics::GetActorOfClass(this, AAudioManager::StaticClass())))
+	{
+		AM->PlayUpgradeOpenSFX();	// 업그레이드 오픈 사운드 재생
+		AM->SetBGMDown(true);	// BGM 볼륨 낮추기
+
 	}
 
 	// 게임 일시정지
@@ -411,6 +423,11 @@ void URewardSystemComponent::SelectReward(const FRewardOption& SelectedOption)
 		InventoryComp->AddSecretBook(SelectedOption.ItemID, IncrementValue);
 	}
 
+	if (AAudioManager* AM = Cast<AAudioManager>(
+		UGameplayStatics::GetActorOfClass(this, AAudioManager::StaticClass())))
+	{
+		AM->SetBGMDown(false);  // 평상시 볼륨으로 원복
+	}
 	// 게임 재개
 	if (APlayerController* PC = Cast<APlayerController>(GetOwner()))
 	{
