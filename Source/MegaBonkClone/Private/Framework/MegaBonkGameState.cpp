@@ -196,7 +196,11 @@ void AMegaBonkGameState::SpawnProps()
 			// 위치 찾기에 성공하면 스폰
 			GetWorld()->SpawnActor<AActor>(PropClassToSpawn, SpawnLoc, FRotator::ZeroRotator);
 		}
-
+		else
+		{
+			// 위치를 못 찾았을 경우 로그 (원한다면 다시 시도하는 로직 추가 가능)
+			// UE_LOG(LogTemp, Warning, TEXT("Failed to find valid location for Prop"));
+		}
 	}
 
 	//제단(Sanctuary) 배치
@@ -212,49 +216,15 @@ void AMegaBonkGameState::SpawnProps()
 		}
 	}
 
-	FVector PlayerLocation = FVector::ZeroVector;
-	if (APawn* PlayerPawn = GetWorld()->GetFirstPlayerController()->GetPawn())
-	{
-		PlayerLocation = PlayerPawn->GetActorLocation();
-	}
-
-	//플레이어 주변 안전 구역 반경 (예: 2000.0f = 20미터)
-	const float SafeRadius = 2000.0f;
-	const int32 MaxSpawnAttempts = 10; // 위치 찾기 최대 시도 횟수 (무한 루프 방지)
-
-	// 보스 제단 배치
+	//보스제단 배치
 	for (int32 i = 0; i < BossSpawnerCount; i++)
 	{
 		if (!BossSpawner) return;
 
 		FVector SpawnLoc;
-		bool bFoundValidLoc = false;
-
-		// [수정] 유효한 위치를 찾을 때까지 몇 번 재시도
-		for (int32 Attempt = 0; Attempt < MaxSpawnAttempts; Attempt++)
-		{
-			if (GetRandomLocationOnNavMesh(SpawnLoc))
-			{
-				// 플레이어와의 거리 계산
-				float Distance = FVector::Dist(SpawnLoc, PlayerLocation);
-
-				// 안전 반경보다 멀리 있으면 합격
-				if (Distance > SafeRadius)
-				{
-					bFoundValidLoc = true;
-					break; // 루프 탈출
-				}
-			}
-		}
-
-		// 유효한 위치를 찾았다면 스폰
-		if (bFoundValidLoc)
+		if (GetRandomLocationOnNavMesh(SpawnLoc))
 		{
 			GetWorld()->SpawnActor<AActor>(BossSpawner, SpawnLoc, FRotator::ZeroRotator);
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("보스 제단 스폰 실패: 플레이어와 먼 위치를 찾지 못했습니다."));
 		}
 	}
 
