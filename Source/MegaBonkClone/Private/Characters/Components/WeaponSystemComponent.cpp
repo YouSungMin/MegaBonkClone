@@ -80,13 +80,32 @@ void UWeaponSystemComponent::LevelUpWeapon(FName WeaponID, EItemStatType StatTyp
 			{
 				// AWeaponBase에 스탯 적용 함수가 있다고 가정 (없으면 변수 직접 수정)
 				// Slot.WeaponInstance->ApplyUpgrade(StatType, IncreaseValue); 
-
-				// 예시: 변수 직접 수정
-				if (StatType == EItemStatType::Damage)
+				switch (StatType)
 				{
+				case EItemStatType::Damage:
 					Slot.WeaponInstance->WeaponDamage += IncreaseValue;
+					break;
+				case EItemStatType::CritChance:
+					Slot.WeaponInstance->CriticalChance += IncreaseValue;
+					break;
+				case EItemStatType::ProjectileCount:
+					Slot.WeaponInstance->WeaponDamage += IncreaseValue;
+					break;
+				case EItemStatType::ProjectileReflectCount:
+					Slot.WeaponInstance->ProjectileReflectCount += IncreaseValue;
+					break;
+				case EItemStatType::AttackSize:
+					Slot.WeaponInstance->AttackSize += IncreaseValue;
+					break;
+				case EItemStatType::ProjectileSpeed:
+					Slot.WeaponInstance->ProjectileSpeed += IncreaseValue;
+					break;
+				case EItemStatType::KnockBack:
+					Slot.WeaponInstance->KnockBack += IncreaseValue;
+					break;
+				default:
+					break;
 				}
-				// ... 다른 스탯 처리
 			}
 
 			OnWeaponChanged.Broadcast();

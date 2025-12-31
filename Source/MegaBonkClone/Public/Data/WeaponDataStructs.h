@@ -82,7 +82,7 @@ public:
 	float KnockBack = 0.0f;
 
 	// 쿨타임 감소
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (DisplayName = "넉백", ClampMin = "0"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (DisplayName = "쿨타임", ClampMin = "0"))
 	float Cooldown = 0.0f;
 
 	// 강화 효율 배열
