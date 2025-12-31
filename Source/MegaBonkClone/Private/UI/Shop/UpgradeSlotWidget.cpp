@@ -55,8 +55,20 @@ void UUpgradeSlotWidget::SetSlotInfo(const FRewardOption& Info, int32 InSlotInde
 		Level->SetText(LevelText);
 	}
 
+	const UEnum* StatEnumPtr = FindObject<UEnum>(nullptr, TEXT("/Script/MegaBonkClone.EItemStatType"), true);
 
-	if (Type) Type->SetText(UEnum::GetDisplayValueAsText(Info.StatType));
+	if (StatEnumPtr)
+	{
+		// 2. Enum 값을 int64로 캐스팅하여 DisplayName을 가져옵니다.
+		FText DisplayName = StatEnumPtr->GetDisplayNameTextByValue((int64)Info.StatType);
+
+		// 3. 텍스트 설정
+		if (Type)
+		{
+			Type->SetText(DisplayName);
+		}
+	}
+	//if (Type) Type->SetText(UEnum::GetDisplayValueAsText(Info.StatType));
 	if (Title) Title->SetText(Info.Name);
 	if (Current) Current ->SetText(FText::AsNumber(Info.CurrentStatValue));
 	if (Next) Next->SetText(FText::AsNumber(Info.NextStatValue));
