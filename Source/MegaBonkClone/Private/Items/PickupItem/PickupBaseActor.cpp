@@ -3,6 +3,7 @@
 #include "Characters/PlayAbleCharacter/PlayerCharacter.h"
 #include "Components/TimelineComponent.h"
 #include "Framework/ObjectPoolSubsystem.h"
+#include "Components/WidgetComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -25,6 +26,21 @@ APickupBaseActor::APickupBaseActor()
 	Mesh->SetCollisionProfileName(TEXT("NoCollision"));
 	Mesh->AddRelativeRotation(FRotator(0, 0, -10.0f));
 
+
+	InteractionWidgetComp = CreateDefaultSubobject<UWidgetComponent>(TEXT("InteractionWidget"));
+	InteractionWidgetComp->SetupAttachment(RootComponent); // 루트에 붙이기
+
+	// ★핵심 설정: Screen 모드로 하면 카메라를 항상 정면으로 바라보고 크기가 일정하게 유지됨 (빌보드)
+	InteractionWidgetComp->SetWidgetSpace(EWidgetSpace::Screen);
+
+	// 위젯 크기 설정 (원하는 대로 조절)
+	InteractionWidgetComp->SetDrawAtDesiredSize(true);
+
+	// 위치를 아이템 머리 위로 살짝 올림 (Z축 +80)
+	InteractionWidgetComp->SetRelativeLocation(FVector(0.0f, 0.0f, 80.0f));
+
+	// 처음엔 안 보이게 숨김
+	InteractionWidgetComp->SetVisibility(false);
 	PickupTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("PickupTimeline"));
 }
 
@@ -199,6 +215,22 @@ void APickupBaseActor::OnPoolDeactivate_Implementation()
 
 	SetActorHiddenInGame(true);
 	SetActorEnableCollision(false);
+}
+
+void APickupBaseActor::BeginFocus_Implementation()
+{
+	if (InteractionWidgetComp)
+	{
+		InteractionWidgetComp->SetVisibility(true);
+	}
+}
+
+void APickupBaseActor::EndFocus_Implementation()
+{
+	if (InteractionWidgetComp)
+	{
+		InteractionWidgetComp->SetVisibility(false);
+	}
 }
 
 void APickupBaseActor::EnablePickup()

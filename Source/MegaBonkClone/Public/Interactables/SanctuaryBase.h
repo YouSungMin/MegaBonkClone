@@ -7,6 +7,7 @@
 #include "Interfaces/InteractionInterface.h"
 #include "SanctuaryBase.generated.h"
 
+
 UCLASS()
 class MEGABONKCLONE_API ASanctuaryBase : public AActor, public IInteractionInterface
 {
@@ -20,6 +21,8 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	virtual void BeginFocus_Implementation() override;
+	virtual void EndFocus_Implementation() override;
 	virtual void Interact_Implementation(AActor* PlayerActor) override;
 protected:	
 	// 기준점 더미 루트
@@ -29,6 +32,10 @@ protected:
 	// 성소 메쉬
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UStaticMeshComponent* SantuaryMesh;
+
+	//상호작용 키 위젯
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
+	TObjectPtr<class UWidgetComponent> InteractionWidgetComp;
 
 	UFUNCTION(BlueprintNativeEvent, Category = "Sanctuary")
 	void ApplyEffect(AActor* Player);

@@ -23,6 +23,8 @@ public:
 	//캐릭터 초기 설정 함수
 	void InitializeCharacterComponents();
 
+	virtual void Tick(float DeltaTime) override;
+
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
@@ -116,6 +118,9 @@ private:
 	// 무적 타이머 종료 시 실행
 	void OnInvincibleEnd();
 
+	//트레이스 로직
+	void PerformInteractionTrace();
+
 public:
 	
 	//캐릭터 데이터 테이블에서 Row 선택 변수
@@ -193,6 +198,9 @@ private:
 	FRotator DeathStartRot;
 	FRotator DeathEndRot;
 
+
+	UPROPERTY()
+	TObjectPtr<AActor> FocusedActor;
 
 	//발자국 소리 타이머 
 	FTimerHandle FootstepTimerHandle;
