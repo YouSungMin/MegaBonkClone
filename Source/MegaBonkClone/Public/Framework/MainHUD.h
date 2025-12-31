@@ -46,6 +46,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "UI")
 	void ShowGameOver();
 
+	UFUNCTION(BlueprintCallable)
+	void ShowPauseWidget();
+
+	UFUNCTION(BlueprintCallable)
+	void HidePauseWidget();
+
 
 protected:
 	//mainwidgetclass는 Umainhudwidget를 상속받은 블루프린트 위젯 클래스
@@ -79,6 +85,12 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI|Panels")
 	TSubclassOf<UUserWidget> UpgradePanelClass;
 
+	UPROPERTY(EditDefaultsOnly, Category = "UI|Panels")
+	TSubclassOf<UUserWidget> PauseWidgetClass;
+
+
+
+
 	//생성된 위젯을 저장해둘 변수
 	UPROPERTY()
 	TObjectPtr<UChestOpen> ChestOpenWidget = nullptr;
@@ -97,4 +109,7 @@ protected:
 
 	UPROPERTY()
 	TObjectPtr<AActor> CachedStudioActor = nullptr;
+
+	UPROPERTY()
+	TObjectPtr<UUserWidget> PauseWidgetInstance = nullptr;
 };

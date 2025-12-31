@@ -284,3 +284,37 @@ void AMainHUD::ShowGameOver()
 	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.001f);
 }
 
+void AMainHUD::ShowPauseWidget()
+{
+	APlayerController* PC = GetOwningPlayerController();
+	if (!PC || !PauseWidgetClass) return;
+
+	if (!PauseWidgetInstance)
+	{
+		PauseWidgetInstance = CreateWidget<UUserWidget>(PC, PauseWidgetClass);
+	}
+
+	if (PauseWidgetInstance && !PauseWidgetInstance->IsInViewport())
+	{
+		PauseWidgetInstance->AddToViewport(9500); // MainWBP 위에 올라오게
+	}
+
+	if (PauseWidgetInstance)
+	{
+		FInputModeUIOnly Mode;
+		Mode.SetWidgetToFocus(PauseWidgetInstance->TakeWidget());
+		Mode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+		PC->SetInputMode(Mode);
+		PC->SetShowMouseCursor(true);
+	}
+
+}
+
+void AMainHUD::HidePauseWidget()
+{
+	if (PauseWidgetInstance && PauseWidgetInstance->IsInViewport())
+	{
+		PauseWidgetInstance->RemoveFromParent();
+	}
+}
+
