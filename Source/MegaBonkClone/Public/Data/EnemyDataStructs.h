@@ -4,20 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h"
+#include "Data/TypeEnums.h"
 #include "EnemyDataStructs.generated.h"
 /**
  *
  */
-
- // 몬스터 등급
-UENUM(BlueprintType)
-enum class EEnemyRank : uint8
-{
-	None,
-	Normal		UMETA(DisplayName = "일반"),
-	Elite		UMETA(DisplayName = "엘리트"),
-	Boss		UMETA(DisplayName = "보스")
-};
 
 // 몬스터 데이터 구조체
 USTRUCT(BlueprintType)
@@ -60,7 +51,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Reward", meta = (DisplayName = "드랍 경험치"))
 	int32 DropExp = 10;
 
-	//돈
+	// 돈
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Reward", meta = (DisplayName = "드랍 골드"))
 	int32 DropGold = 10;
 
