@@ -37,14 +37,14 @@ void URewardSystemComponent::GenerateLevelUpRewards()
 		return;
 	}
 
-	// 2. 슬롯 여유 확인 (3개 제한)
+	// 슬롯 여유 확인
 	bool bCanNewWeapon = (WeaponComp->GetCurrentWeaponCount() < 3);
 	bool bCanNewBook = (InventoryComp->GetSecretBookSlots().Num() < 3);
 
 	TArray<FRewardOption> Pool;
 
 	// =========================================================
-	// [A] 무기 후보군 (무한 레벨업)
+	// 무기 후보군
 	// =========================================================
 	for (FName RowName : WeaponDataTable->GetRowNames())
 	{
@@ -53,7 +53,7 @@ void URewardSystemComponent::GenerateLevelUpRewards()
 
 		bool bHas = WeaponComp->HasWeapon(RowName);
 
-		// [조건] 보유 중이면 무조건 후보(강화), 미보유면 슬롯이 남아야 후보(신규)
+		// 보유 중이면 무조건 후보(강화), 미보유면 슬롯이 남아야 후보(신규)
 		if (bHas || bCanNewWeapon)
 		{
 			FRewardOption Opt;
@@ -71,7 +71,7 @@ void URewardSystemComponent::GenerateLevelUpRewards()
 	}
 
 	// =========================================================
-	// [B] 비전서 후보군 (무한 레벨업)
+	// 비전서 후보군
 	// =========================================================
 	for (FName RowName : ItemDataTable->GetRowNames())
 	{
@@ -88,7 +88,7 @@ void URewardSystemComponent::GenerateLevelUpRewards()
 			if (Slot.ItemID == RowName) { bHas = true; CurLv = Slot.Level; break; }
 		}
 
-		// [조건] 보유 중이면 무조건 후보(강화), 미보유면 슬롯이 남아야 후보(신규)
+		// 보유 중이면 무조건 후보(강화), 미보유면 슬롯이 남아야 후보(신규)
 		if (bHas || bCanNewBook)
 		{
 			FRewardOption Opt;
@@ -105,7 +105,7 @@ void URewardSystemComponent::GenerateLevelUpRewards()
 	}
 
 	// =========================================================
-	// [C] 랜덤 3개 선정
+	// 랜덤 3개 선정
 	// =========================================================
 	TArray<FRewardOption> FinalRewards;
 	int32 PickNum = FMath::Min(Pool.Num(), 3);
@@ -114,9 +114,6 @@ void URewardSystemComponent::GenerateLevelUpRewards()
 	{
 		int32 RandIdx = FMath::RandRange(0, Pool.Num() - 1);
 		FRewardOption Selected = Pool[RandIdx];
-
-		// 등급 부여
-		//Selected.Rarity = CalculateRandomRarity();
 
 		UE_LOG(LogTemp, Log, TEXT("ItemID = %s, Type = %s, StateType = %s, NewLevel = %d, CurrentStatValue = %.1f, NextStatValue = %.1f, Rarity = %s"),
 			*Selected.ItemID.ToString(),
@@ -183,11 +180,11 @@ void URewardSystemComponent::ApplyWeaponUpgradeLogic(const FWeaponData* Row, int
 	}
 	else
 	{
-		// 신규 획득이라면: 등급 개념 없음 (기본 Common 설정)
+		// 신규 획득이라면: 등급 개념 없음
 		OutOption.Rarity = EItemGrade::None;
 	}
 
-	// 강화 옵션이 하나라도 있다면?
+	// 강화 옵션이 하나라도 있어야 함
 	if (Row->UpgradeOptions.Num() > 0)
 	{
 		// 랜덤 옵션 하나 선택
@@ -208,7 +205,7 @@ void URewardSystemComponent::ApplyWeaponUpgradeLogic(const FWeaponData* Row, int
 
 		// 결과 데이터 채우기
 		OutOption.NextStatValue = FinalValue;
-		// 3. 스탯 타입 매핑 및 기본값 가져오기
+		// 스탯 타입 매핑 및 기본값 가져오기
 		float BaseValue = 0.0f;
 
 		switch (SelectedUpgrade.StatType)
@@ -229,12 +226,12 @@ void URewardSystemComponent::ApplyWeaponUpgradeLogic(const FWeaponData* Row, int
 			break;
 
 		case EWeaponStatType::ProjectileScale:
-			OutOption.StatType = EItemStatType::AttackSize; // AttackSize로 매핑
+			OutOption.StatType = EItemStatType::AttackSize;
 			BaseValue = Row->ProjectileScale;
 			break;
 
 		case EWeaponStatType::ChainCount:
-			OutOption.StatType = EItemStatType::AttackSize; // AttackSize로 매핑
+			OutOption.StatType = EItemStatType::ProjectileReflectCount;
 			BaseValue = Row->ChainCount;
 			break;
 
@@ -268,7 +265,7 @@ void URewardSystemComponent::ApplyWeaponUpgradeLogic(const FWeaponData* Row, int
 		OutOption.CurrentStatValue = BaseValue + (CurLv - 1 * SelectedUpgrade.Value); // *주의: 현재 스탯은 배율 적용 전 기준
 		OutOption.NextStatValue = OutOption.CurrentStatValue + FinalValue;
 
-		// 4. 설명 텍스트 생성
+		// 설명 텍스트 생성
 		if (bHas)
 		{
 			// 강화: "공격력 +10 (레어)" 형식
@@ -448,7 +445,7 @@ void URewardSystemComponent::BeginPlay()
 
 	if (FindComponents())
 	{
-		// 2. 이벤트 바인딩
+		// 이벤트 바인딩
 		StatusComp->OnLevelChanged.AddDynamic(this, &URewardSystemComponent::OnPlayerLevelChanged);
 		UE_LOG(LogTemp, Log, TEXT("RewardSystem: 초기화 및 이벤트 구독 완료"));
 	}
