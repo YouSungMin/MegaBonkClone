@@ -130,68 +130,68 @@ void APlayerCharacter::BeginPlay()
 
 
 
-	if (StatusComponent2)
+if (StatusComponent2)
+{
+	// CharacterDataHandle 안에 테이블과 RowName이 다 들어있으므로 이것만 넘기면 끝!
+	StatusComponent2->InitializeStatsFromDataTable(CharacterDataHandle);
+	StatusComponent2->OnPlayerDied.AddDynamic(this, &APlayerCharacter::OnCharacterDie);
+}
+
+if (WeaponComponent2) {
+	FCharacterData* rowData = CharacterDataHandle.GetRow<FCharacterData>(TEXT("Get Weapon"));
+	if (rowData)
 	{
-		// CharacterDataHandle 안에 테이블과 RowName이 다 들어있으므로 이것만 넘기면 끝!
-		StatusComponent2->InitializeStatsFromDataTable(CharacterDataHandle);
-		StatusComponent2->OnPlayerDied.AddDynamic(this, &APlayerCharacter::OnCharacterDie);
-	}
+		// 2. SoftClassPtr 로드 (비동기 로드면 로직이 다르지만, 여기선 동기 로드 사용)
+		UClass* WeaponClass = rowData->BaseWeapon.LoadSynchronous();
 
-	if (WeaponComponent2) {
-		FCharacterData* rowData = CharacterDataHandle.GetRow<FCharacterData>(TEXT("Get Weapon"));
-		if (rowData)
+		if (WeaponClass)
 		{
-			// 2. SoftClassPtr 로드 (비동기 로드면 로직이 다르지만, 여기선 동기 로드 사용)
-			UClass* WeaponClass = rowData->BaseWeapon.LoadSynchronous();
+			// 3. [핵심] 클래스 정보 -> 무기 ID(FName)로 변환
+			FName WeaponID = WeaponComponent2->ResolveWeaponIDFromClass(WeaponClass);
 
-			if (WeaponClass)
+			// 4. ID가 유효하면 무기 추가
+			if (!WeaponID.IsNone())
 			{
-				// 3. [핵심] 클래스 정보 -> 무기 ID(FName)로 변환
-				FName WeaponID = WeaponComponent2->ResolveWeaponIDFromClass(WeaponClass);
-
-				// 4. ID가 유효하면 무기 추가
-				if (!WeaponID.IsNone())
-				{
-					// UE_LOG(LogTemp, Warning, TEXT("AddWeapon ID : %s"), *WeaponID.ToString());
-					WeaponComponent2->AddWeapon(WeaponID);
-				}
-			}
-		}
-		
-	}
-	//피격시 효과 설정 위한 마테리얼 생성
-	if (GetMesh())
-	{
-		int32 MaterialCount = GetMesh()->GetNumMaterials();
-		for (int32 i = 0; i < MaterialCount; i++)
-		{
-			UMaterialInstanceDynamic* DMI = GetMesh()->CreateDynamicMaterialInstance(i);
-			if (DMI)
-			{
-				MeshDMIs.Add(DMI);
+				// UE_LOG(LogTemp, Warning, TEXT("AddWeapon ID : %s"), *WeaponID.ToString());
+				WeaponComponent2->AddWeapon(WeaponID);
 			}
 		}
 	}
 
-	DefaultWeaponEquip();
+}
+//피격시 효과 설정 위한 마테리얼 생성
+if (GetMesh())
+{
+	int32 MaterialCount = GetMesh()->GetNumMaterials();
+	for (int32 i = 0; i < MaterialCount; i++)
+	{
+		UMaterialInstanceDynamic* DMI = GetMesh()->CreateDynamicMaterialInstance(i);
+		if (DMI)
+		{
+			MeshDMIs.Add(DMI);
+		}
+	}
+}
+
+DefaultWeaponEquip();
 
 
-	//발자국 소리 타이머 시작
-	GetWorldTimerManager().SetTimer(FootstepTimerHandle, this, &APlayerCharacter::FootstepTick, FootstepInterval, true);
+//발자국 소리 타이머 시작
+GetWorldTimerManager().SetTimer(FootstepTimerHandle, this, &APlayerCharacter::FootstepTick, FootstepInterval, true);
 }
 
 void APlayerCharacter::OnMoveInput(const FInputActionValue& InValue)
 {
 	FVector2D input = InValue.Get<FVector2D>();
 	//입력 축 방향 반대로 해야 정방향
-	FVector direction = FVector(input.Y, input.X,0.0f);
+	FVector direction = FVector(input.Y, input.X, 0.0f);
 
 	//컨트롤러의 Yaw값을 가져와서 회전방향만큼 회전하여 바라보고 있는 방향으로 움직이게함
 	FRotator ControllerRotation = FRotator(0.0f, GetControlRotation().Yaw, 0.0f);
 	direction = ControllerRotation.RotateVector(direction);
 
 	AddMovementInput(direction);
-	
+
 }
 
 void APlayerCharacter::OnJumpInput(const FInputActionValue& InValue)
@@ -216,6 +216,23 @@ void APlayerCharacter::OnJumpInput(const FInputActionValue& InValue)
 
 void APlayerCharacter::OnPauseInput(const FInputActionValue& InValue)
 {
+	//플레이 컨트롤러 
+	APlayerController* PC = Cast<APlayerController>(GetController());
+	if (!PC) return;
+
+	//Pause상태확인
+	const bool bPaused = UGameplayStatics::IsGamePaused(this);
+
+	if (!bPaused) //일시정지
+	{
+		//게임멈춤
+		UGameplayStatics::SetGamePaused(this, true);
+
+		if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
+		{
+			HUD->ShowPauseWidget();		//PauseWBP를 AddtoViewport
+		}
+	}
 }
 
 void APlayerCharacter::HandleDeathProgress(float Value)
