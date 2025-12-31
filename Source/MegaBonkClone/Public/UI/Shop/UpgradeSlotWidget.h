@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Data/TypeEnums.h"
 #include "UpgradeSlotWidget.generated.h"
 
 class UTextBlock;
@@ -34,6 +35,8 @@ private:
 	UFUNCTION()
 	void HandleClicked();
 
+	// [추가] StatType을 한글 텍스트로 변환해주는 헬퍼 함수 선언
+	FText GetStatDisplayName(EItemStatType InStatType) const;
 protected:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> StatType = nullptr;
