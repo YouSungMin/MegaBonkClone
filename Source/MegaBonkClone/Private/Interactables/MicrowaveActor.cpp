@@ -208,6 +208,7 @@ void AMicrowaveActor::Interact_Implementation(AActor* PlayerActor)
 		Inventory = Player.Get()->FindComponentByClass<UInventoryComponent>();
 		if (!Inventory) return;
 
+
 		const TArray<FInventorySlot>& AllItems = Inventory->GetGeneralItemSlots();
 		TArray<FMicrowaveSlotInfo> FilteredList;
 
@@ -225,6 +226,11 @@ void AMicrowaveActor::Interact_Implementation(AActor* PlayerActor)
 				UE_LOG(LogTemp, Log, TEXT("현재 캐릭터의 아이템 : %s"),*NewInfo.ItemName.ToString());
 				FilteredList.Add(NewInfo);
 			}
+		}
+		if (FilteredList.Num() < 2)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("복사에 필요한 아이템이 부족합니다"), (int32)CurrentRarity);
+			return;
 		}
 
 		if (FilteredList.Num() == 0)
