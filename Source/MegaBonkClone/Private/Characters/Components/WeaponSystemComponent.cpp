@@ -89,7 +89,7 @@ void UWeaponSystemComponent::LevelUpWeapon(FName WeaponID, EItemStatType StatTyp
 					Slot.WeaponInstance->CriticalChance += IncreaseValue;
 					break;
 				case EItemStatType::ProjectileCount:
-					Slot.WeaponInstance->WeaponDamage += IncreaseValue;
+					Slot.WeaponInstance->ProjectileCount += IncreaseValue;
 					break;
 				case EItemStatType::ProjectileReflectCount:
 					Slot.WeaponInstance->ProjectileReflectCount += IncreaseValue;
