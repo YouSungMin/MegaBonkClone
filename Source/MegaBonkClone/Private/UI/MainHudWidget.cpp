@@ -10,6 +10,7 @@
 #include "Components/InventoryComponent.h"	
 #include "Data/ItemDataStructs.h"
 #include "Components/UniformGridPanel.h"
+#include "Components/Overlay.h"
 #include "UI/Inventory/SecretBookSlotWidget.h"
 #include "UI/ResourceBarWidget.h"
 
@@ -171,5 +172,28 @@ void UMainHudWidget::HandleShieldChanged(float CurrentShield, float MaxShield)
 	{
 		// 쉴드는 Max를 MaxShield로 쓸지, MaxHP로 쓸지 기획에 따라 결정 (여기선 MaxHP 기준)
 		ShieldBar->RefreshWidget(CurrentShield, MaxShield);
+	}
+}
+
+void UMainHudWidget::SetUpgradeAnimEnabled(bool bEnabled)
+{
+	if (!LightOverlay) return; // Light1/Light2를 감싸는 오버레이
+
+	if (bEnabled)
+	{
+		LightOverlay->SetVisibility(ESlateVisibility::Visible);
+
+		if (LightAnim)
+		{
+			PlayAnimation(LightAnim, 0.f, 0); // 무한루프
+		}
+	}
+	else
+	{
+		if (LightOverlay)
+		{
+			StopAnimation(LightAnim);
+		}
+		LightOverlay->SetVisibility(ESlateVisibility::Collapsed);
 	}
 }
