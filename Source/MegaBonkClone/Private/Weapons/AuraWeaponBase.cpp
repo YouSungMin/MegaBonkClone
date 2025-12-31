@@ -76,7 +76,7 @@ void AAuraWeaponBase::AttackWeapon_Implementation()
 
 void AAuraWeaponBase::UpdateAuraScale()
 {
-	float auraBaseSize = 5.0f;
+	float auraBaseSize = 7.0f;
 	SetActorScale3D(FVector(FinalAttackSize * auraBaseSize));
 }
 

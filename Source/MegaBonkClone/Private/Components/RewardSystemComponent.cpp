@@ -416,7 +416,14 @@ void URewardSystemComponent::SelectReward(const FRewardOption& SelectedOption)
 
 	if (SelectedOption.Type == EItemType::Weapon)
 	{
-		WeaponComp->LevelUpWeapon(SelectedOption.ItemID, SelectedOption.StatType, IncrementValue);
+		if (WeaponComp->HasWeapon(SelectedOption.ItemID))
+		{
+			WeaponComp->LevelUpWeapon(SelectedOption.ItemID, SelectedOption.StatType, IncrementValue);
+		}
+		else
+		{
+			WeaponComp->AddWeapon(SelectedOption.ItemID);
+		}
 	}
 	else
 	{

@@ -14,6 +14,8 @@
 void AMainHUD::BeginPlay()
 {
 	Super::BeginPlay();
+
+	
 	if (MainWidgetClass)
 	{
 		MainWidgetInstance = CreateWidget<UMainHudWidget>(GetWorld(), MainWidgetClass);
@@ -30,6 +32,7 @@ void AMainHUD::BeginPlay()
 			}
 		}
 	}
+	
 
 	TArray<AActor*> FoundActors;
 

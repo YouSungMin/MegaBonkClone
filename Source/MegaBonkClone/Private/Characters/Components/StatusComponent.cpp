@@ -193,19 +193,19 @@ void UStatusComponent::UpdateCharacterStatus()
 
 	if (Movement)
 	{
-		// [이동 속도]
-		// 공식: PlayerInitial + n  (PlayerInitial에곱함)
-		// n = (0.01 * Player) + (0.001 * Vision) + (0.01 * Shrine) -> 예시: 0.01*15 -> 0.15
+		// 1. 퍼센트 합계 계산 (예: 15 + 0 + 0 = 15)
+		float TotalPercent = PlayerMoveSpeed + VisionMoveSpeed + ShrineMoveSpeed;
 
-		float MoveN = ((0.01f * PlayerMoveSpeed) + (0.001f * VisionMoveSpeed) + (0.01f * ShrineMoveSpeed))*100.0f;
-		//UE_LOG(LogTemp, Warning, TEXT("%.1f"), PlayerMoveSpeed);
-		//UE_LOG(LogTemp, Warning, TEXT("%.1f"), MoveN);
+		// 2. 배율로 변환 (예: 1.0 + 0.15 = 1.15)
+		// 0.01f를 곱해서 퍼센트를 소수로 만듭니다.
+		float SpeedMultiplier = 1.0f + (TotalPercent * 0.01f);
 
-		// 기본 걷기 속도 (예: 400)
+		// 3. 기본 속도 정의
 		float DefaultWalkSpeed = 400.0f;
 
-		//n이 배율이므로 기본 속도 * n (예: 1.45배)
-		ResultMoveSpeed = DefaultWalkSpeed * MoveN;
+		// 4. 최종 속도 계산 (400 * 1.15 = 460)
+		ResultMoveSpeed = DefaultWalkSpeed * SpeedMultiplier;
+
 		Movement->MaxWalkSpeed = ResultMoveSpeed;
 		//UE_LOG(LogTemp, Warning, TEXT("%.1f , %.1f : %.1f"), DefaultWalkSpeed, MoveN, ResultMoveSpeed);
 

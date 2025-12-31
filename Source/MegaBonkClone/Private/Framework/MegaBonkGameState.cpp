@@ -216,15 +216,49 @@ void AMegaBonkGameState::SpawnProps()
 		}
 	}
 
-	//보스제단 배치
+	FVector PlayerLocation = FVector::ZeroVector;
+	if (APawn* PlayerPawn = GetWorld()->GetFirstPlayerController()->GetPawn())
+	{
+		PlayerLocation = PlayerPawn->GetActorLocation();
+	}
+
+	//플레이어 주변 안전 구역 반경 (예: 2000.0f = 20미터)
+	const float SafeRadius = 2000.0f;
+	const int32 MaxSpawnAttempts = 10; // 위치 찾기 최대 시도 횟수 (무한 루프 방지)
+
+	// 보스 제단 배치
 	for (int32 i = 0; i < BossSpawnerCount; i++)
 	{
 		if (!BossSpawner) return;
 
 		FVector SpawnLoc;
-		if (GetRandomLocationOnNavMesh(SpawnLoc))
+		bool bFoundValidLoc = false;
+
+		// [수정] 유효한 위치를 찾을 때까지 몇 번 재시도
+		for (int32 Attempt = 0; Attempt < MaxSpawnAttempts; Attempt++)
+		{
+			if (GetRandomLocationOnNavMesh(SpawnLoc))
+			{
+				// 플레이어와의 거리 계산
+				float Distance = FVector::Dist(SpawnLoc, PlayerLocation);
+
+				// 안전 반경보다 멀리 있으면 합격
+				if (Distance > SafeRadius)
+				{
+					bFoundValidLoc = true;
+					break; // 루프 탈출
+				}
+			}
+		}
+
+		// 유효한 위치를 찾았다면 스폰
+		if (bFoundValidLoc)
 		{
 			GetWorld()->SpawnActor<AActor>(BossSpawner, SpawnLoc, FRotator::ZeroRotator);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("보스 제단 스폰 실패: 플레이어와 먼 위치를 찾지 못했습니다."));
 		}
 	}
 

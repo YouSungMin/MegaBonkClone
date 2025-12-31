@@ -66,6 +66,7 @@ void APotActor::Interact_Implementation(AActor* InstigatorActor)
 					// InstigatorActor는 항아리를 깬 주체(플레이어)입니다.
 					if (SpawnedItem->GetClass()->ImplementsInterface(UPickupInterface::StaticClass()))
 					{
+						SpawnedItem->EnablePickup();
 						IPickupInterface::Execute_OnPickup(SpawnedItem, InstigatorActor);
 					}
 				}

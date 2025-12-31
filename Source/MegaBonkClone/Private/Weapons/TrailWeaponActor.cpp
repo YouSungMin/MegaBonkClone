@@ -58,7 +58,7 @@ void ATrailWeaponActor::InitializeTrail(float InDamage, float InCritDmg, float I
 		DamageTimerHandle,
 		this,
 		&ATrailWeaponActor::OnDamageTick,
-		AttackSpeed,
+		AttackSpeed * 0.5f,
 		true,
 		0.0f
 	);

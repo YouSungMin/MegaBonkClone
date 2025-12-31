@@ -35,7 +35,7 @@ public:
 	void ClosePanels();
 
 	//메인 HUD 위젯 세터
-	inline void InitializeMainHudWidget(UMainHudWidget* InWidget);
+	void InitializeMainHudWidget(UMainHudWidget* InWidget);
 
 
 private:
