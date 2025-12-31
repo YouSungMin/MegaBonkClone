@@ -106,27 +106,21 @@ void UChestOpen::PlayLootSequence(const FItemData& InRowData)
 	if (ChestStudioActor)
 	{
 		FOutputDeviceNull Ar;
-		// BP에 만든 'StartIntroSequence' 이벤트 호출
+		// BP에 만든 'StartIntroSequence' 호출(애니메이션 이벤트)
 		ChestStudioActor->CallFunctionByNameWithArguments(TEXT("StartIntroSequence"), Ar, NULL, true);
 	}
 
 }
 
-//타이머 종료: 아이템 및 버튼 표시
+//타이머 종료후 아이템 및 버튼 표시
 void UChestOpen::ShowItemIcon()
 {
 	if (ItemIcon)
 	{
 		ItemIcon->SetVisibility(ESlateVisibility::Visible);
-
-		// 등장 애니메이션 재생 (있을 경우)
-		/*if (Anim_IconAppear)
-		{
-			PlayAnimation(Anim_IconAppear);
-		}*/
 	}
 
-	// 확인 버튼도 이제 보여줌
+	//버튼 visibility
 	if (Btn_Claim)
 	{
 		Btn_Claim->SetVisibility(ESlateVisibility::Visible);
@@ -170,11 +164,12 @@ void UChestOpen::OnOpenChestClicked()
 	if (ChestStudioActor)
 	{
 		FOutputDeviceNull Ar;
-		// BP에 만든 'StartOpenSequence' 이벤트 호출
+		// BP에 만든 'StartOpenSequence' 호출(애니메이션 이벤트)
 		ChestStudioActor->CallFunctionByNameWithArguments(TEXT("StartOpenSequence"), Ar, NULL, true);
 	}
 
-	
+
+	//ui를 띄웠을때 시간 조절이 들어간만큼 재생시간 빠르게 조정
 	float OpenAnimDuration = 1.2f * 0.001f;
 
 	if (GetWorld())

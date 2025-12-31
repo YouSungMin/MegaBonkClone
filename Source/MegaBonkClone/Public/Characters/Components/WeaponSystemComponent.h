@@ -22,7 +22,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Level = 1;
 
-	// 실제 스폰된 무기 액터 (직접 접근 가능!)
+	// 실제 스폰된 무기 액터 레퍼런스
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<class AWeaponBase> WeaponInstance = nullptr;
 
@@ -72,6 +72,7 @@ public:
 	// 클래스 정보로 ID 찾기 (시작 무기 지급용)
 	FName ResolveWeaponIDFromClass(TSubclassOf<AActor> InWeaponClass) const;
 
+	//디버그용 함수
 	UFUNCTION(BlueprintCallable, Category = "Debug")
 	void Debug_TestWeapon(FName WeaponID);
 
@@ -90,7 +91,7 @@ protected:
 
 
 private:
-	// [통합] 실제 관리되는 무기 슬롯 배열 (이거 하나로 끝!)
+	//실제 관리되는 무기 슬롯 배열
 	UPROPERTY(VisibleInstanceOnly, Category = "State")
 	TArray<FWeaponSlot> ActiveSlots;
 

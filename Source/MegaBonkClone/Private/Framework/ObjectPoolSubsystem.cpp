@@ -5,7 +5,8 @@
 #include "Interfaces/ObjectPoolInterface.h"
 #include "MegaBonkClone/MegaBonkClone.h"
 
-AActor* UObjectPoolSubsystem::SpawnPooledActor(UClass* Class, FVector location, FRotator rotation, AActor* Owner, APawn* Instigator)
+AActor* UObjectPoolSubsystem::SpawnPooledActor(UClass* Class, FVector location, 
+	FRotator rotation, AActor* Owner, APawn* Instigator)
 {
 	if (!Class) return nullptr;
 
@@ -20,7 +21,8 @@ AActor* UObjectPoolSubsystem::SpawnPooledActor(UClass* Class, FVector location, 
 		if (IsValid(Candidate))
 		{
 			PooledActor = Candidate;
-			UE_LOG(LogObjectPool, Warning, TEXT("♻️ [ObjectPool] 재사용 성공 (Reuse): %s (남은 개수: %d)"), *PooledActor->GetName(), PoolQueue.Pool.Num());
+			UE_LOG(LogObjectPool, Warning, TEXT("♻️ [ObjectPool] 재사용 성공 (Reuse): %s (남은 개수: %d)"), 
+				*PooledActor->GetName(), PoolQueue.Pool.Num());
 			break;
 		}
 	}
@@ -34,7 +36,8 @@ AActor* UObjectPoolSubsystem::SpawnPooledActor(UClass* Class, FVector location, 
 
 		if (PooledActor)
 		{
-			UE_LOG(LogObjectPool, Warning, TEXT("✨ [ObjectPool] 신규 생성 (New Spawn): %s"), *PooledActor->GetName());
+			UE_LOG(LogObjectPool, Warning, TEXT("✨ [ObjectPool] 신규 생성 (New Spawn): %s"), 
+				*PooledActor->GetName());
 		}
 	}
 	else
@@ -45,14 +48,11 @@ AActor* UObjectPoolSubsystem::SpawnPooledActor(UClass* Class, FVector location, 
 
 	//활성화 처리 (인터페이스 호출)
 	if (PooledActor && PooledActor->Implements<UObjectPoolInterface>())
-	{
-		// 꺼내짐 알림 (초기화)
+	{ 
+		//(초기화)
 		IObjectPoolInterface::Execute_OnPoolActivate(PooledActor);
 	}
-
 	return PooledActor;
-
-
 }
 
 void UObjectPoolSubsystem::ReturnToPool(AActor* InActor)
@@ -70,7 +70,8 @@ void UObjectPoolSubsystem::ReturnToPool(AActor* InActor)
 		FObjectPoolQueue& poolQueue = PoolMap.FindOrAdd(InActor->GetClass());
 		poolQueue.Pool.Push(InActor);
 
-		UE_LOG(LogObjectPool, Warning, TEXT("📥 [ObjectPool] 반납 완료 (Return): %s (현재 보유량: %d)"), *InActor->GetName(), poolQueue.Pool.Num());
+		UE_LOG(LogObjectPool, Warning, TEXT("📥 [ObjectPool] 반납 완료 (Return): %s (현재 보유량: %d)"), 
+			*InActor->GetName(), poolQueue.Pool.Num());
 	}
 	
 }

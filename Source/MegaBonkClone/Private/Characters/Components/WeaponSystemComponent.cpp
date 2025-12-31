@@ -22,19 +22,19 @@ void UWeaponSystemComponent::AddWeapon(FName WeaponID)
 {
 	if (!WeaponDataTable) return;
 
-	// 1. 이미 가지고 있는지 체크 (안전장치)
+	//이미 가지고 있는지 체크
 	if (HasWeapon(WeaponID)) return;
 
-	// 2. 데이터 조회
+	//데이터 조회
 	FWeaponData* Row = WeaponDataTable->FindRow<FWeaponData>(WeaponID, TEXT("AddWeapon"));
 	if (!Row || !Row->WeaponClass) return;
 
-	// 3. 빈 슬롯 찾기
+	//빈 슬롯 찾기
 	for (auto& Slot : ActiveSlots)
 	{
 		if (Slot.IsEmpty()) // 비어있다면
 		{
-			// A. 실제 액터 스폰
+			//실제 액터 스폰
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.Owner = GetOwner();
 
@@ -42,24 +42,24 @@ void UWeaponSystemComponent::AddWeapon(FName WeaponID)
 
 			if (NewWeapon)
 			{
-				// B. 캐릭터에 부착
+				//캐릭터에 부착
 				ACharacter* OwnerChar = Cast<ACharacter>(GetOwner());
 				if (OwnerChar)
 				{
 					NewWeapon->AttachToComponent(OwnerChar->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, NAME_None);
 				}
 
-				// C. 슬롯 데이터 채우기 (통합!)
+				//슬롯 데이터 채우기 (통합!)
 				Slot.WeaponID = WeaponID;
 				Slot.Level = 1;
 				Slot.WeaponInstance = NewWeapon; // 인스턴스 저장
 
-				// D. UI 알림
+				//UI 알림
 				OnWeaponChanged.Broadcast();
 
 				UE_LOG(LogTemp, Log, TEXT("[WeaponSystem] 무기 추가 완료: %s"), *WeaponID.ToString());
 			}
-			return; // 추가했으니 종료
+			return; //추가했으니 종료
 		}
 	}
 	UE_LOG(LogTemp, Warning, TEXT("[WeaponSystem] 슬롯이 가득 찼습니다."));
@@ -127,10 +127,10 @@ int32 UWeaponSystemComponent::GetCurrentWeaponCount() const
 
 FWeaponData* UWeaponSystemComponent::GetWeaponInfo(FName WeaponID) const
 {
-	// 1. 데이터 테이블이 없거나 ID가 없으면 빈 값 반환
+	//데이터 테이블이 없거나 ID가 없으면 빈 값 반환
 	if (!WeaponDataTable || WeaponID.IsNone()) return nullptr;
 
-	// 2. 데이터 테이블에서 ID로 검색해서 반환
+	//데이터 테이블에서 ID로 검색해서 반환
 	static const FString ContextString(TEXT("GetWeaponInfo"));
 	return WeaponDataTable->FindRow<FWeaponData>(WeaponID, ContextString);
 }
@@ -138,27 +138,27 @@ FWeaponData* UWeaponSystemComponent::GetWeaponInfo(FName WeaponID) const
 
 FName UWeaponSystemComponent::ResolveWeaponIDFromClass(TSubclassOf<AActor> InWeaponClass) const
 {
-	// 1. 유효성 검사 (입력값 및 DT 확인)
+	//유효성 검사 (입력값 및 DT 확인)
 	if (!InWeaponClass || !WeaponDataTable) return NAME_None;
 
-	// 2. 데이터 테이블의 모든 행(Row) 이름 가져오기
+	//데이터 테이블의 모든 행(Row) 이름 가져오기
 	TArray<FName> RowNames = WeaponDataTable->GetRowNames();
 
-	// 3. 반복문을 돌면서 클래스 비교 (역참조 방식)
+	//반복문을 돌면서 클래스 비교 (역참조 방식)
 	for (const FName& RowName : RowNames)
 	{
-		// 해당 행의 데이터 가져오기
+		//해당 행의 데이터 가져오기
 		FWeaponData* RowData = WeaponDataTable->FindRow<FWeaponData>(RowName, TEXT("ResolveWeaponID"));
 
-		// 데이터가 유효하고, 클래스가 일치하는지 확인
+		//데이터가 유효하고, 클래스가 일치하는지 확인
 		if (RowData && RowData->WeaponClass == InWeaponClass)
 		{
-			// 일치하는 행의 ID(RowName) 반환
+			//일치하는 행의 ID(RowName) 반환
 			return RowName;
 		}
 	}
 
-	// 4. 일치하는 무기가 없으면 None 반환
+	//일치하는 무기가 없으면 None 반환
 	return NAME_None;
 }
 
@@ -172,7 +172,7 @@ void UWeaponSystemComponent::Debug_TestWeapon(FName WeaponID)
 
 	UE_LOG(LogTemp, Warning, TEXT("=========== [Weapon Test Logic] ==========="));
 
-	// 1. 이미 가지고 있는지 확인
+	//이미 가지고 있는지 확인
 	if (HasWeapon(WeaponID))
 	{
 		// [강화] 가지고 있다면 -> 데미지 +5.0 강화 테스트

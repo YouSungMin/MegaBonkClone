@@ -27,7 +27,7 @@ public:
 	void SetStudioActor(AActor* InStudioActor);
 
 protected:
-	// 위젯이 생성될 때 실행되는 함수 (초기화)
+	
 	virtual void NativeConstruct() override;
 
 	// 버튼 클릭 시 실행될 함수
@@ -39,6 +39,7 @@ protected:
 
 	UFUNCTION()
 	void OnOpenChestClicked();
+
 	// 타이머가 끝나면 아이콘을 보여주는 함수
 	void ShowItemIcon();
 
@@ -67,10 +68,6 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ChestOpen", meta = (BindWidget))
 	TObjectPtr<UButton> Btn_Decline;
-
-	// [애니메이션 바인딩] (선택 사항)
-	//UPROPERTY(meta = (BindWidgetAnim), Transient)
-	//TObjectPtr<UWidgetAnimation> Anim_IconAppear;
 
 private:
 	// 촬영용 액터 참조
