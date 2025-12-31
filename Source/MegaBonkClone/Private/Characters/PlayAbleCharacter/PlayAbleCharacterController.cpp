@@ -25,7 +25,7 @@ void APlayAbleCharacterController::BeginPlay()
 	SetIgnoreLookInput(false);
 
 
-	UWidgetLayoutLibrary::RemoveAllWidgets(this);
+	//UWidgetLayoutLibrary::RemoveAllWidgets(this);
 
 	//매핑컨텍스트 추가를 위한 서브시스템 가져오기
 	UEnhancedInputLocalPlayerSubsystem* subsystem = 
