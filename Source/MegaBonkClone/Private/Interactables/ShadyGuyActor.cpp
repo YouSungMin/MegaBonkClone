@@ -7,6 +7,7 @@
 #include "Data/ItemDataStructs.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/WidgetComponent.h"
 #include "GameFramework/Character.h"
 
 // Sets default values
@@ -23,6 +24,21 @@ AShadyGuyActor::AShadyGuyActor()
 	ShadyGuyMesh->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 
 	ShadyGuyMesh->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
+	// 위젯 컴포넌트 생성 및 설정
+	InteractionWidgetComp = CreateDefaultSubobject<UWidgetComponent>(TEXT("InteractionWidget"));
+	InteractionWidgetComp->SetupAttachment(RootComponent); // 루트에 붙이기
+
+	// Screen 모드로 하면 카메라를 항상 정면으로 바라보고 크기가 일정하게 유지됨 (빌보드)
+	InteractionWidgetComp->SetWidgetSpace(EWidgetSpace::Screen);
+
+	// 위젯 크기 설정 (원하는 대로 조절)
+	InteractionWidgetComp->SetDrawAtDesiredSize(true);
+
+	// 위치를 아이템 머리 위로 살짝 올림 (Z축 +80)
+	InteractionWidgetComp->SetRelativeLocation(FVector(0.0f, 0.0f, 80.0f));
+
+	// 처음엔 안 보이게 숨김
+	InteractionWidgetComp->SetVisibility(false);
 }
 
 void AShadyGuyActor::ProcessPurchase(int32 ItemIndex)
@@ -272,4 +288,19 @@ void AShadyGuyActor::GenerateShopItems()
 	}
 
 	UE_LOG(LogTemp, Log, TEXT("ShadyGuy: Generated %d items for shop."), CurrentShopItems.Num());
+}
+void AShadyGuyActor::BeginFocus_Implementation()
+{
+	if (InteractionWidgetComp)
+	{
+		InteractionWidgetComp->SetVisibility(true);
+	}
+}
+
+void AShadyGuyActor::EndFocus_Implementation()
+{
+	if (InteractionWidgetComp)
+	{
+		InteractionWidgetComp->SetVisibility(false);
+	}
 }

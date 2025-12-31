@@ -27,12 +27,16 @@ protected:
 	virtual void BeginPlay() override;
 
 	virtual void Interact_Implementation(AActor* PlayerActor) override;
-
+	virtual void BeginFocus_Implementation() override;
+	virtual void EndFocus_Implementation() override;
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 private:
 	FName GetRandomItemID();
 protected:
+	//띄울 상호작용 키 위젯
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
+	TObjectPtr<class UWidgetComponent> InteractionWidgetComp;
 	// 등급별 등장 가중치 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loot Settings")
 	TMap<EItemGrade, float> TierProbabilities;
