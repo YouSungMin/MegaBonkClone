@@ -23,6 +23,8 @@ protected:
 
 	// 상호작용 인터페이스 구현
 	virtual void Interact_Implementation(AActor* PlayerActor) override;
+	virtual void BeginFocus_Implementation() override;
+	virtual void EndFocus_Implementation() override;
 
 private:
 	// 보스가 다처치되었을 실행될 함수
@@ -35,6 +37,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawning")
 	TSubclassOf<class AActor> BossClass;
 protected:
+	//띄울 상호작용 키 위젯
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
+	TObjectPtr<class UWidgetComponent> InteractionWidgetComp;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	USceneComponent* Root;
 

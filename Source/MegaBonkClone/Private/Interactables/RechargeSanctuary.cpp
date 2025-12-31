@@ -158,6 +158,7 @@ void ARechargeSanctuary::ApplySelectedReward(const FSanctuaryRewardInfo& RewardI
 			}
 		}
 	}
+	Destroy();
 }
 
 void ARechargeSanctuary::OnProximityBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

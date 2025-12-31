@@ -55,6 +55,8 @@ protected:
 	virtual void BeginPlay() override;
 
 	virtual void Interact_Implementation(AActor* PlayerActor) override;
+	virtual void BeginFocus_Implementation() override;
+	virtual void EndFocus_Implementation() override;
 private:
 	// 확률에 따라 등급을 결정하는 함수
 	void DetermineRarity();
@@ -65,6 +67,9 @@ private:
 	// 데이터 테이블에서 아이템을 뽑아오는 함수
 	void GenerateShopItems();
 protected:
+	//띄울 상호작용 키 위젯
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
+	TObjectPtr<class UWidgetComponent> InteractionWidgetComp;
 	// 기준점 더미 루트
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	USceneComponent* Root;

@@ -21,7 +21,14 @@ protected:
 	virtual void BeginPlay() override;
 
 	virtual void Interact_Implementation(AActor* PlayerActor) override;
+
+
+	virtual void BeginFocus_Implementation() override;
+	virtual void EndFocus_Implementation() override;
 protected:	
+	//띄울 상호작용 키 위젯
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
+	TObjectPtr<class UWidgetComponent> InteractionWidgetComp;
 	// 기준점 더미 루트
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	USceneComponent* Root;

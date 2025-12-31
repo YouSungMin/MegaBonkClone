@@ -13,5 +13,6 @@ void AGreedSanctuary::ApplyEffect_Implementation(AActor* Player)
 		statusComponent->AddShrineDifficulty(DifficultyAmount);
 		UE_LOG(LogTemp,Log,TEXT("Difficulty = %f"), statusComponent->GetResultDifficulty());
 		bIsUsed = true;
+		Destroy();
 	}
 }

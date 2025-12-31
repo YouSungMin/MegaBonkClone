@@ -27,6 +27,7 @@ void AMagneticSanctuary::ApplyEffect_Implementation(AActor* Player)
 	{
 		player->ActivateMagnetEffect();
 		bIsUsed = true;
+		Destroy();
 	}
 }
 

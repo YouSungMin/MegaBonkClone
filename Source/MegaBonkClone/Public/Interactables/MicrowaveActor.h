@@ -50,6 +50,9 @@ protected:
 	virtual void BeginPlay() override;
 	
 	virtual void Interact_Implementation(AActor* PlayerActor) override;
+	virtual void BeginFocus_Implementation() override;
+	virtual void EndFocus_Implementation() override;
+
 private:
 	void DetermineRarity();		// 등급 결정
 	void UpdateMeshTexture();	// 외형 적용
@@ -60,6 +63,10 @@ private:
 	// 완료된 아이템 수령 및 페널티 처리 함수
 	void RetrieveResult();
  protected:
+	 //띄울 상호작용 키 위젯
+	 UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
+	 TObjectPtr<class UWidgetComponent> InteractionWidgetComp;
+
 	 // 기준점 더미 루트
 	 UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	 USceneComponent* Root;
