@@ -91,6 +91,10 @@ protected:
 	//점프 입력 받으면 실행할 함수
 	UFUNCTION()
 	void OnJumpInput(const FInputActionValue& InValue);
+	//Esecape 입력 받으면 실행할 함수
+	UFUNCTION()
+	void OnPauseInput(const FInputActionValue& InValue);
+	
 	UFUNCTION()
 	void HandleDeathProgress(float Value);
 
@@ -100,12 +104,18 @@ protected:
 	UFUNCTION()
 	void ResetHitFlash();
 
+	//발자국 소리 재생 함수
+	void FootstepTick();
+	//사망 시 카메라 위에서보는시점으로 바꾸는함수
+	void ApplyDeathTopDownCamera();
+
 private:
 	// 시간정지 타이머 종료 시 실행
 	void OnStopwatchEnd(); 
 
 	// 무적 타이머 종료 시 실행
 	void OnInvincibleEnd();
+
 public:
 	
 	//캐릭터 데이터 테이블에서 Row 선택 변수
@@ -135,6 +145,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player|Input")
 	TObjectPtr<class UInputAction> IA_Interact = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player|Input")
+	TObjectPtr<class UInputAction> IA_Pause = nullptr;
 
 	//화면 연출 MPC
 	UPROPERTY(EditDefaultsOnly, Category = "Effects")
@@ -179,4 +192,26 @@ private:
 
 	FRotator DeathStartRot;
 	FRotator DeathEndRot;
+
+
+	//발자국 소리 타이머 
+	FTimerHandle FootstepTimerHandle;
+
+	// 죽을 때 카메라 시작/목표 회전
+	FRotator DeathCamStartRot;
+	FRotator DeathCamTargetRot;
+	FVector DeathCamStartSocketOffset;
+
+	UPROPERTY(EditAnywhere, Category = "Audio|Footstep")
+	float FootstepInterval = 0.35f;   // 발자국 간격
+
+	UPROPERTY(EditAnywhere, Category = "Audio|Footstep")
+	float MinMoveSpeedForFootstep = 10.f;
+
+	UPROPERTY(EditAnywhere, Category = "DeathCamera")
+	FRotator DeathCamArmRotation = FRotator(-90.f, 0.f, 0.f); // 위에서 직각
+
+	UPROPERTY(EditAnywhere, Category = "DeathCamera")
+	FVector DeathCamTargetSocketOffset = FVector(0.f, 150.f, 100.f); // Y로 위쪽 밀기(값은 튜닝)
+
 };

@@ -43,6 +43,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "UI")
 	void ClearCenterContent();
 
+	//업그레이드 애니메이션 재생함수
+	UFUNCTION(BlueprintCallable)
+	void SetUpgradeAnimEnabled(bool bEnabled);
+
 private:
 	//비전시 슬롯 캐싱
 	void CacheSecretSlots();
@@ -58,6 +62,8 @@ private:
 
 	UFUNCTION()
 	void HandleShieldChanged(float CurrentShield, float MaxShield);
+
+
 
 public:
 	//인벤토리 열림 상태 GETTER
@@ -94,11 +100,16 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget), Category = "UI|Inventory|Items")
 	TObjectPtr<class UUniformGridPanel> SecretSlotGridPanel = nullptr;
-
-
 	//에디터의 Named Slot과 바인딩
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Center",meta = (BindWidget))
 	TObjectPtr<UNamedSlot> CenterSlot = nullptr;
+
+	//업그레이드 오버레이 위젯
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UOverlay> LightOverlay;
+
+	UPROPERTY(Transient, meta = (BindWidgetAnim))
+	TObjectPtr<class UWidgetAnimation> LightAnim;
 
 
 private:
