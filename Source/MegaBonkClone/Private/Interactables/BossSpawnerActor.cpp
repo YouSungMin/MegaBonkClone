@@ -1,3 +1,4 @@
+
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
@@ -65,17 +66,25 @@ void ABossSpawnerActor::SpawnBosses(int32 Amount)
 		UE_LOG(LogTemp, Error, TEXT("BossClass가 할당되지 않음"));
 		return;
 	}
+	float MinRadius = 400.0f;
+	float MaxRadius = 800.0f;
 
 	for (int i = 0; i < Amount; i++)
 	{
 		// 보스 소환 함수
 
-		FVector SpawnLocation = GetActorLocation();
+		FVector RandomDir = FMath::VRand();
+		RandomDir.Z = 0.0f;
+		RandomDir.Normalize();
 
-		// 여러 마리가 겹치지 않게 약간씩 띄우기
-		SpawnLocation.X += FMath::RandRange(-300.0f, 300.0f);
-		SpawnLocation.Y += FMath::RandRange(-300.0f, 300.0f);
-		SpawnLocation.Z += 150.0f;
+		// 2. 최소~최대 반경 사이의 랜덤 거리 구하기
+		float RandomDist = FMath::RandRange(MinRadius, MaxRadius);
+
+		// 3. 최종 위치 계산 (스포너 위치 + (방향 * 거리))
+		FVector SpawnLocation = GetActorLocation() + (RandomDir * RandomDist);
+
+		// 바닥에 살짝 띄우기 (너무 높으면 NavMesh 못 찾을 수 있으니 적당히)
+		SpawnLocation.Z = GetActorLocation().Z + 100.0f;
 
 		FRotator SpawnRotation = GetActorRotation();
 

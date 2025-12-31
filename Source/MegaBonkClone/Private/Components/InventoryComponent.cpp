@@ -246,12 +246,10 @@ void UInventoryComponent::ExecuteProcEffect(const FItemProcData& Proc, int32 Sta
 
 	case EProcEffectType::FireProjectile:
 		// 플레이어의 무기 컴포넌트 등을 통해 발사하거나 직접 스폰
-		// (구현된 투사체 로직에 따라 다름)
 		break;
 
 	case EProcEffectType::ApplyStatus:
 		// 타겟에게 상태이상 부여
-		// TargetActor가 있고, 상태이상 인터페이스나 컴포넌트가 있는지 확인 후 적용
 		break;
 
 	case EProcEffectType::AreaExplosion:
@@ -287,8 +285,6 @@ void UInventoryComponent::ExecuteProcEffect(const FItemProcData& Proc, int32 Sta
 
 
 	case EProcEffectType::TemporaryBuffStat:
-		// StatusComponent에 "일시적 버프"를 거는 함수가 필요함
-		// 예: CachedStatusComponent->AddBuff(Proc.StatType, TotalValue, Proc.Duration);
 		UE_LOG(LogTemp,Log,TEXT("일시적 버프"));
 		break;
 
@@ -357,8 +353,7 @@ void UInventoryComponent::ProcessPassiveStats(const FItemData& ItemData, int32 C
 			{
 				float ApplyVal = FinalAddValue;
 
-				// [A] 비전서(SecretBook)
-				// -> StatusComponent 내부 로직에 맡기므로 값 그대로 전달
+				// 비전서(SecretBook)
 				if (ItemType == EItemType::SecretBook)
 				{
 					// 퍼센트 체크 (합연산)
@@ -368,12 +363,11 @@ void UInventoryComponent::ProcessPassiveStats(const FItemData& ItemData, int32 C
 					}
 					else
 					{
-						// 예: 체력 +50 -> 그대로 50 더함
 						ApplyVal = FinalAddValue;
 					}
 					VisionFunc(ApplyVal);
 				}
-				// [B] 일반 아이템(Player)
+				// 일반 아이템(Player)
 				else
 				{
 					// 퍼센트 체크 (합연산)
@@ -383,7 +377,6 @@ void UInventoryComponent::ProcessPassiveStats(const FItemData& ItemData, int32 C
 					}
 					else
 					{
-						// 예: 체력 +50 -> 그대로 50 더함
 						ApplyVal = FinalAddValue;
 					}
 					PlayerFunc(ApplyVal);
