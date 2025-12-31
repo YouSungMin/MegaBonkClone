@@ -111,7 +111,7 @@ void UTopDetailWidget::RefreshTimerText(float InMin, float InSec)
 
 void UTopDetailWidget::RefreshGoldCoinText(float InGold)
 {
-	FText goldCoinText = FText::AsNumber(InGold);
+	FText goldCoinText = FText::AsNumber(static_cast<int32>(InGold));
 
 	GoldCoinText->SetText(goldCoinText);
 }
