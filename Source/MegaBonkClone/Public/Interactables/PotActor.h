@@ -22,15 +22,7 @@ protected:
 	
 	// InteractionInterface 구현
 	virtual void Interact_Implementation(AActor* InstigatorActor) override;
-
-
-	virtual void BeginFocus_Implementation() override;
-	virtual void EndFocus_Implementation() override;
 protected:
-	//상호작용키
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
-	TObjectPtr<class UWidgetComponent> InteractionWidgetComp;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UStaticMeshComponent> PotMesh = nullptr;
 

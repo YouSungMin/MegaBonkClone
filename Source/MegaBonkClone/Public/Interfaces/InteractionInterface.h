@@ -25,12 +25,4 @@ public:
 	// 상호작용 함수
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interaction")
 	void Interact(AActor* InstigatorActor);
-
-	//시선이 고정되었을 때 (외곽선 켜기 / UI 켜기)
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interaction")
-	void BeginFocus();
-
-	//시선이 벗어났을 때 (외곽선 끄기 / UI 끄기)
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interaction")
-	void EndFocus();
 };

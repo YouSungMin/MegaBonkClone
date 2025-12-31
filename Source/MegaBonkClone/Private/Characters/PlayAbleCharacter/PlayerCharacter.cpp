@@ -30,7 +30,7 @@
 APlayerCharacter::APlayerCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	InitializeCharacterComponents();
 	
@@ -100,14 +100,6 @@ void APlayerCharacter::InitializeCharacterComponents()
 	DeathTimelineComp = CreateDefaultSubobject<UTimelineComponent>(TEXT("DeathTimelineComp"));
 	
 	
-}
-
-void APlayerCharacter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-
-	PerformInteractionTrace();
 }
 
 
@@ -339,47 +331,41 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 void APlayerCharacter::TryInteract()
 {
-	////검사할 오브젝트 타입류
-	//TArray<TEnumAsByte<EObjectTypeQuery>> objectTypes;
-	//objectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
-	//objectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_WorldDynamic));
+	//검사할 오브젝트 타입류
+	TArray<TEnumAsByte<EObjectTypeQuery>> objectTypes;
+	objectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
+	objectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_WorldDynamic));
 
-	////무시할 액터종류
-	//TArray<AActor*> ignoreActors;
-	//ignoreActors.Add(this);
+	//무시할 액터종류
+	TArray<AActor*> ignoreActors;
+	ignoreActors.Add(this);
 
-	//TArray<FHitResult> outResults;
+	TArray<FHitResult> outResults;
 
-	//UKismetSystemLibrary::SphereTraceMultiForObjects(
-	//	GetWorld(),
-	//	GetActorLocation(), 
-	//	GetActorLocation(),
-	//	100.0f, 
-	//	objectTypes, 
-	//	false, 
-	//	ignoreActors, 
-	//	EDrawDebugTrace::ForDuration, 
-	//	outResults, 
-	//	true, 
-	//	FLinearColor::Red,
-	//	FLinearColor::Green, 
-	//	5.0f);
+	UKismetSystemLibrary::SphereTraceMultiForObjects(
+		GetWorld(),
+		GetActorLocation(), 
+		GetActorLocation(),
+		100.0f, 
+		objectTypes, 
+		false, 
+		ignoreActors, 
+		EDrawDebugTrace::ForDuration, 
+		outResults, 
+		true, 
+		FLinearColor::Red,
+		FLinearColor::Green, 
+		5.0f);
 
-	//
-	//for (const auto& elements : outResults) {
-	//	if (IsValid(elements.GetActor())) {
-	//		//인터페이스 구현부 체크
-	//		if (elements.GetActor()->Implements<UInteractionInterface>()) {
-	//			IInteractionInterface::Execute_Interact(elements.GetActor(), this);
-	//			//UE_LOG(LogTemp, Warning, TEXT("상호작용 : %s"), *elements.GetActor()->GetName());
-	//		}
-	//	}
-	//}
-
-	if (FocusedActor)
-	{
-		IInteractionInterface::Execute_Interact(FocusedActor, this);
-		// UE_LOG(LogTemp, Log, TEXT("상호작용 실행: %s"), *FocusedActor->GetName());
+	
+	for (const auto& elements : outResults) {
+		if (IsValid(elements.GetActor())) {
+			//인터페이스 구현부 체크
+			if (elements.GetActor()->Implements<UInteractionInterface>()) {
+				IInteractionInterface::Execute_Interact(elements.GetActor(), this);
+				//UE_LOG(LogTemp, Warning, TEXT("상호작용 : %s"), *elements.GetActor()->GetName());
+			}
+		}
 	}
 }
 
@@ -509,78 +495,6 @@ void APlayerCharacter::OnInvincibleEnd()
 	bIsInvincible = false;
 	// TODO: 무적 이펙트 끄기
 	UE_LOG(LogTemp, Log, TEXT("무적 상태 종료."));
-}
-
-void APlayerCharacter::PerformInteractionTrace()
-{
-	// 1. 검사 설정
-	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
-	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
-	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_WorldDynamic));
-	// 필요하다면 PhysicsBody 등 추가
-
-	TArray<AActor*> IgnoreActors;
-	IgnoreActors.Add(this);
-
-	TArray<FHitResult> OutResults;
-	FVector Start = GetActorLocation();
-	FVector End = Start; // 제자리에서 구체 검사
-
-	// 2. 스피어 트레이스 실행
-	bool bHit = UKismetSystemLibrary::SphereTraceMultiForObjects(
-		GetWorld(),
-		Start,
-		End,
-		100.0f, // 감지 반경 (조절 가능)
-		ObjectTypes,
-		false,
-		IgnoreActors,
-		EDrawDebugTrace::None, // 디버깅 선 끄기 (테스트 땐 ForDuration 추천)
-		OutResults,
-		true
-	);
-
-	AActor* ClosestActor = nullptr;
-
-	// 3. 가장 가까운 상호작용 대상 찾기 (3개가 겹쳐도 문제 없도록)
-	if (bHit)
-	{
-		float MinDistanceSq = FLT_MAX;
-
-		for (const FHitResult& Result : OutResults)
-		{
-			AActor* HitActor = Result.GetActor();
-			if (HitActor && HitActor->Implements<UInteractionInterface>())
-			{
-				// 거리 제곱 비교 (연산 최적화)
-				float DistSq = FVector::DistSquared(GetActorLocation(), HitActor->GetActorLocation());
-				if (DistSq < MinDistanceSq)
-				{
-					MinDistanceSq = DistSq;
-					ClosestActor = HitActor;
-				}
-			}
-		}
-	}
-
-	// 4. 포커스 상태 변경 감지 (이전과 달라졌는가?)
-	if (ClosestActor != FocusedActor)
-	{
-		// 4-1. 이전에 보던 게 있으면 끄기
-		if (FocusedActor)
-		{
-			IInteractionInterface::Execute_EndFocus(FocusedActor);
-		}
-
-		// 4-2. 새로 발견한 게 있으면 켜기
-		if (ClosestActor)
-		{
-			IInteractionInterface::Execute_BeginFocus(ClosestActor);
-		}
-
-		// 4-3. 변수 갱신
-		FocusedActor = ClosestActor;
-	}
 }
 
 void APlayerCharacter::ActivateStopwatch(float Duration)

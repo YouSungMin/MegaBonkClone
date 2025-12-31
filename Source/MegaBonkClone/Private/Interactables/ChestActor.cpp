@@ -5,7 +5,6 @@
 #include "Framework/MainHUD.h"
 #include "Kismet/GameplayStatics.h"
 #include "Interfaces/InventoryOwner.h"
-#include "Components/WidgetComponent.h"
 #include "Components/BoxComponent.h"
 
 // Sets default values
@@ -23,22 +22,6 @@ AChestActor::AChestActor()
 	TriggerBox->SetupAttachment(RootComponent); // 루트(메시)에 부착
 	TriggerBox->SetBoxExtent(FVector(50.f, 50.f, 50.f)); // 크기 설정
 	TriggerBox->SetCollisionProfileName(TEXT("Trigger")); // 트리거 프리셋 사용
-
-
-	InteractionWidgetComp = CreateDefaultSubobject<UWidgetComponent>(TEXT("InteractionWidget"));
-	InteractionWidgetComp->SetupAttachment(RootComponent); // 루트에 붙이기
-
-	// ★핵심 설정: Screen 모드로 하면 카메라를 항상 정면으로 바라보고 크기가 일정하게 유지됨 (빌보드)
-	InteractionWidgetComp->SetWidgetSpace(EWidgetSpace::Screen);
-
-	// 위젯 크기 설정 (원하는 대로 조절)
-	InteractionWidgetComp->SetDrawAtDesiredSize(true);
-
-	// 위치를 아이템 머리 위로 살짝 올림 (Z축 +80)
-	InteractionWidgetComp->SetRelativeLocation(FVector(0.0f, 0.0f, 80.0f));
-
-	// 처음엔 안 보이게 숨김
-	InteractionWidgetComp->SetVisibility(false);
 }
 
 // Called when the game starts or when spawned
@@ -109,22 +92,6 @@ void AChestActor::Interact_Implementation(AActor* PlayerActor)
 
 	//상자 삭제 
 	Destroy();
-}
-
-void AChestActor::BeginFocus_Implementation()
-{
-	if (InteractionWidgetComp)
-	{
-		InteractionWidgetComp->SetVisibility(true);
-	}
-}
-
-void AChestActor::EndFocus_Implementation()
-{
-	if (InteractionWidgetComp)
-	{
-		InteractionWidgetComp->SetVisibility(false);
-	}
 }
 
 void AChestActor::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

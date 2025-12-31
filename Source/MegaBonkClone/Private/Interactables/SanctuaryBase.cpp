@@ -2,7 +2,6 @@
 
 
 #include "Interactables/SanctuaryBase.h"
-#include "Components/WidgetComponent.h"
 
 // Sets default values
 ASanctuaryBase::ASanctuaryBase()
@@ -17,45 +16,13 @@ ASanctuaryBase::ASanctuaryBase()
 	SantuaryMesh->SetupAttachment(Root);
 	SantuaryMesh->SetCollisionProfileName(TEXT("BlockAllDynamic"));
 	SantuaryMesh->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
-
-	InteractionWidgetComp = CreateDefaultSubobject<UWidgetComponent>(TEXT("InteractionWidget"));
-	InteractionWidgetComp->SetupAttachment(RootComponent); // 루트에 붙이기
-
-	// ★핵심 설정: Screen 모드로 하면 카메라를 항상 정면으로 바라보고 크기가 일정하게 유지됨 (빌보드)
-	InteractionWidgetComp->SetWidgetSpace(EWidgetSpace::Screen);
-
-	// 위젯 크기 설정 (원하는 대로 조절)
-	InteractionWidgetComp->SetDrawAtDesiredSize(true);
-
-	// 위치를 아이템 머리 위로 살짝 올림 (Z축 +80)
-	InteractionWidgetComp->SetRelativeLocation(FVector(0.0f, 0.0f, 80.0f));
-
-	// 처음엔 안 보이게 숨김
-	InteractionWidgetComp->SetVisibility(false);
 }
-
 
 // Called when the game starts or when spawned
 void ASanctuaryBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
-}
-
-void ASanctuaryBase::BeginFocus_Implementation()
-{
-	if (InteractionWidgetComp)
-	{
-		InteractionWidgetComp->SetVisibility(true);
-	}
-}
-
-void ASanctuaryBase::EndFocus_Implementation()
-{
-	if (InteractionWidgetComp)
-	{
-		InteractionWidgetComp->SetVisibility(false);
-	}
 }
 
 void ASanctuaryBase::Interact_Implementation(AActor* PlayerActor)

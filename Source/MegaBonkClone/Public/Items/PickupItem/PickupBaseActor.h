@@ -6,11 +6,10 @@
 #include "GameFramework/Actor.h"
 #include "Interfaces/ObjectPoolInterface.h"
 #include "Interfaces/PickupInterface.h"
-#include "Interfaces/InteractionInterface.h"
 #include "PickupBaseActor.generated.h"
 
 UCLASS()
-class MEGABONKCLONE_API APickupBaseActor : public AActor , public IPickupInterface, public IObjectPoolInterface, public IInteractionInterface
+class MEGABONKCLONE_API APickupBaseActor : public AActor , public IPickupInterface, public IObjectPoolInterface
 {
 	GENERATED_BODY()
 	
@@ -38,9 +37,6 @@ public:
 	virtual void OnPoolActivate_Implementation() override;
 	virtual void OnPoolDeactivate_Implementation() override;
 
-	virtual void BeginFocus_Implementation() override;
-	virtual void EndFocus_Implementation() override;
-
 	void EnablePickup();
 private:
 	UFUNCTION()
@@ -49,10 +45,6 @@ private:
 	UFUNCTION()
 	void OnTimelineFinished();
 protected:
-	//상호작용 키 위젯
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
-	TObjectPtr<class UWidgetComponent> InteractionWidgetComp;
-
 	// 물리 적용용 루트
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<class USphereComponent> BaseRoot = nullptr;
