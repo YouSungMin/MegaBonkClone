@@ -145,3 +145,13 @@ enum class EMicrowaveState : uint8
 	Cooking     UMETA(DisplayName = "조리 중"),
 	Completed   UMETA(DisplayName = "조리 완료 (수령 대기)")
 };
+
+// 몬스터 등급
+UENUM(BlueprintType)
+enum class EEnemyRank : uint8
+{
+	None,
+	Normal		UMETA(DisplayName = "일반"),
+	Elite		UMETA(DisplayName = "엘리트"),
+	Boss		UMETA(DisplayName = "보스")
+};
