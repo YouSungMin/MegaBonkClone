@@ -85,11 +85,11 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "DataTable")
 	TObjectPtr<UDataTable> ItemDataTable = nullptr;
 
-	// 2. 비전서 슬롯 (최대 3개)
+	// 비전서 슬롯
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory|SecretBooks")
 	TArray<FInventorySlot> SecretBookSlots;
 
-	// 3. 일반 아이템 (무한)
+	// 일반 아이템 슬롯
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory|Items")
 	TArray<FInventorySlot> GeneralItems;
 

@@ -38,8 +38,8 @@ void URewardSystemComponent::GenerateLevelUpRewards()
 	}
 
 	// 슬롯 여유 확인
-	bool bCanNewWeapon = (WeaponComp->GetCurrentWeaponCount() < 3);
-	bool bCanNewBook = (InventoryComp->GetSecretBookSlots().Num() < 3);
+	bool bCanNewWeapon = (WeaponComp->GetCurrentWeaponCount() < MaxSlots);
+	bool bCanNewBook = (InventoryComp->GetSecretBookSlots().Num() < MaxSlots);
 
 	TArray<FRewardOption> Pool;
 
@@ -108,7 +108,7 @@ void URewardSystemComponent::GenerateLevelUpRewards()
 	// 랜덤 3개 선정
 	// =========================================================
 	TArray<FRewardOption> FinalRewards;
-	int32 PickNum = FMath::Min(Pool.Num(), 3);
+	int32 PickNum = FMath::Min(Pool.Num(), MaxChoiceSlots);
 
 	for (int32 i = 0; i < PickNum; ++i)
 	{

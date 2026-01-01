@@ -108,5 +108,7 @@ protected:
 	// 등급별 스탯 증가 배율
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")
 	TMap<EItemGrade, float> GradeMultipliers;
-		
+private:
+	int32 MaxSlots = 3;
+	int32 MaxChoiceSlots = 3;
 };
