@@ -5,6 +5,7 @@
 #include "Components/InventoryComponent.h"
 #include <Characters/Components/StatusComponent.h>
 #include "Components/WidgetComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Framework/MainHUD.h"
 
 // Sets default values
@@ -48,10 +49,12 @@ void AMicrowaveActor::StartCooking(FName SelectedItemID)
 	// SpendGold가 false를 반환하면(돈 부족) 중단
 	if (Status && Status->SpendGold(GoldCost))
 	{
+		MicroWaveNotifyToHUD(FString::Printf(TEXT("%d 골드 사용, 조리 시작"), GoldCost));
 		UE_LOG(LogTemp, Log, TEXT("%d 골드 사용, 조리 시작"), GoldCost);
 	}
 	else
 	{
+		MicroWaveNotifyToHUD(FString::Printf(TEXT("결제 실패: 골드가 부족합니다.")));
 		UE_LOG(LogTemp, Warning, TEXT("결제 실패: 골드가 부족합니다."));
 		return;
 	}
@@ -81,12 +84,14 @@ void AMicrowaveActor::StartCooking(FName SelectedItemID)
 
 		// 인벤토리 컴포넌트에 구현한 RemoveItem 호출
 		Inventory->RemoveItem(TargetDeleteID, 1);
+		MicroWaveNotifyToHUD(FString::Printf(TEXT("등가교환 발생! 사라진 아이템: %s"), *TargetDeleteID.ToString()));
 		UE_LOG(LogTemp, Warning, TEXT("등가교환 발생! 사라진 아이템: %s"), *TargetDeleteID.ToString());
 
 	}
 	// 2. 타이머 시작 (지정된 시간 후 OnCookingFinished 호출)
 	GetWorldTimerManager().SetTimer(CookingTimerHandle, this, &AMicrowaveActor::OnCookingFinished, CookTime, false);
 
+	MicroWaveNotifyToHUD(FString::Printf(TEXT("전자레인지 가동 시작!(대상: % s, 소요시간 : % .1f초"), *SavedItemID.ToString(), CookTime));
 	UE_LOG(LogTemp, Log, TEXT("전자레인지 가동 시작! (대상: %s, 소요시간: %.1f초)"), *SavedItemID.ToString(), CookTime);
 
 	// (옵션) UI 닫기, 가동 사운드 재생 등
@@ -179,9 +184,21 @@ void AMicrowaveActor::UpdateMeshTexture()
 void AMicrowaveActor::OnCookingFinished()
 {
 	CurrentState = EMicrowaveState::Completed;
+	MicroWaveNotifyToHUD(FString::Printf(TEXT("조리 완료! 상호작용하여 아이템을 꺼내세요.")));
 	UE_LOG(LogTemp, Log, TEXT("조리 완료! 상호작용하여 아이템을 꺼내세요."));
 
 	// 소리 재생, 파티클 이펙트 등
+}
+
+void AMicrowaveActor::MicroWaveNotifyToHUD(FString Message)
+{
+	if (APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0))
+	{
+		if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
+		{
+			HUD->ShowInteractionFail(FText::FromString(Message));
+		}
+	}
 }
 
 void AMicrowaveActor::RetrieveResult()
@@ -215,6 +232,7 @@ void AMicrowaveActor::Interact_Implementation(AActor* PlayerActor)
 		if (Status->GetCurrentGold() < GoldCost)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("골드가 부족합니다! (필요: %d, 보유: %.0f)"), GoldCost, Status->GetCurrentGold());
+			MicroWaveNotifyToHUD(FString::Printf(TEXT("골드가 부족합니다! (필요: %d, 보유: %.0f)"), GoldCost, Status->GetCurrentGold()));
 			// 여기에 "골드가 부족합니다" 같은 UI 메시지를 띄우는 로직 추가 가능
 			return;
 		}
@@ -245,12 +263,14 @@ void AMicrowaveActor::Interact_Implementation(AActor* PlayerActor)
 		if (FilteredList.Num() < 2)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("복사에 필요한 아이템이 부족합니다"), (int32)CurrentRarity);
+			MicroWaveNotifyToHUD(FString::Printf(TEXT("복사에 필요한 아이템이 부족합니다")));
 			return;
 		}
 
 		if (FilteredList.Num() == 0)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("등급(%d)에 맞는 아이템이 인벤토리에 없습니다."), (int32)CurrentRarity);
+			MicroWaveNotifyToHUD(FString::Printf(TEXT("등급(%d)에 맞는 아이템이 인벤토리에 없습니다."), (int32)CurrentRarity));
 			return;
 		}
 

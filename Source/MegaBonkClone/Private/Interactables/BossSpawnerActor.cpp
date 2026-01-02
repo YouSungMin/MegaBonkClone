@@ -5,6 +5,7 @@
 #include "Interactables/BossSpawnerActor.h"
 #include "Framework/MegaBonkGameState.h"
 #include "Kismet/GameplayStatics.h"
+#include "Framework/MainHUD.h"
 #include "Components/WidgetComponent.h"
 // Sets default values
 ABossSpawnerActor::ABossSpawnerActor()
@@ -112,11 +113,23 @@ void ABossSpawnerActor::SpawnBosses(int32 Amount)
 
 		if (NewBoss)
 		{
+			NotifyToHUD(FString::Printf(TEXT("보스 %d명 소환!!"), i + 1));
 			UE_LOG(LogTemp, Log, TEXT("보스 %d 마리 소환 성공: %s"), (i + 1), *NewBoss->GetName());
 		}
 	}
 	UE_LOG(LogTemp, Log, TEXT("보스 %d 마리 소환 "), GameState->GetBossSummonCount());
 	GameState->AddAliveBossCount(Amount);
+}
+
+void ABossSpawnerActor::NotifyToHUD(FString Message)
+{
+	if (APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0))
+	{
+		if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
+		{
+			HUD->ShowInteractionFail(FText::FromString(Message));
+		}
+	}
 }
 
 void ABossSpawnerActor::OnBossClear()

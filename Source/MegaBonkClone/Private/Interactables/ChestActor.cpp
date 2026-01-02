@@ -76,6 +76,7 @@ void AChestActor::Interact_Implementation(AActor* PlayerActor)
 
 		if (!bPaymentSuccess)
 		{
+			ChestNotifyToHUD(FString::Printf(TEXT("돈이 부족합니다!")));
 			UE_LOG(LogTemp, Warning, TEXT("돈이 부족합니다!"));
 			return;
 		}
@@ -191,5 +192,16 @@ FName AChestActor::GetRandomItemID()
 	}
 	
 	return Candidates.Last().ItemID;
+}
+
+void AChestActor::ChestNotifyToHUD(FString Message)
+{
+	if (APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0))
+	{
+		if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
+		{
+			HUD->ShowInteractionFail(FText::FromString(Message));
+		}
+	}
 }
 

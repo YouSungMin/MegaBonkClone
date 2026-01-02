@@ -60,6 +60,9 @@ private:
 	UFUNCTION()
 	void OnCookingFinished();
 
+
+	void MicroWaveNotifyToHUD(FString Message);
+
 	// 완료된 아이템 수령 및 페널티 처리 함수
 	void RetrieveResult();
  protected:

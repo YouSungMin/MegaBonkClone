@@ -49,6 +49,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "UI")
 	void ShowGameClear();
 
+	UFUNCTION(BlueprintCallable, Category = "UI")
+	void ShowInteractionFail(FText Message);
+
 	UFUNCTION(BlueprintCallable)
 	void ShowPauseWidget();
 

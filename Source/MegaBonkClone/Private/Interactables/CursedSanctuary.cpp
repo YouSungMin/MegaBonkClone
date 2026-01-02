@@ -16,6 +16,7 @@ void ACursedSanctuary::ApplyEffect_Implementation(AActor* Player)
     {
         // 3. 카운트 증가 함수 호출
         MyGameState->IncreaseBossSummonCount();
+        SanNotifyToHUD(FString::Printf(TEXT("저주의 제단 활성화됨!")));
         Destroy();
         // (선택) 제단 비활성화나 이펙트 재생 로직
         UE_LOG(LogTemp, Log, TEXT("저주의 제단 활성화됨!"));

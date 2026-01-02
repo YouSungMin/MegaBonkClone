@@ -47,6 +47,13 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetUpgradeAnimEnabled(bool bEnabled);
 
+	//알림 텍스트
+	UFUNCTION(BlueprintCallable, Category = "UI")
+	void PlayNotificationText(FText Message);
+
+	UFUNCTION(BlueprintCallable, Category = "UI")
+	void ClearNotificationText();
+
 private:
 	//비전시 슬롯 캐싱
 	void CacheSecretSlots();
@@ -80,6 +87,9 @@ private:
 	TArray<TObjectPtr<class USecretBookSlotWidget>> SecretSlotWidgets;
 
 protected:
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidget), Category = "Notification")
+	TObjectPtr<class UTextBlock> NoticeText;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Resource", meta = (BindWidget))
 	TObjectPtr<class UResourceBarWidget> ShieldBar = nullptr;
 
@@ -110,6 +120,8 @@ protected:
 
 	UPROPERTY(Transient, meta = (BindWidgetAnim))
 	TObjectPtr<class UWidgetAnimation> LightAnim;
+
+	FTimerHandle NoticeTimerHandle;
 
 
 private:

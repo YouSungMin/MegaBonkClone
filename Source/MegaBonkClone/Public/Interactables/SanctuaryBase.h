@@ -25,6 +25,8 @@ protected:
 
 	virtual void BeginFocus_Implementation() override;
 	virtual void EndFocus_Implementation() override;
+
+	void SanNotifyToHUD(FString Message);
 protected:	
 	//띄울 상호작용 키 위젯
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")

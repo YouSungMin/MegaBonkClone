@@ -27,6 +27,7 @@ void AMagneticSanctuary::ApplyEffect_Implementation(AActor* Player)
 	{
 		player->ActivateMagnetEffect();
 		bIsUsed = true;
+		SanNotifyToHUD(FString::Printf(TEXT("자석의 제단 활성화됨!")));
 		Destroy();
 	}
 }

@@ -17,6 +17,8 @@ public:
 	// Sets default values for this actor's properties
 	ABossSpawnerActor();
 
+
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -33,6 +35,8 @@ private:
 
 	// 보스를 파라미터의 값만큼 소환하는 함수
 	void SpawnBosses(int32 Amount);
+
+	void NotifyToHUD(FString Message);
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawning")
 	TSubclassOf<class AActor> BossClass;

@@ -10,6 +10,7 @@
 #include "Components/InventoryComponent.h"	
 #include "Data/ItemDataStructs.h"
 #include "Components/UniformGridPanel.h"
+#include "Components/TextBlock.h"
 #include "Components/Overlay.h"
 #include "UI/Inventory/SecretBookSlotWidget.h"
 #include "UI/ResourceBarWidget.h"
@@ -195,5 +196,29 @@ void UMainHudWidget::SetUpgradeAnimEnabled(bool bEnabled)
 			StopAnimation(LightAnim);
 		}
 		LightOverlay->SetVisibility(ESlateVisibility::Collapsed);
+	}
+}
+
+void UMainHudWidget::PlayNotificationText(FText Message)
+{
+	if (NoticeText)
+	{
+		NoticeText->SetText(Message);
+		NoticeText->SetVisibility(ESlateVisibility::HitTestInvisible); // 다시 보이게 설정
+	}
+
+	if (GetWorld())
+	{
+		GetWorld()->GetTimerManager().ClearTimer(NoticeTimerHandle);
+		GetWorld()->GetTimerManager().SetTimer(NoticeTimerHandle, this, &UMainHudWidget::ClearNotificationText, 3.0f, false);
+	}
+}
+
+void UMainHudWidget::ClearNotificationText()
+{
+	if (NoticeText)
+	{
+		NoticeText->SetText(FText::GetEmpty());
+		NoticeText->SetVisibility(ESlateVisibility::Collapsed);
 	}
 }

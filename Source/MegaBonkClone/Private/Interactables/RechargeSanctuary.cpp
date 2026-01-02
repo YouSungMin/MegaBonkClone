@@ -5,6 +5,8 @@
 #include "Components/SphereComponent.h"
 #include "Characters/PlayAbleCharacter/PlayerCharacter.h"
 #include "TimerManager.h"
+#include "Components/CapsuleComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Characters/Components/StatusComponent.h"
 #include "Framework/MainHUD.h"
 #include "Data/TypeEnums.h"
@@ -165,18 +167,24 @@ void ARechargeSanctuary::OnProximityBeginOverlap(UPrimitiveComponent* Overlapped
 {
 	if (!bIsUsed)
 	{
+		if (OtherComp == UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)->GetCapsuleComponent()) {
+
+
 			UE_LOG(LogTemp, Log, TEXT("충전 시작"), ChargeTime);
 			if (!OtherActor->IsA(APlayerCharacter::StaticClass()))
 			{
 				return;
 			}
+			SanNotifyToHUD(FString::Printf(TEXT("충전 시작")));
 			OverlappingPlayer = OtherActor;
 
 			// 타이머 시작 //자동시작 막기
 			GetWorldTimerManager().SetTimer(ChargeTimerHandle, this, &ARechargeSanctuary::OnChargeComplete, ChargeTime, false);
-	}
+		}
+		}
 	else
 	{
+		SanNotifyToHUD(FString::Printf(TEXT("이미 사용한 성소입니다")));
 		UE_LOG(LogTemp, Log, TEXT("이미 사용한 성소입니다"));
 	}
 }
@@ -189,7 +197,7 @@ void ARechargeSanctuary::OnProximityEndOverlap(UPrimitiveComponent* OverlappedCo
 		// 타이머 취소
 		GetWorldTimerManager().ClearTimer(ChargeTimerHandle);
 		OverlappingPlayer = nullptr;
-
+		SanNotifyToHUD(FString::Printf(TEXT("범위를 벗어나 충전이 취소되었습니다.")));
 		UE_LOG(LogTemp, Log, TEXT("범위를 벗어나 충전이 취소되었습니다."));
 	}
 }
@@ -271,7 +279,6 @@ void ARechargeSanctuary::OnChargeComplete()
 	{
 			OnRewardsGenerated.Broadcast(FinalRewards, this);
 	}
-
 	//bIsCharging = false;
 }
 

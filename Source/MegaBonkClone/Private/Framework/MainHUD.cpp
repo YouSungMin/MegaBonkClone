@@ -314,6 +314,16 @@ void AMainHUD::ShowGameClear()
 	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.001f);
 }
 
+void AMainHUD::ShowInteractionFail(FText Message)
+{
+	if (MainWidgetInstance)
+	{
+		MainWidgetInstance->PlayNotificationText(Message);
+	}
+}
+
+
+
 void AMainHUD::ShowPauseWidget()
 {
 	APlayerController* PC = GetOwningPlayerController();

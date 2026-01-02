@@ -13,6 +13,7 @@ void AGreedSanctuary::ApplyEffect_Implementation(AActor* Player)
 		statusComponent->AddShrineDifficulty(DifficultyAmount);
 		UE_LOG(LogTemp,Log,TEXT("Difficulty = %f"), statusComponent->GetResultDifficulty());
 		bIsUsed = true;
+		SanNotifyToHUD(FString::Printf(TEXT("탐욕의 제단 활성화됨!")));
 		Destroy();
 	}
 }

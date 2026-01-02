@@ -3,6 +3,8 @@
 
 #include "Interactables/SanctuaryBase.h"
 #include "Components/WidgetComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Framework/MainHUD.h"
 // Sets default values
 ASanctuaryBase::ASanctuaryBase()
 {
@@ -68,6 +70,17 @@ void ASanctuaryBase::EndFocus_Implementation()
 	if (InteractionWidgetComp)
 	{
 		InteractionWidgetComp->SetVisibility(false);
+	}
+}
+
+void ASanctuaryBase::SanNotifyToHUD(FString Message)
+{
+	if (APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0))
+	{
+		if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
+		{
+			HUD->ShowInteractionFail(FText::FromString(Message));
+		}
 	}
 }
 
