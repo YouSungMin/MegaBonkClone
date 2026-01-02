@@ -29,30 +29,35 @@ void ADamageTextActor::BeginPlay()
 
 void ADamageTextActor::SetDamageValue(float DamageAmount)
 {
-	SetActorHiddenInGame(false);
-
-	//위젯 컴포넌트가 렌더링 준비를 마칠 시간을 주기 위해 '다음 틱'에 실행합니다.
-	// 람다 함수를 사용하여 안전하게 처리합니다.
+	SetActorHiddenInGame(true);
 
 	TWeakObjectPtr<ADamageTextActor> WeakThis = this;
 
 	GetWorld()->GetTimerManager().SetTimerForNextTick([WeakThis, DamageAmount]()
-	{
-		// 액터가 소멸되지 않았는지 확인
-		if (!WeakThis.IsValid()) return;
-
-		ADamageTextActor* Self = WeakThis.Get();
-
-		// 위젯 가져오기
-		if (UDamageValueWidget* Widget = Cast<UDamageValueWidget>(Self->DamageWidgetComp->GetUserWidgetObject()))
 		{
-			// 여기서 애니메이션 재생 (초기화 및 Play)
-			float AnimDuration = Widget->PlayDamagePopup(DamageAmount);
+			// 액터 유효성 검사
+			if (!WeakThis.IsValid()) return;
 
-			//애니메이션 끝나는 시간에 맞춰 반납 타이머 설정
-			Self->GetWorld()->GetTimerManager().SetTimer(Self->DestroyTimerHandle, Self, &ADamageTextActor::ReturnToPool, AnimDuration, false);
-		}
-	});
+			ADamageTextActor* Self = WeakThis.Get();
+
+			// 위젯 가져오기
+			if (UDamageValueWidget* Widget = Cast<UDamageValueWidget>(Self->DamageWidgetComp->GetUserWidgetObject()))
+			{
+				// 1. 먼저 값을 세팅하고 애니메이션 준비
+				float AnimDuration = Widget->PlayDamagePopup(DamageAmount);
+
+				// 2. [핵심] 값이 바뀐 것이 확정된 후 보이게 설정
+				Self->SetActorHiddenInGame(false);
+
+				// 3. 반납 타이머 설정
+				Self->GetWorld()->GetTimerManager().SetTimer(Self->DestroyTimerHandle, Self, &ADamageTextActor::ReturnToPool, AnimDuration, false);
+			}
+			else
+			{
+				// 혹시 위젯을 못 찾았으면 그냥 즉시 반납 (안전장치)
+				Self->ReturnToPool();
+			}
+		});
 }
 
 void ADamageTextActor::OnPoolActivate_Implementation()

@@ -13,6 +13,8 @@ float UDamageValueWidget::PlayDamagePopup(float Damage)
     {
         DamageText->SetText(FText::AsNumber(FMath::RoundToInt(Damage)));
         // 텍스트 블록 자체에 애니메이션이 걸려있다면 초기화
+        DamageText->ForceLayoutPrepass();
+
         DamageText->SetRenderOpacity(1.0f);
         DamageText->SetRenderTransform(FWidgetTransform());
     }
