@@ -46,6 +46,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "UI")
 	void ShowGameOver();
 
+	UFUNCTION(BlueprintCallable, Category = "UI")
+	void ShowGameClear();
+
 	UFUNCTION(BlueprintCallable)
 	void ShowPauseWidget();
 
@@ -67,6 +70,14 @@ protected:
 
 	UPROPERTY()
 	TObjectPtr<UUserWidget> GameOverWidgetInstance = nullptr;
+
+	//게임클리어 위젯클래스
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
+	TSubclassOf<UUserWidget> GameClearWidgetClass = nullptr;
+
+	UPROPERTY()
+	TObjectPtr<UUserWidget> GameClearWidgetInstance = nullptr;
+
 
 
 	//에디터에서 WBP_ChestPopup을 할당할 변수

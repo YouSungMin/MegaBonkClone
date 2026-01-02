@@ -7,7 +7,7 @@
 #include "UI/Shop/MicroShopWidget.h"
 #include "UI/Shop/ShadyStoreShopWidget.h"
 #include "UI/Shop/UpgradeShopWidget.h"
-
+#include "Framework/MegaBonkGameState.h"
 #include "Kismet/GameplayStatics.h"
 #include "Characters/PlayAbleCharacter/PlayAbleCharacterController.h"
 
@@ -31,6 +31,11 @@ void AMainHUD::BeginPlay()
 				pc->InitializeMainHudWidget(MainWidgetInstance);
 			}
 		}
+	}
+
+	if (AMegaBonkGameState* GameState = GetWorld()->GetGameState<AMegaBonkGameState>())
+	{
+		GameState->OnAllBossesDead.AddDynamic(this, &AMainHUD::ShowGameClear);
 	}
 	
 
@@ -274,6 +279,31 @@ void AMainHUD::ShowGameOver()
 	if (GameOverWidgetInstance && !GameOverWidgetInstance->IsInViewport())
 	{
 		GameOverWidgetInstance->AddToViewport(9999);
+	}
+
+	// UI 입력으로 전환 (버튼 클릭되게)
+	PC->SetShowMouseCursor(true);
+	PC->SetInputMode(FInputModeUIOnly());
+
+	// 게임멈춤
+	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.001f);
+}
+
+void AMainHUD::ShowGameClear()
+{
+	APlayerController* PC = GetOwningPlayerController();
+	if (!PC || !GameClearWidgetClass) return;
+
+	// 아직 없으면 생성
+	if (!GameClearWidgetInstance)
+	{
+		GameClearWidgetInstance = CreateWidget<UUserWidget>(PC, GameClearWidgetClass);
+	}
+
+	// 화면에 올리기 (항상 맨 위)
+	if (GameClearWidgetInstance && !GameClearWidgetInstance->IsInViewport())
+	{
+		GameClearWidgetInstance->AddToViewport(9999);
 	}
 
 	// UI 입력으로 전환 (버튼 클릭되게)

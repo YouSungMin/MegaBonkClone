@@ -3,6 +3,7 @@
 
 #include "Framework/MegaBonkGameState.h"
 #include "NavigationSystem.h"
+#include "Framework/MainHUD.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 AMegaBonkGameState::AMegaBonkGameState()
@@ -30,6 +31,7 @@ bool AMegaBonkGameState::IsOvertime() const
 void AMegaBonkGameState::BeginPlay()
 {
 	Super::BeginPlay();
+
 	SpawnProps();
 }
 
@@ -64,7 +66,7 @@ void AMegaBonkGameState::OnBossDied()
 		if (OnAllBossesDead.IsBound())
 		{
 			OnAllBossesDead.Broadcast();
-			UE_LOG(LogTemp, Warning, TEXT("모든 보스 처치 완료! 다음 스테이지 개방 신호 전송!"));
+			UE_LOG(LogTemp, Warning, TEXT("모든 보스 처치 완료!"));
 		}
 	}
 }
