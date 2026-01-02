@@ -73,14 +73,13 @@ void AMegaBonkGameState::CheckWaveLogic()
 {
 	if (!WaveDataTable) return;
 
-	// ... (기존 데이터 테이블 조회 코드 유지) ...
 	static const FString ContextString(TEXT("WaveContext"));
 	TArray<FStageWaveInfo*> AllRows;
 	WaveDataTable->GetAllRows<FStageWaveInfo>(ContextString, AllRows);
 
 	for (FStageWaveInfo* Row : AllRows)
 	{
-		// [중요] 데이터 테이블의 시간과 현재 절대 시간 비교
+		//데이터 테이블의 시간과 현재 절대 시간 비교
 		if (StageTimer >= Row->StartTime && StageTimer < (Row->StartTime + Row->Duration))
 		{
 			if (GetWorld()->GetTimeSeconds() - LastSpawnTime >= Row->SpawnInterval)
@@ -112,9 +111,6 @@ void AMegaBonkGameState::CheckOvertimeLogic()
 	}
 }
 
-// =========================================================
-// [핵심] 랜덤 위치 찾기 & 스폰
-// =========================================================
 void AMegaBonkGameState::SpawnEnemy(TSubclassOf<AActor> EnemyClass)
 {
 	// 플레이어 주변에서 스폰 (도넛 모양 범위)
@@ -142,7 +138,7 @@ void AMegaBonkGameState::SpawnEnemy(TSubclassOf<AActor> EnemyClass)
 
 void AMegaBonkGameState::SpawnProps()
 {
-	// 1. [생성 목록 만들기] 비율에 맞춰서 "무엇을 소환할지" 리스트를 미리 만듭니다.
+	//비율에 맞춰서 "무엇을 소환할지" 리스트를 미리 만듭니다.
 	TArray<TSubclassOf<AActor>> SpawnDeck;
 
 	int32 CurrentCount = 0;
@@ -161,7 +157,7 @@ void AMegaBonkGameState::SpawnProps()
 		CurrentCount += CountForThisType;
 	}
 
-	//반올림 오차 등으로 전체 개수가 모자라면, 첫 번째 항목(보통 가장 흔한 항아리)으로 채웁니다.
+	//반올림 오차 등으로 전체 개수가 모자라면, 항아리로 채웁니다.
 	if (SpawnDeck.Num() < TotalPropCount && PropSpawnRules.Num() > 0)
 	{
 		int32 MissingCount = TotalPropCount - SpawnDeck.Num();
@@ -171,22 +167,7 @@ void AMegaBonkGameState::SpawnProps()
 		}
 	}
 
-	// 2.목록을 무작위로 섞습니다. (항아리, 항아리, 상자... 순서를 섞음)
-	if (SpawnDeck.Num() > 0)
-	{
-		// Fisher-Yates Shuffle 알고리즘 (언리얼 내장 기능 이용)
-		const int32 LastIndex = SpawnDeck.Num() - 1;
-		for (int32 i = 0; i <= LastIndex; ++i)
-		{
-			int32 Index = FMath::RandRange(i, LastIndex);
-			if (i != Index)
-			{
-				SpawnDeck.Swap(i, Index);
-			}
-		}
-	}
-
-	// 3.섞인 목록을 하나씩 꺼내서 맵에 배치합니다.
+	//목록을 하나씩 꺼내서 맵에 배치합니다.
 	for (TSubclassOf<AActor> PropClassToSpawn : SpawnDeck)
 	{
 		FVector SpawnLoc;
@@ -195,11 +176,6 @@ void AMegaBonkGameState::SpawnProps()
 		{
 			// 위치 찾기에 성공하면 스폰
 			GetWorld()->SpawnActor<AActor>(PropClassToSpawn, SpawnLoc, FRotator::ZeroRotator);
-		}
-		else
-		{
-			// 위치를 못 찾았을 경우 로그 (원한다면 다시 시도하는 로직 추가 가능)
-			// UE_LOG(LogTemp, Warning, TEXT("Failed to find valid location for Prop"));
 		}
 	}
 
@@ -224,7 +200,7 @@ void AMegaBonkGameState::SpawnProps()
 
 	//플레이어 주변 안전 구역 반경 (예: 2000.0f = 20미터)
 	const float SafeRadius = 2000.0f;
-	const int32 MaxSpawnAttempts = 10; // 위치 찾기 최대 시도 횟수 (무한 루프 방지)
+	const int32 MaxSpawnAttempts = 20; // 위치 찾기 최대 시도 횟수 (무한 루프 방지)
 
 	// 보스 제단 배치
 	for (int32 i = 0; i < BossSpawnerCount; i++)
@@ -234,7 +210,7 @@ void AMegaBonkGameState::SpawnProps()
 		FVector SpawnLoc;
 		bool bFoundValidLoc = false;
 
-		// [수정] 유효한 위치를 찾을 때까지 몇 번 재시도
+		//유효한 위치를 찾을 때까지 몇 번 재시도
 		for (int32 Attempt = 0; Attempt < MaxSpawnAttempts; Attempt++)
 		{
 			if (GetRandomLocationOnNavMesh(SpawnLoc))
@@ -270,15 +246,15 @@ bool AMegaBonkGameState::GetRandomLocationOnNavMesh(FVector& OutLocation)
 	UNavigationSystemV1* NavSystem = UNavigationSystemV1::GetCurrent(GetWorld());
 	if (!NavSystem) return false;
 
-	//맵의 크기 정의 (예: 가로세로 12000 크기의 사각형 맵이라 가정)
-	// BoxExtent는 절반 크기이므로 6000으로 설정
+	//맵의 크기 정의
+	//BoxExtent는 절반 크기이므로 6000으로 설정
 	FVector MapOrigin = FVector::ZeroVector;
 	FVector BoxExtent = FVector(6000.0f, 6000.0f, 0.0f); // Z는 무시
 
 	//박스 안에서 완전 랜덤한 지점 생성
 	FVector RandomPoint = UKismetMathLibrary::RandomPointInBoundingBox(MapOrigin, BoxExtent);
 
-	//그 랜덤 지점을 내비게이션 메쉬 위로 투영 (Project)
+	//그 랜덤 지점을 내비게이션 메쉬 위치 값으로 변환
 	FNavLocation ResultLocation;
 
 	// QueryExtent: 검색할 때 높이 여유값 (Z축으로 얼마나 위아래를 찾을지)
